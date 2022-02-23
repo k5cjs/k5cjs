@@ -1,0 +1,179 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Lint, cypress tests and builds
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  pull_request:
+    branches:
+      - 'master'
+
+# Ensure only one workflow per branch is running
+concurrency:
+  group: ci-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  install:
+    name: Install npm packages
+    runs-on: ubuntu-20.04
+    timeout-minutes: 3
+    strategy:
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Node cache
+        id: node-cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install a project with a clean slate
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-20.04
+    timeout-minutes: 2
+    needs: install
+    strategy:
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Node cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Prettier
+        run: npm run format:prettier
+
+  build-libs:
+    name: Build all libraries
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    needs: install
+    strategy:
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Node cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Dist cache
+        uses: ./.github/actions/dist-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Build libraries
+        run: npm run build:libs:prod
+
+  stylelint:
+    name: Stylelint
+    runs-on: ubuntu-20.04
+    timeout-minutes: 1
+    needs: install
+    strategy:
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Node cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Stylelint
+        run: npm run format:stylelint
+
+  eslint:
+    name: Eslint
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    needs: [prettier, build-libs]
+    strategy:
+      fail-fast: true
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Node cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Dist cache
+        uses: ./.github/actions/dist-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Cache eslint
+        uses: actions/cache@v2
+        with:
+          path: ./.eslintcache
+          key: ${{ runner.os }}-eslint-v3-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-eslint-v3-
+
+      - name: Eslint
+        run: npm run format:eslint
+
+  tests:
+    name: Unit tests
+    runs-on: ubuntu-20.04
+    timeout-minutes: 10
+    needs: [stylelint, eslint]
+    strategy:
+      fail-fast: true
+      matrix:
+        node-version: [16.14.0]
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Node cache
+        uses: ./.github/actions/node-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Dist cache
+        uses: ./.github/actions/dist-cache
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Tests
+        run: npm run tests
+
+      - name: Comment Test Coverage
+        uses: AthleticNet/comment-test-coverage@1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ./coverage/rxjs/coverage-summary.json
+          title: Karma Test Coverage

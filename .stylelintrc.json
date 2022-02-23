@@ -1,0 +1,100 @@
+{
+  "extends": ["stylelint-config-standard-scss", "stylelint-config-recess-order"],
+  "rules": {
+    "no-empty-source": null,
+    "declaration-block-no-duplicate-properties": true,
+    "color-named": "never",
+    "function-url-no-scheme-relative": true,
+    "function-url-scheme-disallowed-list": ["ftp", "/^http/", "/^www/", "//"],
+    "keyframes-name-pattern": "Anim[A-Z].+",
+    "number-max-precision": 3,
+    "unit-disallowed-list": ["ms"],
+    "shorthand-property-no-redundant-values": true,
+    "value-no-vendor-prefix": true,
+    "custom-property-pattern": "var-[a-z]+(?:-[a-z]+)*$",
+    "property-no-vendor-prefix": true,
+    "declaration-block-no-redundant-longhand-properties": [
+      true,
+      {
+        "ignoreShorthands": ["/flex-/", "/grid-/"]
+      }
+    ],
+    "declaration-no-important": true,
+    "selector-class-pattern": [
+      "^(?:(?:o|c|u|t|s|is|has|_|js|qa)-)?[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*(?:__[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:--[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)?(?:\\[.+\\])?$",
+      {
+        "resolveNestedSelectors": true
+      }
+    ],
+    "selector-pseudo-element-no-unknown": [
+      true,
+      {
+        "ignorePseudoElements": ["ng-deep"]
+      }
+    ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["first"]
+      }
+    ],
+    "selector-max-attribute": 1,
+    "selector-max-class": 3,
+    "selector-max-combinators": 3,
+    "selector-max-compound-selectors": 4,
+    "selector-max-id": 0,
+    "selector-max-pseudo-class": 4,
+    "selector-max-specificity": "0,3,0",
+    "selector-max-type": 2,
+    "selector-max-universal": 4,
+    "selector-no-qualifying-type": true,
+    "selector-no-vendor-prefix": true,
+    "media-feature-name-no-vendor-prefix": true,
+    "custom-media-pattern": "med-.+",
+    "at-rule-no-vendor-prefix": true,
+    "max-nesting-depth": 4,
+    "no-unknown-animations": true,
+    "font-family-name-quotes": "always-unless-keyword",
+    "font-weight-notation": "numeric",
+    "function-url-quotes": "never",
+    "number-leading-zero": "always",
+    "string-quotes": "single",
+    "length-zero-no-unit": true,
+    "value-keyword-case": [
+      "lower",
+      {
+        "ignoreKeywords": ["/^A[0-9]+/"]
+      }
+    ],
+    "selector-attribute-quotes": "always",
+    "selector-list-comma-newline-after": "always-multi-line",
+    "selector-list-comma-space-after": "always-single-line",
+    "at-rule-name-newline-after": "always-multi-line",
+    "at-rule-semicolon-space-before": "never",
+    "linebreaks": "unix",
+    "max-line-length": 120,
+    "no-empty-first-line": true,
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "function",
+          "for",
+          "if",
+          "each",
+          "include",
+          ".theme",
+          "mixin",
+          "tailwind",
+          "apply",
+          "variants",
+          "responsive",
+          "screen"
+        ]
+      }
+    ],
+    "scss/at-import-partial-extension": "never",
+    "declaration-block-trailing-semicolon": null,
+    "no-descending-specificity": null
+  }
+}

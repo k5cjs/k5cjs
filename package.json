@@ -1,12 +1,26 @@
 {
   "name": "k5cjs",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "config": {
+    "files_stylelint": "./projects/{*.scss,**/*.scss}"
+  },
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "serve": "ng serve --host 0.0.0.0 --port 4200",
+    "build:libs": "node ci/build-libraries.mjs",
+    "build:libs:prod": "node ci/build-libraries.mjs --prod",
+    "build:libs:clean": "run-s clear:dist build:libs",
+    "format:prettier": "node ./ci/prettier.mjs",
+    "format:prettier:fix": "npm run format:prettier -- --fix",
+    "format:eslint": "node ./ci/lint.mjs",
+    "format:eslint:fix": "npm run format:eslint -- --fix",
+    "format:stylelint": "stylelint $npm_package_config_files_stylelint",
+    "format:stylelint:fix": "npm run format:stylelint -- --fix",
+    "format": "run-s format:prettier format:eslint format:stylelint",
+    "format:fix": "run-s format:prettier:fix format:eslint:fix format:stylelint:fix",
+    "test:rxjs": "ng test rxjs",
+    "tests": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
+    "coverage:rxjs": "http-server ./coverage/rxjs -p 4200"
   },
   "private": true,
   "dependencies": {
@@ -23,16 +37,38 @@
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "~13.2.4",
+    "@angular-eslint/builder": "13.1.0",
+    "@angular-eslint/eslint-plugin": "13.1.0",
+    "@angular-eslint/eslint-plugin-template": "13.1.0",
+    "@angular-eslint/schematics": "13.1.0",
+    "@angular-eslint/template-parser": "13.1.0",
     "@angular/cli": "~13.2.4",
     "@angular/compiler-cli": "~13.2.0",
     "@types/jasmine": "~3.10.0",
     "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "5.11.0",
+    "@typescript-eslint/parser": "5.11.0",
+    "eslint": "^8.2.0",
+    "eslint-config-prettier": "^8.4.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-sort-export-all": "^1.2.1",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
     "karma-coverage": "~2.1.0",
+    "karma-coverage-istanbul-reporter": "^3.0.3",
+    "karma-firefox-launcher": "^2.1.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "~1.7.0",
-    "typescript": "~4.5.2"
+    "ng-packagr": "^13.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.5.1",
+    "stylelint": "^14.5.1",
+    "stylelint-config-recess-order": "^3.0.0",
+    "stylelint-config-standard-scss": "^3.0.0",
+    "typescript": "~4.5.2",
+    "zx": "^5.1.0"
   }
 }

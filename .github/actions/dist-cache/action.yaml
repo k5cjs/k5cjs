@@ -1,0 +1,19 @@
+name: "Dist cache"
+description: "Get last dist is exists"
+
+inputs:
+  node-version:
+    description: "Node version to use"
+    required: true
+    default: lts/*
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache dist
+      uses: actions/cache@v2
+      with:
+        path: ./dist
+        key: ${{ runner.os }}-dist-v1-${{ inputs.node-version }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-dist-v1-${{ inputs.node-version }}-

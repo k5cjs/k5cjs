@@ -3,5 +3,49 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "rxjs": {
+      "projectType": "library",
+      "root": "projects/rxjs",
+      "sourceRoot": "projects/rxjs/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/rxjs/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/rxjs/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/rxjs/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/rxjs/src/test.ts",
+            "tsConfig": "projects/rxjs/tsconfig.spec.json",
+            "karmaConfig": "projects/rxjs/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/rxjs/**/*.ts",
+              "projects/rxjs/**/*.html"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "rxjs",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
   }
 }

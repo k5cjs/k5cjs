@@ -1,0 +1,20 @@
+name: "Select environment"
+description: "Check tag version to select the right environment"
+
+outputs:
+  version:
+    description: "Forward actions/environment version output"
+    value: ${{ steps.environment.outputs.version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get environment version
+      id: environment
+      run: |
+        if [[ "${{ github.ref_name }}" =~ ^[0-9]+.[0-9]+.[0-9]+$ ]]; then
+          echo "::set-output name=version::prod"
+        elif [[ "${{ github.ref_name }}" =~ ^[0-9]+.[0-9]+.[0-9]+.rc[0-9]+$ ]]; then
+          echo "::set-output name=version::dev"
+        fi
+      shell: bash
