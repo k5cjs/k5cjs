@@ -15,6 +15,7 @@ process.env.FORCE_COLOR = 3;
 const commands = [
   [
     { name: Libs.Rxjs, needs: [] },
+    { name: Libs.Forms, needs: [] },
   ],
 ];
 

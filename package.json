@@ -18,9 +18,11 @@
     "format:stylelint:fix": "npm run format:stylelint -- --fix",
     "format": "run-s format:prettier format:eslint format:stylelint",
     "format:fix": "run-s format:prettier:fix format:eslint:fix format:stylelint:fix",
-    "test:rxjs": "ng test rxjs",
+    "test:rxjs": "ng test rxjs --browsers=Firefox --code-coverage",
+    "test:forms": "ng test forms --browsers=Firefox --code-coverage",
     "tests": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
-    "coverage:rxjs": "http-server ./coverage/rxjs -p 4200"
+    "coverage:rxjs": "http-server ./coverage/rxjs -p 4200",
+    "coverage:forms": "http-server ./coverage/forms -p 4200"
   },
   "private": true,
   "dependencies": {
@@ -54,6 +56,7 @@
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-sort-export-all": "^1.2.1",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "http-server": "^14.1.0",
     "jasmine-core": "~4.0.0",
     "karma": "~6.3.0",
     "karma-chrome-launcher": "~3.1.0",
