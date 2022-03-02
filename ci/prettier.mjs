@@ -21,6 +21,7 @@ ${fix} \
 
 const libs = [
   Libs.Rxjs,
+  Libs.Forms,
 ];
 
 const apps = [];

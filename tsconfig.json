@@ -17,7 +17,8 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "paths": {
-      "@k5cjs/rxjs": ["dist/rxjs/rxjs", "dist/rxjs"]
+      "@k5cjs/rxjs": ["dist/rxjs/rxjs", "dist/rxjs"],
+      "@k5cjs/forms": ["dist/forms/forms", "dist/forms"]
     },
     "target": "es2017",
     "module": "es2020",
