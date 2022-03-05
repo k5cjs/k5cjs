@@ -18,7 +18,8 @@
     "importHelpers": true,
     "paths": {
       "@k5cjs/rxjs": ["dist/rxjs/rxjs", "dist/rxjs"],
-      "@k5cjs/forms": ["dist/forms/forms", "dist/forms"]
+      "@k5cjs/forms": ["dist/forms/forms", "dist/forms"],
+      "@k5cjs/tables": ["dist/tables/tables", "dist/tables"]
     },
     "target": "es2017",
     "module": "es2020",
