@@ -20,13 +20,16 @@
     "format:fix": "run-s format:prettier:fix format:eslint:fix format:stylelint:fix",
     "test:rxjs": "ng test rxjs --browsers=Firefox --code-coverage",
     "test:forms": "ng test forms --browsers=Firefox --code-coverage",
+    "test:tables": "ng test tables --browsers=Firefox --code-coverage",
     "tests": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
     "coverage:rxjs": "http-server ./coverage/rxjs -p 4200",
-    "coverage:forms": "http-server ./coverage/forms -p 4200"
+    "coverage:forms": "http-server ./coverage/forms -p 4200",
+    "coverage:tables": "http-server ./coverage/tables -p 4200"
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "~13.2.0",
+    "@angular/cdk": "^13.2.3",
     "@angular/common": "~13.2.0",
     "@angular/compiler": "~13.2.0",
     "@angular/core": "~13.2.0",
