@@ -1,6 +1,17 @@
 import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { Injectable, NgZone } from '@angular/core';
-import { Observable, Subject, combineLatest, distinctUntilChanged, map, shareReplay, withLatestFrom } from 'rxjs';
+import {
+  Observable,
+  ReplaySubject,
+  asapScheduler,
+  combineLatest,
+  distinctUntilChanged,
+  map,
+  observeOn,
+  share,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 
 @Injectable()
 export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
@@ -11,9 +22,9 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private bufferSize!: number;
   private viewport!: CdkVirtualScrollViewport;
 
-  private readonly indexChange = new Subject<number>();
+  private readonly indexChange = new ReplaySubject<number>();
 
-  constructor(private ngZone: NgZone) {
+  constructor(private _ngZone: NgZone) {
     this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
   }
 
@@ -32,7 +43,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   onDataLengthChanged(): void {
-    if (this.viewport) this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.rowHeight);
+    this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.rowHeight);
+    this.updateContent();
   }
 
   onContentRendered(): void {
@@ -44,19 +56,41 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   scrollToIndex(index: number, behavior?: ScrollBehavior): void {
-    if (this.viewport) this.viewport.scrollToOffset(index * this.rowHeight + this.headerHeight, behavior);
+    this.viewport.scrollToOffset(index * this.rowHeight + this.headerHeight, behavior);
   }
 
   setScrollHeight(headerHeight: number, rowHeight: number, bufferSize: number): void {
     this.headerHeight = headerHeight;
     this.rowHeight = rowHeight;
     this.bufferSize = bufferSize;
-    this.updateContent();
   }
 
-  getViewportElements<T>(source: Observable<T[]>, get: () => void, sourceTotal: Observable<number>): Observable<T[]> {
-    return combineLatest([source, this.scrolledIndexChange]).pipe(
+  getViewportElements<T>(
+    source: Observable<T[]>,
+    sourceTotal: Observable<number>,
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    get: () => void = () => {},
+  ): Observable<T[]> {
+    get();
+
+    let skipGet = true;
+
+    return combineLatest([
+      //
+      source.pipe(
+        /**
+         * we reset the skipGet flag when the source changed
+         * because is meaning that the previous getting is completed
+         */
+        tap(() => (skipGet = false)),
+      ),
+      this.scrolledIndexChange,
+    ]).pipe(
       withLatestFrom(sourceTotal),
+      /**
+       * if source is changed before cdkVirtualForOf
+       */
+      observeOn(asapScheduler),
       map(([[items, firstIndex], total]) => {
         const offsetHeight = this.viewport.getViewportSize();
 
@@ -104,49 +138,69 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
          *
          * 100 - (4 + 7) < 4
          */
-        if (length - (firstIndexRow + range) < this.bufferSize && length < total)
+        if (
+          /**
+           * if size of the source is 0 we skip getting the items
+           * because we call getting items at the bigging of the function
+           * and the result it was empty
+           */
+          length &&
+          /**
+           * check if the source has not reached the end
+           */
+          length < total &&
+          /**
+           * check that the rest of the item length minus the sum of the items displayed in the viewport
+           * plus the position where the display starts is less than the buffer to be displayed.
+           */
+          length - (firstIndexRow + range) < this.bufferSize &&
+          /**
+           * skip to get items because getting items is in progress
+           */
+          !skipGet
+        ) {
+          skipGet = true;
           /**
            * execute function when the index of the first element visible in the viewport changes.
            */
-          void Promise.resolve().then(() => this.ngZone.run(() => get()));
+          void Promise.resolve().then(() => this._ngZone.run(() => get()));
+        }
 
         return items.slice(start, end);
       }),
-      shareReplay(1),
+      share(),
     );
   }
 
   private updateContent() {
-    if (this.viewport) {
-      /**
-       * scroll position in pixels
-       */
-      const scrollOffset = this.viewport.measureScrollOffset();
-      /**
-       * we delete the header to calculate how many rows there are
-       *
-       * scrollOffset   335px
-       * header         35px
-       * row            30px
-       *
-       * remove header height
-       * 335 - 35 = 300px
-       * 300 / 30 = 10
-       * start at row 10 + 1
-       */
-      const firstIndex = Math.max(0, Math.trunc((scrollOffset - this.headerHeight) / this.rowHeight + 1));
-      /**
-       * if the start is smaller than the size of the buffer,
-       * then it means that no item will be removed and we will return the start
-       */
-      const firstIndexRow = firstIndex - 1;
-      const startBuffer = Math.min(firstIndexRow, this.bufferSize);
-      const removedItems = firstIndexRow - startBuffer;
-      const removedItemsSize = removedItems * this.rowHeight;
+    /**
+     * scroll position in pixels
+     */
+    const scrollOffset = this.viewport.measureScrollOffset();
+    /**
+     * we delete the header to calculate how many rows there are
+     *
+     * scrollOffset   335px
+     * header         35px
+     * row            30px
+     *
+     * remove header height
+     * 335 - 35 = 300px
+     * 300 / 30 = 10
+     * start at row 10 + 1
+     */
+    const firstIndex = Math.max(0, Math.trunc((scrollOffset - this.headerHeight) / this.rowHeight + 1));
+    /**
+     * if the start is smaller than the size of the buffer,
+     * then it means that no item will be removed and we will return the start
+     */
+    const firstIndexRow = firstIndex - 1;
+    const startBuffer = Math.min(firstIndexRow, this.bufferSize);
+    const removedItems = firstIndexRow - startBuffer;
+    const removedItemsSize = removedItems * this.rowHeight;
 
-      this.viewport.setRenderedContentOffset(removedItemsSize);
+    this.viewport.setRenderedContentOffset(removedItemsSize);
 
-      this.indexChange.next(firstIndex);
-    }
+    this.indexChange.next(firstIndex);
   }
 }
