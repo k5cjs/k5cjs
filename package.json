@@ -21,10 +21,12 @@
     "test:rxjs": "ng test rxjs --browsers=Firefox --code-coverage",
     "test:forms": "ng test forms --browsers=Firefox --code-coverage",
     "test:tables": "ng test tables --browsers=Firefox --code-coverage",
+    "test:scroll": "ng test scroll --browsers=Firefox --code-coverage",
     "tests": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
     "coverage:rxjs": "http-server ./coverage/rxjs -p 4200",
     "coverage:forms": "http-server ./coverage/forms -p 4200",
-    "coverage:tables": "http-server ./coverage/tables -p 4200"
+    "coverage:tables": "http-server ./coverage/tables -p 4200",
+    "coverage:scroll": "http-server ./coverage/scroll -p 4200"
   },
   "private": true,
   "dependencies": {
