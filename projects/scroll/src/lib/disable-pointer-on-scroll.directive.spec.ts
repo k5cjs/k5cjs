@@ -22,10 +22,10 @@ describe('SelectionModel', () => {
   });
 
   it('default time', (done) => {
-    component.element(1).scrollIntoView({ behavior: 'smooth' });
+    component.element(10).scrollIntoView();
     setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 50);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 600);
-    setTimeout(() => done(), 610);
+    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 200);
+    setTimeout(() => done(), 210);
   });
 
   it('custom time', (done) => {
@@ -35,11 +35,11 @@ describe('SelectionModel', () => {
 
     const component = fixture.componentInstance;
 
-    component.element(1).scrollIntoView({ behavior: 'smooth' });
+    component.element(10).scrollIntoView();
     setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 50);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 1800);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 1900);
-    setTimeout(() => done(), 1910);
+    setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 1450);
+    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 1550);
+    setTimeout(() => done(), 1560);
   });
 });
 
@@ -77,7 +77,7 @@ class DummyComponent {
   list: string[];
 
   constructor() {
-    this.list = Array.from({ length: 20 }).map(() => '');
+    this.list = Array.from({ length: 50 }).map(() => '');
   }
 
   pointerEvents(): string {
@@ -123,7 +123,7 @@ class Dummy2Component {
   list: string[];
 
   constructor() {
-    this.list = Array.from({ length: 20 }).map(() => '');
+    this.list = Array.from({ length: 50 }).map(() => '');
   }
 
   pointerEvents(): string {

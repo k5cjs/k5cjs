@@ -25,13 +25,11 @@ export class DisablePointerOnScrollDirective {
 
     clearTimeout(this._timer);
 
-    console.log('set to none');
-
     this._el.nativeElement.style.pointerEvents = 'none';
 
-    this._timer = setTimeout(() => {
-      this._el.nativeElement.style.pointerEvents = 'initial';
-      console.log('remove', this.k5cDisablePointerOnScroll);
-    }, this.k5cDisablePointerOnScroll);
+    this._timer = setTimeout(
+      () => (this._el.nativeElement.style.pointerEvents = 'initial'),
+      this.k5cDisablePointerOnScroll,
+    );
   };
 }
