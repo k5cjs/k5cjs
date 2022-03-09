@@ -23,8 +23,8 @@ describe('SelectionModel', () => {
 
   it('default time', (done) => {
     component.element(10).scrollIntoView();
-    setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 50);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 200);
+    setTimeout(() => expect(component.className()).toContain('k5c-disable-pointer-on-scroll'), 50);
+    setTimeout(() => expect(component.className()).not.toContain('k5c-disable-pointer-on-scroll'), 200);
     setTimeout(() => done(), 210);
   });
 
@@ -36,9 +36,10 @@ describe('SelectionModel', () => {
     const component = fixture.componentInstance;
 
     component.element(10).scrollIntoView();
-    setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 50);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('none'), 1450);
-    setTimeout(() => expect(component.pointerEvents()).toEqual('initial'), 1550);
+
+    setTimeout(() => expect(component.className()).toContain('k5c-disable-pointer-on-scroll'), 50);
+    setTimeout(() => expect(component.className()).toContain('k5c-disable-pointer-on-scroll'), 1450);
+    setTimeout(() => expect(component.className()).not.toContain('k5c-disable-pointer-on-scroll'), 1550);
     setTimeout(() => done(), 1560);
   });
 });
@@ -80,8 +81,8 @@ class DummyComponent {
     this.list = Array.from({ length: 50 }).map(() => '');
   }
 
-  pointerEvents(): string {
-    return this.container.nativeElement.style.getPropertyValue('pointer-events');
+  className(): string {
+    return this.container.nativeElement.className;
   }
 
   element(index: number): HTMLElement {
@@ -126,8 +127,8 @@ class Dummy2Component {
     this.list = Array.from({ length: 50 }).map(() => '');
   }
 
-  pointerEvents(): string {
-    return this.container.nativeElement.style.getPropertyValue('pointer-events');
+  className(): string {
+    return this.container.nativeElement.className;
   }
 
   element(index: number): HTMLElement {
