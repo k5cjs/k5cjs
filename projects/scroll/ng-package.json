@@ -3,5 +3,6 @@
   "dest": "../../dist/scroll",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "assets": ["prebuilt.css"]
 }

@@ -1,5 +1,5 @@
 import { NumberInput, coerceNumberProperty } from '@angular/cdk/coercion';
-import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 
 @Directive({
   selector: '[k5cDisablePointerOnScroll]',
@@ -18,17 +18,17 @@ export class DisablePointerOnScrollDirective {
 
   private _timer!: ReturnType<typeof setTimeout>;
 
-  constructor(private _el: ElementRef<HTMLElement>) {}
+  constructor(private _el: ElementRef<HTMLElement>, private _renderer: Renderer2) {}
 
   @HostListener('scroll', ['$event']) onclick = () => {
     this.scrollPosition.emit(this._el.nativeElement.scrollTop);
 
     clearTimeout(this._timer);
 
-    this._el.nativeElement.style.pointerEvents = 'none';
+    this._renderer.addClass(this._el.nativeElement, 'k5c-disable-pointer-on-scroll');
 
     this._timer = setTimeout(
-      () => (this._el.nativeElement.style.pointerEvents = 'initial'),
+      () => this._renderer.removeClass(this._el.nativeElement, 'k5c-disable-pointer-on-scroll'),
       this.k5cDisablePointerOnScroll,
     );
   };

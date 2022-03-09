@@ -1,0 +1,3 @@
+.k5c-disable-pointer-on-scroll * {
+  pointer-events: none;
+}
