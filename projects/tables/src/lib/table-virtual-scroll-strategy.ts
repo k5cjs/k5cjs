@@ -20,7 +20,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private headerHeight!: number;
   private rowHeight!: number;
   private bufferSize!: number;
-  private viewport!: CdkVirtualScrollViewport;
+  private viewport!: CdkVirtualScrollViewport | undefined;
 
   private readonly indexChange = new ReplaySubject<number>();
 
@@ -30,8 +30,9 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
   attach(viewport: CdkVirtualScrollViewport): void {
     this.viewport = viewport;
-    this.onDataLengthChanged();
-    this.updateContent();
+
+    this._updateContentSize();
+    this._updateContent();
   }
 
   detach(): void {
@@ -39,12 +40,14 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   onContentScrolled(): void {
-    this.updateContent();
+    this._updateContent();
   }
 
   onDataLengthChanged(): void {
-    this.viewport.setTotalContentSize(this.viewport.getDataLength() * this.rowHeight);
-    this.updateContent();
+    if (!this.viewport) return;
+
+    this._updateContentSize();
+    this._updateContent();
   }
 
   onContentRendered(): void {
@@ -56,6 +59,8 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   }
 
   scrollToIndex(index: number, behavior?: ScrollBehavior): void {
+    if (!this.viewport) return;
+
     this.viewport.scrollToOffset(index * this.rowHeight + this.headerHeight, behavior);
   }
 
@@ -92,9 +97,9 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
        */
       observeOn(asapScheduler),
       map(([[items, firstIndex], total]) => {
-        const offsetHeight = this.viewport.getViewportSize();
+        const offsetHeight = this.viewport!.getViewportSize();
 
-        const length = this.viewport.getDataLength();
+        const length = this.viewport!.getDataLength();
         /**
          * the number of items that can be viewed in the viewport
          */
@@ -108,7 +113,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
         const start = Math.max(0, firstIndexRow - this.bufferSize);
         const end = Math.min(length, firstIndexRow + range + this.bufferSize);
 
-        this.viewport.setRenderedRange({ start, end });
+        this.viewport!.setRenderedRange({ start, end });
         /**
          *  buffer  = 4
          *  range   = 7
@@ -172,11 +177,15 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     );
   }
 
-  private updateContent() {
+  private _updateContentSize(): void {
+    this.viewport!.setTotalContentSize(this.viewport!.getDataLength() * this.rowHeight);
+  }
+
+  private _updateContent() {
     /**
      * scroll position in pixels
      */
-    const scrollOffset = this.viewport.measureScrollOffset();
+    const scrollOffset = this.viewport!.measureScrollOffset();
     /**
      * we delete the header to calculate how many rows there are
      *
@@ -199,7 +208,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     const removedItems = firstIndexRow - startBuffer;
     const removedItemsSize = removedItems * this.rowHeight;
 
-    this.viewport.setRenderedContentOffset(removedItemsSize);
+    this.viewport!.setRenderedContentOffset(removedItemsSize);
 
     this.indexChange.next(firstIndex);
   }
