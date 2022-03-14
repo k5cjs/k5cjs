@@ -12,7 +12,7 @@ describe('SelectionModel', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [DummyComponent, Dummy2Component, Dummy3Component],
+      declarations: [DummyComponent, Dummy2Component, Dummy3Component, Dummy4Component, Dummy5Component],
       imports: [ScrollingModule, CdkTableModule],
       providers: [DummyStoreService],
     }).compileComponents();
@@ -328,6 +328,50 @@ describe('SelectionModel', () => {
       step++;
     });
   });
+
+  it('default items', (done) => {
+    const fixture = TestBed.createComponent(Dummy4Component);
+    const component = fixture.componentInstance;
+
+    component.setConfig({
+      viewportHeight: 300,
+      viewportWidth: 500,
+      headerHeight: 40,
+      rowHeight: 30,
+      buffer: 5,
+    });
+
+    fixture.detectChanges();
+
+    component.dataSource$.pipe().subscribe((items) => {
+      fixture.detectChanges();
+
+      expect(items.length).toEqual(3);
+      done();
+    });
+  });
+
+  it('scroll before rendering', (done) => {
+    const fixture = TestBed.createComponent(Dummy5Component);
+    const component = fixture.componentInstance;
+
+    component.setConfig({
+      viewportHeight: 300,
+      viewportWidth: 500,
+      headerHeight: 40,
+      rowHeight: 30,
+      buffer: 5,
+    });
+
+    fixture.detectChanges();
+
+    component.dataSource$.pipe().subscribe((items) => {
+      fixture.detectChanges();
+
+      expect(items.length).toEqual(3);
+      done();
+    });
+  });
 });
 
 interface Item {
@@ -395,9 +439,7 @@ class DummyStoreService {
   }
 }
 
-@Component({
-  selector: 'lib-dummy',
-  template: `
+const template = `
     <!-- virtual scroll container -->
     <cdk-virtual-scroll-viewport [style.height.px]="viewportHeight" [style.width.px]="viewportWidth" class="viewport">
       <!-- table -->
@@ -435,7 +477,11 @@ class DummyStoreService {
         </ng-template>
       </table>
     </cdk-virtual-scroll-viewport>
-  `,
+  `;
+
+@Component({
+  selector: 'lib-dummy',
+  template,
   styles: [
     `
       .viewport {
@@ -516,45 +562,7 @@ class DummyComponent {
 
 @Component({
   selector: 'lib-dummy-2',
-  template: `
-    <!-- virtual scroll container -->
-    <cdk-virtual-scroll-viewport [style.height.px]="viewportHeight" [style.width.px]="viewportWidth" class="viewport">
-      <!-- table -->
-      <table cdk-table [dataSource]="dataSource$">
-        <ng-container cdkColumnDef="id">
-          <!-- headers -->
-          <th cdk-header-cell *cdkHeaderCellDef [style.height.px]="headerHeight">id</th>
-
-          <!-- columns -->
-          <td *cdkCellDef="let element" [style.height.px]="rowHeight">
-            <ng-container>{{ element.id }}</ng-container>
-          </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="name">
-          <!-- headers -->
-          <th cdk-header-cell *cdkHeaderCellDef [style.height.px]="headerHeight">name</th>
-
-          <!-- columns -->
-          <td *cdkCellDef="let element" [style.height.px]="rowHeight">
-            <ng-container>{{ element.name }}</ng-container>
-          </td>
-        </ng-container>
-
-        <tr cdk-header-row *cdkHeaderRowDef="['id', 'name']"></tr>
-
-        <ng-template
-          let-row
-          cdkRowDef
-          cdkVirtualFor
-          [cdkRowDefColumns]="['id', 'name']"
-          [cdkVirtualForOf]="virtualDataSource$"
-        >
-          <tr cdk-row></tr>
-        </ng-template>
-      </table>
-    </cdk-virtual-scroll-viewport>
-  `,
+  template,
   styles: [
     `
       .viewport {
@@ -653,45 +661,7 @@ class Dummy2Component {
 
 @Component({
   selector: 'lib-dummy',
-  template: `
-    <!-- virtual scroll container -->
-    <cdk-virtual-scroll-viewport [style.height.px]="viewportHeight" [style.width.px]="viewportWidth" class="viewport">
-      <!-- table -->
-      <table cdk-table [dataSource]="dataSource$">
-        <ng-container cdkColumnDef="id">
-          <!-- headers -->
-          <th cdk-header-cell *cdkHeaderCellDef [style.height.px]="headerHeight">id</th>
-
-          <!-- columns -->
-          <td *cdkCellDef="let element" [style.height.px]="rowHeight">
-            <ng-container>{{ element.id }}</ng-container>
-          </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="name">
-          <!-- headers -->
-          <th cdk-header-cell *cdkHeaderCellDef [style.height.px]="headerHeight">name</th>
-
-          <!-- columns -->
-          <td *cdkCellDef="let element" [style.height.px]="rowHeight">
-            <ng-container>{{ element.name }}</ng-container>
-          </td>
-        </ng-container>
-
-        <tr cdk-header-row *cdkHeaderRowDef="['id', 'name']"></tr>
-
-        <ng-template
-          let-row
-          cdkRowDef
-          cdkVirtualFor
-          [cdkRowDefColumns]="['id', 'name']"
-          [cdkVirtualForOf]="virtualDataSource$"
-        >
-          <tr cdk-row></tr>
-        </ng-template>
-      </table>
-    </cdk-virtual-scroll-viewport>
-  `,
+  template,
   styles: [
     `
       .viewport {
@@ -766,5 +736,169 @@ class Dummy3Component {
 
     this.scrollStrategy.setScrollHeight(this.headerHeight, this.rowHeight, buffer);
     this.dummyStore.setConfig(total, limit);
+  }
+}
+
+@Component({
+  selector: 'lib-dummy',
+  template,
+  styles: [
+    `
+      .viewport {
+        background: green;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 0px;
+      }
+    `,
+  ],
+  providers: [{ provide: VIRTUAL_SCROLL_STRATEGY, useClass: TableVirtualScrollStrategy }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class Dummy4Component {
+  @ViewChild(CdkVirtualScrollViewport, { static: true }) virtualScroll!: CdkVirtualScrollViewport;
+
+  viewportHeight: number;
+  viewportWidth: number;
+
+  virtualDataSource$: Observable<Item[]>;
+  dataSource$: Observable<Item[]>;
+
+  headerHeight: number;
+  rowHeight: number;
+
+  constructor(
+    @Inject(VIRTUAL_SCROLL_STRATEGY)
+    public scrollStrategy: TableVirtualScrollStrategy,
+  ) {
+    this.viewportHeight = 300;
+    this.viewportWidth = 500;
+
+    this.headerHeight = 30;
+    this.rowHeight = 30;
+
+    const source = new BehaviorSubject<Item[]>([
+      { id: 1, name: 'a' },
+      { id: 2, name: 'b' },
+      { id: 3, name: 'c' },
+    ]);
+
+    this.virtualDataSource$ = source.asObservable();
+
+    this.dataSource$ = this.scrollStrategy.getViewportElements(
+      //
+      this.virtualDataSource$,
+      source.asObservable().pipe(map((items) => items.length)),
+    );
+  }
+
+  setConfig({
+    viewportHeight,
+    viewportWidth,
+    headerHeight,
+    rowHeight,
+    buffer,
+  }: {
+    viewportHeight: number;
+    viewportWidth: number;
+    headerHeight: number;
+    rowHeight: number;
+    buffer: number;
+  }) {
+    this.viewportHeight = viewportHeight;
+    this.viewportWidth = viewportWidth;
+    this.headerHeight = headerHeight;
+    this.rowHeight = rowHeight;
+
+    this.scrollStrategy.setScrollHeight(this.headerHeight, this.rowHeight, buffer);
+  }
+}
+
+@Component({
+  selector: 'lib-dummy',
+  template,
+  styles: [
+    `
+      .viewport {
+        background: green;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 0px;
+      }
+    `,
+  ],
+  providers: [{ provide: VIRTUAL_SCROLL_STRATEGY, useClass: TableVirtualScrollStrategy }],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class Dummy5Component {
+  @ViewChild(CdkVirtualScrollViewport, { static: true }) virtualScroll!: CdkVirtualScrollViewport;
+
+  viewportHeight: number;
+  viewportWidth: number;
+
+  virtualDataSource$: Observable<Item[]>;
+  dataSource$: Observable<Item[]>;
+
+  headerHeight: number;
+  rowHeight: number;
+
+  constructor(
+    @Inject(VIRTUAL_SCROLL_STRATEGY)
+    public scrollStrategy: TableVirtualScrollStrategy,
+  ) {
+    this.viewportHeight = 300;
+    this.viewportWidth = 500;
+
+    this.headerHeight = 30;
+    this.rowHeight = 30;
+
+    const source = new BehaviorSubject<Item[]>([
+      { id: 1, name: 'a' },
+      { id: 2, name: 'b' },
+      { id: 3, name: 'c' },
+    ]);
+
+    this.scrollStrategy.scrollToIndex(10);
+
+    this.virtualDataSource$ = source.asObservable();
+
+    this.dataSource$ = this.scrollStrategy.getViewportElements(
+      //
+      this.virtualDataSource$,
+      source.asObservable().pipe(map((items) => items.length)),
+    );
+  }
+
+  setConfig({
+    viewportHeight,
+    viewportWidth,
+    headerHeight,
+    rowHeight,
+    buffer,
+  }: {
+    viewportHeight: number;
+    viewportWidth: number;
+    headerHeight: number;
+    rowHeight: number;
+    buffer: number;
+  }) {
+    this.viewportHeight = viewportHeight;
+    this.viewportWidth = viewportWidth;
+    this.headerHeight = headerHeight;
+    this.rowHeight = rowHeight;
+
+    this.scrollStrategy.setScrollHeight(this.headerHeight, this.rowHeight, buffer);
   }
 }
