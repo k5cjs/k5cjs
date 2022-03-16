@@ -1,10 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { ControlValueAccessor, DefaultValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({ template: `` })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export abstract class WrappedFormControl implements ControlValueAccessor {
-  @ViewChild(NG_VALUE_ACCESSOR, { static: true }) valueAccessor!: DefaultValueAccessor;
+  @ViewChild(NG_VALUE_ACCESSOR, { static: true }) valueAccessor!: ControlValueAccessor;
 
   writeValue(obj: unknown): void {
     if ((typeof ngDevMode === 'undefined' || ngDevMode) && !this.valueAccessor)
