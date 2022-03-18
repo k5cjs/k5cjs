@@ -1,9 +1,9 @@
 import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/scrolling';
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
+  BehaviorSubject,
   Observable,
-  ReplaySubject,
-  asapScheduler,
+  asyncScheduler,
   combineLatest,
   distinctUntilChanged,
   map,
@@ -22,10 +22,11 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private bufferSize!: number;
   private viewport!: CdkVirtualScrollViewport | undefined;
 
-  private readonly indexChange = new ReplaySubject<number>();
+  private _indexChange: BehaviorSubject<number>;
 
-  constructor(private _ngZone: NgZone) {
-    this.scrolledIndexChange = this.indexChange.asObservable().pipe(distinctUntilChanged());
+  constructor() {
+    this._indexChange = new BehaviorSubject(0);
+    this.scrolledIndexChange = this._indexChange.asObservable().pipe(distinctUntilChanged());
   }
 
   attach(viewport: CdkVirtualScrollViewport): void {
@@ -76,7 +77,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     get: () => void = () => {},
   ): Observable<T[]> {
-    get();
+    void Promise.resolve().then(() => get());
 
     let skipGet = true;
 
@@ -95,7 +96,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
       /**
        * if source is changed before cdkVirtualForOf
        */
-      observeOn(asapScheduler),
+      observeOn(asyncScheduler),
       map(([[items, firstIndex], total]) => {
         const offsetHeight = this.viewport!.getViewportSize();
 
@@ -168,7 +169,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
           /**
            * execute function when the index of the first element visible in the viewport changes.
            */
-          void Promise.resolve().then(() => this._ngZone.run(() => get()));
+          void Promise.resolve().then(() => get());
         }
 
         return items.slice(start, end);
@@ -210,6 +211,6 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
 
     this.viewport!.setRenderedContentOffset(removedItemsSize);
 
-    this.indexChange.next(firstIndex);
+    this._indexChange.next(firstIndex);
   }
 }
