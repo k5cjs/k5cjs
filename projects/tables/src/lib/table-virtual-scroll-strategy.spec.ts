@@ -245,11 +245,11 @@ describe('SelectionModel', () => {
       if (step === 0) expect(items.length).toEqual(0);
       else if (step === 1) {
         expect(items.length).toEqual(14);
-        setTimeout(() => component.virtualScroll.scrollToIndex(6), 0);
-        setTimeout(() => component.virtualScroll.scrollToIndex(7), 20);
-        setTimeout(() => component.virtualScroll.scrollToIndex(8), 40);
-        setTimeout(() => component.virtualScroll.scrollToIndex(9), 60);
-      } else if (step === 6) {
+        setTimeout(() => component.virtualScroll.scrollToIndex(6), 500);
+      } else if (step === 2) setTimeout(() => component.virtualScroll.scrollToIndex(7), 500);
+      else if (step === 3) setTimeout(() => component.virtualScroll.scrollToIndex(8), 500);
+      else if (step === 4) setTimeout(() => component.virtualScroll.scrollToIndex(9), 500);
+      else if (step === 6) {
         expect(items.length).toEqual(20);
         done();
       }
