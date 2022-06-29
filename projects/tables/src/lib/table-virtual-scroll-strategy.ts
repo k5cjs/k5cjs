@@ -1,9 +1,9 @@
 import { CdkVirtualScrollViewport, VirtualScrollStrategy } from '@angular/cdk/scrolling';
 import { Injectable } from '@angular/core';
 import {
-  BehaviorSubject,
   Observable,
-  asyncScheduler,
+  ReplaySubject,
+  asapScheduler,
   combineLatest,
   distinctUntilChanged,
   map,
@@ -22,10 +22,10 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
   private bufferSize!: number;
   private viewport!: CdkVirtualScrollViewport | undefined;
 
-  private _indexChange: BehaviorSubject<number>;
+  private _indexChange: ReplaySubject<number>;
 
   constructor() {
-    this._indexChange = new BehaviorSubject(0);
+    this._indexChange = new ReplaySubject(0);
     this.scrolledIndexChange = this._indexChange.asObservable().pipe(distinctUntilChanged());
   }
 
@@ -96,7 +96,7 @@ export class TableVirtualScrollStrategy implements VirtualScrollStrategy {
       /**
        * if source is changed before cdkVirtualForOf
        */
-      observeOn(asyncScheduler),
+      observeOn(asapScheduler),
       map(([[items, firstIndex], total]) => {
         const offsetHeight = this.viewport!.getViewportSize();
 
