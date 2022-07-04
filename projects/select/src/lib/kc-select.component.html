@@ -1,0 +1,17 @@
+<div cdk-overlay-origin #origin="cdkOverlayOrigin" (click)="open()">
+  <span *ngIf="!value; else valueRef">Place holder</span>
+
+  <ng-template #valueRef></ng-template>
+
+  <ng-template
+    #templateRef
+    cdk-connected-overlay
+    cdkConnectedOverlayLockPosition
+    [cdkConnectedOverlayOrigin]="origin"
+    [cdkConnectedOverlayOpen]="panelOpen"
+    (overlayKeydown)="keydown($event)"
+    (overlayOutsideClick)="close($event)"
+  >
+    <ng-content></ng-content>
+  </ng-template>
+</div>

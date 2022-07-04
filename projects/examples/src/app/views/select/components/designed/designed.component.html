@@ -1,0 +1,19 @@
+<pre>{{ control.value | json }}</pre>
+
+<kc-select [formControl]="control" [options]="options" (closed)="closed($event)">
+  <app-value *kcValue></app-value>
+
+  <div class="modal">
+    <input type="text" placeholder="Search" />
+
+    <app-options *kcOptions="let options">
+      <kc-options [options]="options">
+        <app-option *kcOption="let option">
+          <kc-option [option]="option"></kc-option>
+        </app-option>
+      </kc-options>
+    </app-options>
+
+    <div kcClose>test button</div>
+  </div>
+</kc-select>

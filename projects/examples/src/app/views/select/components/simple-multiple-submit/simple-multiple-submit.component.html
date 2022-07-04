@@ -1,0 +1,13 @@
+<pre>{{ control.value | json }}</pre>
+
+<kc-select [formControl]="control" [options]="options" (closed)="closed($event)" multiple>
+  <kc-value *kcValue></kc-value>
+
+  <div kcToggle>Toggle all</div>
+
+  <kc-options *kcOptions="let options" [options]="options">
+    <kc-option *kcOption="let option" [option]="option"></kc-option>
+  </kc-options>
+
+  <button kcSubmit>Submit</button>
+</kc-select>
