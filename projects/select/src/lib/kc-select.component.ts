@@ -100,6 +100,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   private _dialog = false;
 
   @Output() closed: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
+  @Output() submitted: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
   /**
    * get the template for the overlay that contains ng-content
    */
@@ -151,6 +152,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._destroy = new Subject<void>();
 
     this.closed = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
+    this.submitted = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
     this.allSelected = false;
 
     this._allSelectedChanged = new BehaviorSubject<boolean>(false);
@@ -216,7 +218,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   submit(): void {
     this.close();
-
+    this.submitted.emit(this.value);
     this.clear();
   }
 
