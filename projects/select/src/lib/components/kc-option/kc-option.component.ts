@@ -45,6 +45,7 @@ export class KcOptionComponent<K, V> implements OnDestroy {
 
   @HostListener('click')
   click(): void {
+    console.log('super click');
     this.toggle();
   }
 

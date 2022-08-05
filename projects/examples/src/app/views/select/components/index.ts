@@ -1,5 +1,6 @@
 export * from './designed/components';
 export * from './designed/designed.component';
+export * from './extend-option/extend-option.component';
 export * from './group-multiple/group-multiple.component';
 export * from './group-search/group-search.component';
 export * from './simple-modal/simple-modal.component';

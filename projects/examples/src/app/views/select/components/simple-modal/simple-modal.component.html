@@ -4,6 +4,7 @@
   <kc-value *kcValue></kc-value>
 
   <kc-options *kcOptions="let options" [options]="options">
-    <kc-option *kcOption="let option" [option]="option"></kc-option>
+    <!-- <kc-option *kcOption="let option" [option]="option"></kc-option> -->
+    <app-extend-option *kcOption="let option" [option]="option"></app-extend-option>
   </kc-options>
 </kc-select>
