@@ -22,6 +22,8 @@ export class SelectComponent {
       { link: 'simple-without-form-control', label: 'Simple Without FormControl' },
       { link: 'group-search', label: 'Group Search' },
       { link: 'group-multiple', label: 'Group Multiple' },
+      { link: 'group-boolean', label: 'Group Boolean' },
+      { link: 'group-boolean-toggle', label: 'Group Boolean Toggle' },
       { link: 'designed', label: 'Designed' },
     ];
   }

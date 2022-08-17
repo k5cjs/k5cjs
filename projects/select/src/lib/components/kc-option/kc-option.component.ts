@@ -23,11 +23,11 @@ import { KcOption } from '../../types';
 export class KcOptionComponent<K, V> implements OnDestroy {
   @Input() option!: KcOption<K | V, V>;
 
-  private _destroy: Subject<void>;
+  protected _destroy: Subject<void>;
 
   constructor(
-    @Inject(KC_SELECTION) private _selection: MapEmit<K | V, KcOption<K | V, V>, boolean>,
-    private _cdr: ChangeDetectorRef,
+    @Inject(KC_SELECTION) protected _selection: MapEmit<K | V, KcOption<K | V, V>, boolean>,
+    protected _cdr: ChangeDetectorRef,
   ) {
     this._destroy = new Subject();
 
@@ -45,12 +45,11 @@ export class KcOptionComponent<K, V> implements OnDestroy {
 
   @HostListener('click')
   click(): void {
-    console.log('super click');
     this.toggle();
   }
 
   toggle(): void {
-    if (this._selection.has(this.option.key || this.option.value)) this.deselect();
+    if (this.selected) this.deselect();
     else this.select();
   }
 

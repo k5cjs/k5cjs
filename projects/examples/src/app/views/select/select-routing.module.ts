@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 import {
   DesignedComponent,
+  GroupBooleanComponent,
+  GroupBooleanToggleComponent,
   GroupMultipleComponent,
   GroupSearchComponent,
   SimpleModalComponent,
@@ -65,6 +67,14 @@ const routes: Routes = [
       {
         path: 'group-multiple',
         component: GroupMultipleComponent,
+      },
+      {
+        path: 'group-boolean',
+        component: GroupBooleanComponent,
+      },
+      {
+        path: 'group-boolean-toggle',
+        component: GroupBooleanToggleComponent,
       },
       {
         path: 'designed',

@@ -219,6 +219,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   submit(): void {
     this.close();
     this.submitted.emit(this.value);
+    this.clear();
   }
 
   keydown(event: KeyboardEvent): void {

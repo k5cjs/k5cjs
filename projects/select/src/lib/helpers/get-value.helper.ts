@@ -56,11 +56,15 @@ function checkIsEmpty<V>(item: OptionsValue<V> | undefined): item is undefined |
   /**
    * check if items is undefined
    */
-  if (!item) return true;
+  if (item === undefined) return true;
   /**
-   * check if array or object and is empty
+   * check if object is empty
    */
-  if (!Object.keys(item).length) return true;
+  if (typeof item === 'object' && Object.keys(item).length === 0) return true;
+  /**
+   * check if array and is empty
+   */
+  if (Array.isArray(item) && item.length === 0) return true;
 
   return false;
 }

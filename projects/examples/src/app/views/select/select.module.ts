@@ -7,9 +7,12 @@ import { KcSelectModule } from '@k5cjs/select';
 import {
   DesignedComponent,
   ExtendOptionComponent,
+  GroupBooleanComponent,
+  GroupBooleanToggleComponent,
   GroupMultipleComponent,
   GroupSearchComponent,
   OptionComponent,
+  OptionToggleComponent,
   OptionsComponent,
   SimpleModalComponent,
   SimpleMultipleComponent,
@@ -46,6 +49,9 @@ import { SelectComponent } from './select.component';
     SimpleMultipleSubmitComponent,
     GroupMultipleComponent,
     ExtendOptionComponent,
+    GroupBooleanComponent,
+    GroupBooleanToggleComponent,
+    OptionToggleComponent,
   ],
   imports: [CommonModule, SelectRoutingModule, KcSelectModule, FormsModule, ReactiveFormsModule],
 })

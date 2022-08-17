@@ -1,0 +1,17 @@
+<pre>{{ control.value | json }}</pre>
+
+<kc-select [formControl]="control" [options]="options" multiple>
+  <div *kcValue>Select</div>
+
+  <kc-group *kcGroup="let options" [options]="options" key="location">
+    <kc-options *kcOptions="let options" [options]="options">
+      <app-option-toggle *kcOption="let option" [option]="option"></app-option-toggle>
+    </kc-options>
+  </kc-group>
+
+  <kc-group *kcGroup="let options" [options]="options" key="waiter">
+    <kc-options *kcOptions="let options" [options]="options">
+      <app-option-toggle *kcOption="let option" [option]="option"></app-option-toggle>
+    </kc-options>
+  </kc-group>
+</kc-select>
