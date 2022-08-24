@@ -2,6 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+  CustomPlaceHolderComponent,
+  DefaultPlaceHolderComponent,
   DesignedComponent,
   GroupBooleanComponent,
   GroupBooleanToggleComponent,
@@ -79,6 +81,14 @@ const routes: Routes = [
       {
         path: 'designed',
         component: DesignedComponent,
+      },
+      {
+        path: 'default-placeholder',
+        component: DefaultPlaceHolderComponent,
+      },
+      {
+        path: 'custom-placeholder',
+        component: CustomPlaceHolderComponent,
       },
     ],
   },

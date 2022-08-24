@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 
-import { KcOption, KcOptionValue } from 'dist/select/public-api';
+import { KcOption, KcOptionValue } from '@k5cjs/select';
 
 @Component({
   selector: 'app-designed',
