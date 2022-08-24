@@ -25,7 +25,7 @@ import { first, map, switchMap, tap } from 'rxjs/operators';
 import { MapEmit } from '@k5cjs/selection-model';
 
 import { KcOptionComponent } from './components';
-import { KcGroupDirective, KcOptionsDirective, KcValueDirective } from './directives';
+import { KcGroupDirective, KcOptionsDirective, KcPlaceHolderDirective, KcValueDirective } from './directives';
 import { getValues } from './helpers';
 import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
 import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, KcSelect } from './types';
@@ -105,6 +105,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
    * get the template for the overlay that contains ng-content
    */
   @ViewChild('valueRef', { read: ViewContainerRef, static: true }) private _valueRef!: ViewContainerRef;
+ 
+  @ViewChild('placeholderRef', { read: ViewContainerRef , static: false }) private _placeholderRef!: ViewContainerRef;
+
   @ViewChild('templateRef') templateRef!: TemplateRef<unknown>;
 
   @ContentChildren(KcOptionComponent, { descendants: true })
@@ -112,6 +115,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   @ContentChild(KcValueDirective, { static: true })
   private _valueDirective?: KcValueDirective;
+
+  @ContentChild(KcPlaceHolderDirective, { static: true })
+  private _placeHolderDirective?: KcPlaceHolderDirective;
 
   @ContentChildren(KcGroupDirective, { descendants: true })
   private _groupDirectives!: QueryList<KcGroupDirective<K, V>>;
@@ -167,6 +173,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._initSelectionModel();
 
     if (this._valueDirective) this._valueRef.createEmbeddedView(this._valueDirective.template);
+    if (this._placeHolderDirective) this._placeholderRef.createEmbeddedView(this._placeHolderDirective.template);
 
     this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.render(options));

@@ -25,6 +25,8 @@ export class SelectComponent {
       { link: 'group-boolean', label: 'Group Boolean' },
       { link: 'group-boolean-toggle', label: 'Group Boolean Toggle' },
       { link: 'designed', label: 'Designed' },
+      { link: 'default-placeholder', label: 'Default Placeholder' },
+      { link: 'custom-placeholder', label: 'Custom Placeholder' },
     ];
   }
 }

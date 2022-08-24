@@ -10,10 +10,11 @@ import {
   KcGroupDirective,
   KcOptionDirective,
   KcOptionsDirective,
+  KcPlaceHolderDirective,
   KcSelectAllDirective,
   KcSubmitDirective,
   KcToggleDirective,
-  KcValueDirective,
+  KcValueDirective
 } from './directives';
 import { KcSelectComponent } from './kc-select.component';
 
@@ -34,6 +35,7 @@ import { KcSelectComponent } from './kc-select.component';
     KcToggleDirective,
     KcClearDirective,
     KcSubmitDirective,
+    KcPlaceHolderDirective
   ],
   imports: [CommonModule, OverlayModule],
   exports: [
@@ -52,6 +54,7 @@ import { KcSelectComponent } from './kc-select.component';
     KcToggleDirective,
     KcClearDirective,
     KcSubmitDirective,
+    KcPlaceHolderDirective
   ],
 })
 export class KcSelectModule {}
