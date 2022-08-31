@@ -27,6 +27,7 @@ export class SelectComponent {
       { link: 'designed', label: 'Designed' },
       { link: 'default-placeholder', label: 'Default Placeholder' },
       { link: 'custom-placeholder', label: 'Custom Placeholder' },
+      { link: 'custom-options', label: 'Custom options' },
     ];
   }
 }

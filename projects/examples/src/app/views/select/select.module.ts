@@ -5,6 +5,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { KcSelectModule } from '@k5cjs/select';
 
 import {
+  CustomOptionComponent,
+  CustomOptionsComponent,
   CustomPlaceHolderComponent,
   DefaultPlaceHolderComponent,
   DesignedComponent,
@@ -55,7 +57,9 @@ import { SelectComponent } from './select.component';
     GroupBooleanToggleComponent,
     OptionToggleComponent,
     DefaultPlaceHolderComponent,
-    CustomPlaceHolderComponent
+    CustomPlaceHolderComponent,
+    CustomOptionsComponent,
+    CustomOptionComponent,
   ],
   imports: [CommonModule, SelectRoutingModule, KcSelectModule, FormsModule, ReactiveFormsModule],
 })

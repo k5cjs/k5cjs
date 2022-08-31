@@ -1,4 +1,6 @@
-export * from './custom-placeholder/custom-placeholder.component'
+export * from './custom-options/components';
+export * from './custom-options/custom-options.component';
+export * from './custom-placeholder/custom-placeholder.component';
 export * from './default-placeholder/default-placeholder.component';
 export * from './designed/components';
 export * from './designed/designed.component';

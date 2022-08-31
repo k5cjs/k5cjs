@@ -19,8 +19,18 @@ import {
   forwardRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BehaviorSubject, Observable, ReplaySubject, Subject, isObservable, takeUntil } from 'rxjs';
-import { first, map, switchMap, tap } from 'rxjs/operators';
+import {
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  Subject,
+  first,
+  isObservable,
+  map,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs';
 
 import { MapEmit } from '@k5cjs/selection-model';
 
@@ -104,9 +114,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   /**
    * get the template for the overlay that contains ng-content
    */
+  @ViewChild('placeholderRef', { read: ViewContainerRef, static: false }) private _placeholderRef!: ViewContainerRef;
+
   @ViewChild('valueRef', { read: ViewContainerRef, static: true }) private _valueRef!: ViewContainerRef;
- 
-  @ViewChild('placeholderRef', { read: ViewContainerRef , static: false }) private _placeholderRef!: ViewContainerRef;
 
   @ViewChild('templateRef') templateRef!: TemplateRef<unknown>;
 
@@ -172,8 +182,8 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
      */
     this._initSelectionModel();
 
-    if (this._valueDirective) this._valueRef.createEmbeddedView(this._valueDirective.template);
     if (this._placeHolderDirective) this._placeholderRef.createEmbeddedView(this._placeHolderDirective.template);
+    if (this._valueDirective) this._valueRef.createEmbeddedView(this._valueDirective.template);
 
     this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.render(options));

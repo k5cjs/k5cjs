@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormBuilder, FormControl } from '@angular/forms';
 
-import { KcOption } from 'dist/select/public-api';
+import { KcOption } from '@k5cjs/select';
 
 @Component({
   selector: 'app-simple-multiple-select-all',

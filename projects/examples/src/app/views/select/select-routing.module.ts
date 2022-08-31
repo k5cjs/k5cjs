@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import {
+  CustomOptionsComponent,
   CustomPlaceHolderComponent,
   DefaultPlaceHolderComponent,
   DesignedComponent,
@@ -89,6 +90,10 @@ const routes: Routes = [
       {
         path: 'custom-placeholder',
         component: CustomPlaceHolderComponent,
+      },
+      {
+        path: 'custom-options',
+        component: CustomOptionsComponent,
       },
     ],
   },

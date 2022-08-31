@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 export interface KcSelect {
   allSelected: boolean;
   allSelectedChanged: Observable<boolean>;
+  multiple: boolean;
   close: (event?: MouseEvent) => void;
   submit: () => void;
   selectAll: () => void;
