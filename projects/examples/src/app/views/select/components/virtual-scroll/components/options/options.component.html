@@ -1,0 +1,16 @@
+<!-- ng-content is for header elements and for option template -->
+<ng-content></ng-content>
+
+<cdk-virtual-scroll-viewport itemSize="50" class="example-viewport" (scrolledIndexChange)="scrolledIndexChange($event)">
+  <app-option
+    *cdkVirtualFor="let item of options; templateCacheSize: 0"
+    [option]="item"
+    [optionTemplate]="optionTemplate"
+    class="example-item"
+  ></app-option>
+
+  <ng-content select="[scroll]"></ng-content>
+</cdk-virtual-scroll-viewport>
+
+<!-- ng-content is for footer elements -->
+<ng-content select="[footer]"></ng-content>

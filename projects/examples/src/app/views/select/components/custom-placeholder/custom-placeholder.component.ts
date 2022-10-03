@@ -9,15 +9,13 @@ import { KcOption } from 'dist/select/public-api';
     <pre>{{ control.value | json }}</pre>
 
     <kc-select [formControl]="control" [options]="options" multiple>
-      <div *kcPlaceHolder>Custom placeholder</div>
-
-      <kc-value *kcValue></kc-value>
+      <kc-value *kcValue>Value</kc-value>
 
       <kc-options *kcOptions="let options" [options]="options">
         <kc-option *kcOption="let option" [option]="option"></kc-option>
       </kc-options>
     </kc-select>
-`,
+  `,
   styleUrls: [],
 })
 export class CustomPlaceHolderComponent {

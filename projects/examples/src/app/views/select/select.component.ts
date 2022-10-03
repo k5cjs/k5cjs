@@ -28,6 +28,7 @@ export class SelectComponent {
       { link: 'default-placeholder', label: 'Default Placeholder' },
       { link: 'custom-placeholder', label: 'Custom Placeholder' },
       { link: 'custom-options', label: 'Custom options' },
+      { link: 'virtual-scroll', label: 'Virtual scroll' },
     ];
   }
 }

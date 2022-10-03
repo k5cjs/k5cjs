@@ -10,51 +10,31 @@ import {
   KcGroupDirective,
   KcOptionDirective,
   KcOptionsDirective,
-  KcPlaceHolderDirective,
   KcSelectAllDirective,
   KcSubmitDirective,
   KcToggleDirective,
-  KcValueDirective
+  KcValueDirective,
 } from './directives';
 import { KcSelectComponent } from './kc-select.component';
 
+const components = [KcSelectComponent, KcValueComponent, KcGroupComponent, KcOptionsComponent, KcOptionComponent];
+
+const directives = [
+  KcValueDirective,
+  KcGroupDirective,
+  KcOptionsDirective,
+  KcOptionDirective,
+  KcCloseDirective,
+  KcSelectAllDirective,
+  KcDeselectAllDirective,
+  KcToggleDirective,
+  KcClearDirective,
+  KcSubmitDirective,
+];
+
 @NgModule({
-  declarations: [
-    KcSelectComponent,
-    KcValueComponent,
-    KcValueDirective,
-    KcOptionComponent,
-    KcOptionDirective,
-    KcOptionsComponent,
-    KcOptionsDirective,
-    KcGroupDirective,
-    KcGroupComponent,
-    KcCloseDirective,
-    KcSelectAllDirective,
-    KcDeselectAllDirective,
-    KcToggleDirective,
-    KcClearDirective,
-    KcSubmitDirective,
-    KcPlaceHolderDirective
-  ],
+  declarations: [...components, ...directives],
   imports: [CommonModule, OverlayModule],
-  exports: [
-    KcSelectComponent,
-    KcValueComponent,
-    KcValueDirective,
-    KcOptionComponent,
-    KcOptionDirective,
-    KcOptionsComponent,
-    KcOptionsDirective,
-    KcGroupDirective,
-    KcGroupComponent,
-    KcCloseDirective,
-    KcSelectAllDirective,
-    KcDeselectAllDirective,
-    KcToggleDirective,
-    KcClearDirective,
-    KcSubmitDirective,
-    KcPlaceHolderDirective
-  ],
+  exports: [...components, ...directives],
 })
 export class KcSelectModule {}

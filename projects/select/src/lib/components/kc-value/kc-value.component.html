@@ -1,2 +1,9 @@
-<div>{{ value | async }}</div>
+<ng-container *ngIf="value | async as value; else placeholder">
+  <div>{{ value }}</div>
+</ng-container>
+
+<ng-template #placeholder>
+  <div>Choose an option</div>
+</ng-template>
+
 <ng-content></ng-content>

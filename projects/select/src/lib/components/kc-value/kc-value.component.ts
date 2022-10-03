@@ -13,19 +13,17 @@ import { KcOption } from '../../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KcValueComponent<T extends boolean = false> {
-  value!: Observable<string>;
+  value!: Observable<string | undefined>;
 
   constructor(@Inject(KC_SELECTION) private _selection: MapEmit<string, KcOption<string, unknown>, T>) {
     this.value = this._selection.changed.pipe(
       startWith({ source: { selected: this._selection.selected } }),
       map(({ source: { selected } }) => {
-        if (Array.isArray(selected)) {
-          return selected.map(({ label }) => label).join(', ');
-        }
+        if (Array.isArray(selected)) return selected.map(({ label }) => label).join(', ');
+        else if (selected && typeof selected === 'object' && Object.keys(selected).length > 0) return 'Object logic';
+        else if (selected && selected.label) return selected.label;
 
-        if (selected && selected.label) return selected.label;
-
-        return '';
+        return;
       }),
     );
   }

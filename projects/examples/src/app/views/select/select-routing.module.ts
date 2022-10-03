@@ -95,6 +95,10 @@ const routes: Routes = [
         path: 'custom-options',
         component: CustomOptionsComponent,
       },
+      {
+        path: 'virtual-scroll',
+        loadChildren: () => import('./components/virtual-scroll').then((m) => m.VirtualScrollModule),
+      },
     ],
   },
 ];

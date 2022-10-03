@@ -1,0 +1,15 @@
+<div>
+  <pre>{{ control.value | json }}</pre>
+
+  <kc-select [formControl]="control" [options]="options" multiple>
+    <kc-value *kcValue></kc-value>
+
+    <div kcSelectAll>Select all</div>
+
+    <app-options *kcOptions="let options" [options]="options" (index)="indexChanged($event)">
+      <kc-option *kcOption="let option" [option]="option"></kc-option>
+
+      <div *ngIf="loading" scroll>Loading...</div>
+    </app-options>
+  </kc-select>
+</div>
