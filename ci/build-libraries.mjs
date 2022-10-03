@@ -16,6 +16,7 @@ const commands = [
   [
     { name: Libs.Rxjs, needs: [] },
     { name: Libs.Forms, needs: [] },
+    { name: Libs.SelectionModel, needs: [] },
   ],
 ];
 
