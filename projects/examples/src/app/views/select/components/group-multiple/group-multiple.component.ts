@@ -47,18 +47,6 @@ export class GroupMultipleComponent {
               value: 'Waiter 2',
             },
           ],
-          // [
-          //   {
-          //     key: 'waiter 3',
-          //     label: 'Waiter 3',
-          //     value: 'Waiter 3',
-          //   },
-          //   {
-          //     key: 'waiter 4',
-          //     label: 'Waiter 4',
-          //     value: 'Waiter 4',
-          //   },
-          // ],
         ],
       },
     };

@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Directive, TemplateRef, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 
-import { KcGroup, KcOption } from '../../types';
+import { KcGroup } from '../../types';
 
 type Context<K, V> = { $implicit: KcGroup<K, V> };
 
@@ -8,6 +8,8 @@ type Context<K, V> = { $implicit: KcGroup<K, V> };
   selector: '[kcGroup]',
 })
 export class KcGroupDirective<K, V> {
+  private _embeddedViewRef: EmbeddedViewRef<Context<K, V>> | undefined;
+
   constructor(
     private _template: TemplateRef<Context<K, V>>,
     private _viewContainer: ViewContainerRef,
@@ -18,9 +20,17 @@ export class KcGroupDirective<K, V> {
     return true;
   }
 
-  render(options: KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>) {
+  render(options: KcGroup<K, V>) {
+    if (this._embeddedViewRef) this._embeddedViewRef.context.$implicit = options;
+    else this._embeddedViewRef = this._viewContainer.createEmbeddedView(this._template, { $implicit: options });
+
+    this._cdr.detectChanges();
+  }
+
+  clear() {
+    this._embeddedViewRef = undefined;
     this._viewContainer.clear();
-    this._viewContainer.createEmbeddedView(this._template, { $implicit: options });
+
     this._cdr.detectChanges();
   }
 }

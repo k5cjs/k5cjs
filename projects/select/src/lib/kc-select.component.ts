@@ -24,6 +24,7 @@ import {
   Observable,
   ReplaySubject,
   Subject,
+  Subscription,
   first,
   isObservable,
   map,
@@ -35,7 +36,7 @@ import {
 import { MapEmit } from '@k5cjs/selection-model';
 
 import { KcOptionComponent } from './components';
-import { KcGroupDirective, KcOptionsDirective, KcPlaceHolderDirective, KcValueDirective } from './directives';
+import { KcGroupDirective, KcOptionsDirective, KcValueDirective } from './directives';
 import { getValues } from './helpers';
 import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
 import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, KcSelect } from './types';
@@ -111,10 +112,6 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   @Output() closed: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
   @Output() submitted: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
-  /**
-   * get the template for the overlay that contains ng-content
-   */
-  @ViewChild('placeholderRef', { read: ViewContainerRef, static: false }) private _placeholderRef!: ViewContainerRef;
 
   @ViewChild('valueRef', { read: ViewContainerRef, static: true }) private _valueRef!: ViewContainerRef;
 
@@ -125,9 +122,6 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   @ContentChild(KcValueDirective, { static: true })
   private _valueDirective?: KcValueDirective;
-
-  @ContentChild(KcPlaceHolderDirective, { static: true })
-  private _placeHolderDirective?: KcPlaceHolderDirective;
 
   @ContentChildren(KcGroupDirective, { descendants: true })
   private _groupDirectives!: QueryList<KcGroupDirective<K, V>>;
@@ -158,6 +152,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   private _allSelectedChanged: BehaviorSubject<boolean>;
 
   private _dialogOverlayRef: OverlayRef | undefined;
+  private _optionsSubscription: Subscription | undefined;
   private _destroy: Subject<void>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: unknown) => void = () => {};
@@ -182,18 +177,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
      */
     this._initSelectionModel();
 
-    if (this._placeHolderDirective) this._placeholderRef.createEmbeddedView(this._placeHolderDirective.template);
-    if (this._valueDirective) this._valueRef.createEmbeddedView(this._valueDirective.template);
-
-    this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
-      if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.render(options));
-      else if (this._optionsDirectives.length)
-        this._optionsDirectives.forEach((optionDirective, index) =>
-          optionDirective.render(
-            this._getOptions(options as KcOption<K, V>[] | KcOption<K, V>[][])[index] as unknown as KcOption<K, V>[],
-          ),
-        );
-    });
+    if (this._valueDirective) this._valueDirective.render(this._valueRef);
   }
 
   writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
@@ -213,6 +197,22 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     else this.panelOpen = true;
 
     this.selectionOpened = true;
+
+    if (this._optionsSubscription) {
+      this._optionsSubscription.unsubscribe();
+      this._optionsSubscription = undefined;
+    }
+
+    this._optionsSubscription = this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
+      if (this._groupDirectives.length)
+        this._groupDirectives.forEach((group) => group.render(options as KcGroup<K, V>));
+      else if (this._optionsDirectives.length)
+        this._optionsDirectives.forEach((optionDirective, index) =>
+          optionDirective.render(
+            this._getOptions(options as KcOption<K, V>[] | KcOption<K, V>[][])[index] as unknown as KcOption<K, V>[],
+          ),
+        );
+    });
   }
 
   close(event?: MouseEvent): void {
@@ -227,6 +227,10 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this.selectionOpened = false;
 
     this.closed.emit(this.value);
+
+    if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.clear());
+    else if (this._optionsDirectives.length)
+      this._optionsDirectives.forEach((optionDirective) => optionDirective.clear());
     /**
      * mark for check when user try to close from KcSelect token
      */

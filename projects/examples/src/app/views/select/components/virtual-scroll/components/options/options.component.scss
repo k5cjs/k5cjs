@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-viewport {
+  width: 200px;
+  height: 200px;
+  border: 1px solid #000;
+}
+
+.example-item {
+  height: 50px;
+}
