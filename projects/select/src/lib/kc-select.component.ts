@@ -198,10 +198,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this.selectionOpened = true;
 
-    if (this._optionsSubscription) {
-      this._optionsSubscription.unsubscribe();
-      this._optionsSubscription = undefined;
-    }
+    this._removeOptionsSubscription();
 
     this._optionsSubscription = this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length)
@@ -226,7 +223,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this.selectionOpened = false;
 
-    this.closed.emit(this.value);
+    this._removeOptionsSubscription();
 
     if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.clear());
     else if (this._optionsDirectives.length)
@@ -235,6 +232,8 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
      * mark for check when user try to close from KcSelect token
      */
     this._cdr.markForCheck();
+
+    this.closed.emit(this.value);
   }
 
   submit(): void {
@@ -266,6 +265,13 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   clear(): void {
     this.allSelected = false;
     this.selection.clear();
+  }
+
+  private _removeOptionsSubscription(): void {
+    if (!this._optionsSubscription) return;
+
+    this._optionsSubscription.unsubscribe();
+    this._optionsSubscription = undefined;
   }
 
   private _initSelectionModel(): void {
