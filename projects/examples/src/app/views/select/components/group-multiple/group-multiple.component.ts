@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { KcGroup } from '@k5cjs/select';
 
@@ -10,10 +10,10 @@ import { KcGroup } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupMultipleComponent {
-  control: FormControl;
+  control: UntypedFormControl;
   options: KcGroup<string, string>;
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control({});
 
     this.options = {

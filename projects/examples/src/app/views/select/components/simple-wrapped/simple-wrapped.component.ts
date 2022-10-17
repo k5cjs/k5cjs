@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormBuilder, FormControl } from '@angular/forms';
+import { ControlValueAccessor, UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { WrappedFormControl, provideValueAccessor } from '@k5cjs/forms';
 import { KcOption, KcSelectComponent } from '@k5cjs/select';
@@ -58,11 +58,11 @@ export class SimpleWrappedSharedComponent<T = unknown> extends WrappedFormContro
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleWrappedComponent {
-  control: FormControl;
-  search: FormControl;
+  control: UntypedFormControl;
+  search: UntypedFormControl;
   options: KcOption<string, string>[];
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control(['Location 2']);
     this.search = this._fb.control('');
 

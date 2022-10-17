@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { KcOption } from '@k5cjs/select';
 
@@ -10,10 +10,10 @@ import { KcOption } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleMultipleSelectAllComponent {
-  control: FormControl;
+  control: UntypedFormControl;
   options: KcOption<string, string>[];
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control('Location 2');
 
     this.options = [

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { KcOption } from '@k5cjs/select';
@@ -11,7 +11,7 @@ import { KcOption } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VirtualScrollComponent {
-  control: FormControl;
+  control: UntypedFormControl;
   options: Observable<KcOption<string, string>[]>;
   loading = false;
 
@@ -21,7 +21,7 @@ export class VirtualScrollComponent {
   private _buffer = 5;
   private _loaded: Set<number>;
 
-  constructor(private _fb: FormBuilder, private _cdr: ChangeDetectorRef) {
+  constructor(private _fb: UntypedFormBuilder, private _cdr: ChangeDetectorRef) {
     this.control = this._fb.control(null);
 
     this._options = new BehaviorSubject<KcOption<string, string>[]>([]);

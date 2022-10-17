@@ -2,7 +2,13 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ChangeDetectionStrategy, Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ControlValueAccessor, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormsModule,
+  ReactiveFormsModule,
+  UntypedFormBuilder,
+  UntypedFormGroup,
+} from '@angular/forms';
 import { By } from '@angular/platform-browser';
 
 import { provideValueAccessor } from './provide-value-accessor';
@@ -60,9 +66,9 @@ class ChildComponent extends WrappedFormControl {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ParentComponent {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.form = this._fb.group({
       input: 'default',
     });
@@ -89,9 +95,9 @@ class ErrorChildComponent extends WrappedFormControl {}
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class ErrorParentComponent {
-  form: FormGroup;
+  form: UntypedFormGroup;
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.form = this._fb.group({
       input: 'default',
     });
