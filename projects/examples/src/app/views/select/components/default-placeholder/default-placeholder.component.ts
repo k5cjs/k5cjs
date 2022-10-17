@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { KcOption } from 'dist/select/public-api';
 
@@ -19,10 +19,10 @@ import { KcOption } from 'dist/select/public-api';
   styleUrls: [],
 })
 export class DefaultPlaceHolderComponent {
-  control: FormControl;
+  control: UntypedFormControl;
   options: KcOption<string, string>[];
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control(null);
 
     this.options = [

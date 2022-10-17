@@ -1,9 +1,9 @@
 {
   "name": "@k5cjs/scroll",
-  "version": "0.0.2",
+  "version": "14.0.0",
   "peerDependencies": {
-    "@angular/core": "^13.2.0",
-    "@angular/cdk": "^13.2.0"
+    "@angular/core": "^14.2.6",
+    "@angular/cdk": "^14.2.5"
   },
   "dependencies": {
     "tslib": "^2.3.0"

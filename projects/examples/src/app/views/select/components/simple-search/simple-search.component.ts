@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { KcOption, filterNestedOptions } from '@k5cjs/select';
 
@@ -10,11 +10,11 @@ import { KcOption, filterNestedOptions } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleSearchComponent {
-  control: FormControl;
-  search: FormControl;
+  control: UntypedFormControl;
+  search: UntypedFormControl;
   options: KcOption<string, string>[];
 
-  constructor(private _fb: FormBuilder, private _cdr: ChangeDetectorRef) {
+  constructor(private _fb: UntypedFormBuilder, private _cdr: ChangeDetectorRef) {
     this.control = this._fb.control('Location 2');
     this.search = this._fb.control('');
 

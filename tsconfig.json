@@ -24,7 +24,7 @@
       "@k5cjs/select": ["dist/select/select", "dist/select"],
       "@k5cjs/selection-model": ["dist/selection-model/selection-model", "dist/selection-model"]
     },
-    "target": "es2017",
+    "target": "es2020",
     "module": "es2020",
     "lib": ["es2020", "dom"]
   },

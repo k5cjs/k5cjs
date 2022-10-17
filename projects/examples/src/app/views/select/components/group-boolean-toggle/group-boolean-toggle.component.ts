@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 
 import { KcGroup } from '@k5cjs/select';
 
@@ -10,10 +10,10 @@ import { KcGroup } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GroupBooleanToggleComponent {
-  control: FormControl;
+  control: UntypedFormControl;
   options: KcGroup<string, boolean>;
 
-  constructor(private _fb: FormBuilder) {
+  constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control({
       /**
        * same value as option
