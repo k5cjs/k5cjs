@@ -216,7 +216,13 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     /**
      * check if html element contains an attribute called 'prevent-close''
      */
-    if (this.selectionOpened && (event?.target as HTMLElement).hasAttribute('prevent-close')) return;
+    if (
+      this.selectionOpened &&
+      event &&
+      this._checkIsHtmlElement(event.target) &&
+      event.target.hasAttribute('prevent-close')
+    )
+      return;
 
     if (this.dialog) this._closeDialog();
     else this.panelOpen = false;
@@ -372,5 +378,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     // if (!this.multiple) this.close();
 
     this._cdr.detectChanges();
+  }
+
+  private _checkIsHtmlElement(element: EventTarget | null): element is HTMLElement {
+    return element instanceof HTMLElement;
   }
 }
