@@ -375,7 +375,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this.allSelected = [...this.optionComponents].every((option) => option.selected);
     this._allSelectedChanged.next(this.allSelected);
 
-    // if (!this.multiple) this.close();
+    if (!this.multiple) this.close();
 
     this._cdr.detectChanges();
   }
