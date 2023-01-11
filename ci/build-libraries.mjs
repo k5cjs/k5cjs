@@ -18,6 +18,10 @@ const commands = [
     { name: Libs.Forms, needs: [] },
     { name: Libs.SelectionModel, needs: [] },
   ],
+  [
+
+    { name: Libs.Select, needs: [Libs.SelectionModel] },
+  ]
 ];
 
 const libHash = (name) => $`git rev-parse HEAD:projects/${name}/`;

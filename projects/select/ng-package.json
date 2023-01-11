@@ -4,5 +4,6 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "assets": ["./_index.scss"]
+  "assets": ["./_index.scss"],
+  "allowedNonPeerDependencies": ["@k5cjs/selection-model"]
 }
