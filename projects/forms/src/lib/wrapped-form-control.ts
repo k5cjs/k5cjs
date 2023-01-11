@@ -12,6 +12,7 @@ export abstract class WrappedFormControl implements ControlValueAccessor {
         you don't have any provider for NG_VALUE_ACCESSOR in ${this.constructor.name}
 
           default control:
+            import { ReactiveFormsModule } from '@angular/forms';
             <input ngDefaultControl/>
 
           custom control:
