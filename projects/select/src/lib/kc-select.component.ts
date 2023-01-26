@@ -182,6 +182,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
     this.value = obj;
+    this._updateSelectionModel();
   }
 
   registerOnChange(fn: (value: unknown) => void): void {
@@ -280,6 +281,22 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._optionsSubscription = undefined;
   }
 
+  private _updateSelectionModel(): void {
+    if (!this.selection) return;
+
+    this._getSelectedOptions
+      .pipe(
+        first(),
+        tap((options) => {
+          if (!options) return;
+
+          this.selection.clear({ emitEvent: false });
+          this.selection.set(options);
+        }),
+      )
+      .subscribe();
+  }
+
   private _initSelectionModel(): void {
     this._getSelectedOptions
       .pipe(
@@ -374,8 +391,6 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this.allSelected = [...this.optionComponents].every((option) => option.selected);
     this._allSelectedChanged.next(this.allSelected);
-
-    if (!this.multiple) this.close();
 
     this._cdr.detectChanges();
   }
