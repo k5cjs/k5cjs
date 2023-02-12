@@ -6,17 +6,26 @@ import {
   ContentChildren,
   Inject,
   Input,
+  OnDestroy,
   OnInit,
   QueryList,
   SkipSelf,
   forwardRef,
 } from '@angular/core';
-
-import { MapEmit } from '@k5cjs/selection-model';
+import { Subject, takeUntil } from 'rxjs';
 
 import { KcGroupDirective, KcOptionsDirective } from '../../directives';
-import { KC_SELECTION, KC_VALUE } from '../../tokens';
-import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, OptionGroup } from '../../types';
+import { MapEmitSelect } from '../../helpers';
+import { KC_SELECT, KC_SELECTION, KC_VALUE } from '../../tokens';
+import {
+  KcGroup,
+  KcOption,
+  KcOptionGroupValue,
+  KcOptionSelection,
+  KcOptionValue,
+  KcSelect,
+  OptionGroup,
+} from '../../types';
 
 @Component({
   selector: 'kc-group',
@@ -25,19 +34,19 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
   providers: [
     {
       provide: KC_SELECTION,
-      useFactory: (autocomplete: KcGroupComponent<unknown, unknown>) => autocomplete.selection,
+      useFactory: (autocomplete: KcGroupComponent<unknown, unknown, unknown>) => autocomplete.selection,
       deps: [forwardRef(() => KcGroupComponent)],
     },
     {
       provide: KC_VALUE,
-      useFactory: (component: KcGroupComponent<unknown, unknown>) => component.value,
+      useFactory: (component: KcGroupComponent<unknown, unknown, unknown>) => component.value,
       deps: [forwardRef(() => KcGroupComponent)],
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
-  @Input() options!: KcGroup<K, V>;
+export class KcGroupComponent<V, K, L> implements OnInit, AfterContentInit, OnDestroy {
+  @Input() options!: KcGroup<V, K, L>;
   @Input() key!: string;
 
   @Input()
@@ -49,22 +58,27 @@ export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
   }
   private _multiple = false;
 
-  @ContentChildren(KcGroupDirective) groups!: QueryList<KcGroupDirective<K, V>>;
-  @ContentChildren(KcOptionsDirective) option!: QueryList<KcOptionsDirective<K, V>>;
+  @ContentChildren(KcGroupDirective) groups!: QueryList<KcGroupDirective<V, K, L>>;
+  @ContentChildren(KcOptionsDirective) option!: QueryList<KcOptionsDirective<V, K, L>>;
 
-  selection!: MapEmit<string | K | V, KcOption<K, V> | KcOptionSelection<K, V>, boolean>;
+  selection!: MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, string | K | V, boolean>;
+
+  private _destroy: Subject<void>;
 
   constructor(
     @SkipSelf()
     @Inject(KC_SELECTION)
-    private _selection: MapEmit<string, KcOptionSelection<K, V>, boolean>,
-    @SkipSelf() @Inject(KC_VALUE) private _value: KcOptionValue<V> | KcOptionGroupValue<V>,
-  ) {}
+    private _selection: MapEmitSelect<KcOptionSelection<V, K, L>, string, boolean>,
+    @SkipSelf() @Inject(KC_SELECT) private _select: KcSelect<V>,
+  ) {
+    this._destroy = new Subject();
+  }
 
   get value(): KcOptionValue<V> | KcOptionGroupValue<V> {
-    if (this._isOptionGroupValue(this._value)) return this._value[this.key];
+    const value = this._select.value;
+    if (this._isOptionGroupValue(value)) return value[this.key];
 
-    return this._value;
+    return value;
   }
 
   ngAfterContentInit(): void {
@@ -76,27 +90,34 @@ export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
     this._initSelection();
   }
 
+  ngOnDestroy(): void {
+    this._destroy.next();
+  }
+
   private _initSelection(): void {
     this.selection = this._getSelection();
+    /**
+     * If the selection is empty, set the selection to the current option.
+     * we need to check if the selection is empty because the selection can be set from previous render.
+     */
+    if (this._selection.isEmpty()) this._selection.set(this.key, this.selection);
 
-    this._selection.set(this.key, this.selection);
-
-    this.selection.changed.subscribe(() => {
+    this.selection.changed.pipe(takeUntil(this._destroy)).subscribe(() => {
       if (this._selection.has(this.key)) this._selection.update(this.key, this.selection);
       else this._selection.set(this.key, this.selection);
     });
   }
 
-  private _getSelection(): MapEmit<string | K | V, KcOption<K, V> | KcOptionSelection<K, V>, boolean> {
+  private _getSelection(): MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, string | K | V, boolean> {
     if (this._selection.has(this.key)) return this._selection.get(this.key)!;
 
     const option = this._getOption();
     const options = option && (this.multiple ? option : option[0]);
 
-    return new MapEmit<string, KcOption<K, V> | KcOptionSelection<K, V>, boolean>(this.multiple, options);
+    return new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, string, boolean>(this.multiple, options);
   }
 
-  private _getOption(): [string, KcOption<K, V>][] | undefined {
+  private _getOption(): [string, KcOption<V, K, L>][] | undefined {
     if (this._isOptionGroup(this.options[this.key]))
       return this._getOptions(this.options)
         .flat()
@@ -110,15 +131,15 @@ export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
     return undefined;
   }
 
-  private _getGroup(options: KcGroup<K, V>): KcGroup<K, V> {
-    return options[this.key] as KcGroup<K, V>;
+  private _getGroup(options: KcGroup<V, K, L>): KcGroup<V, K, L> {
+    return options[this.key] as KcGroup<V, K, L>;
   }
 
-  private _getOptionGroup(options: KcGroup<K, V>): OptionGroup<K, V> {
-    return options[this.key] as OptionGroup<K, V>;
+  private _getOptionGroup(options: KcGroup<V, K, L>): OptionGroup<V, K, L> {
+    return options[this.key] as OptionGroup<V, K, L>;
   }
 
-  private _getOptions(options: KcGroup<K, V>): KcOption<K, V>[][] {
+  private _getOptions(options: KcGroup<V, K, L>): KcOption<V, K, L>[][] {
     const value = this._getOptionGroup(options).value;
 
     if (this._isOptionChunks(value)) return value;
@@ -126,7 +147,7 @@ export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
     return [value];
   }
 
-  private _isOptionGroup(option: KcGroup<K, V> | OptionGroup<K, V>): option is OptionGroup<K, V> {
+  private _isOptionGroup(option: KcGroup<V, K, L> | OptionGroup<V, K, L>): option is OptionGroup<V, K, L> {
     return !!option.value;
   }
 
@@ -134,7 +155,7 @@ export class KcGroupComponent<K, V> implements OnInit, AfterContentInit {
     return typeof value === 'object' && !Array.isArray(value);
   }
 
-  private _isOptionChunks(option: KcOption<K, V>[] | KcOption<K, V>[][]): option is KcOption<K, V>[][] {
+  private _isOptionChunks(option: KcOption<V, K, L>[] | KcOption<V, K, L>[][]): option is KcOption<V, K, L>[][] {
     return Array.isArray(option[0]);
   }
 }

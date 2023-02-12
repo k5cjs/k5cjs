@@ -11,7 +11,7 @@ import { KcGroup } from '@k5cjs/select';
 })
 export class GroupMultipleComponent {
   control: UntypedFormControl;
-  options: KcGroup<string, string>;
+  options: KcGroup<string, string, string>;
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control({});

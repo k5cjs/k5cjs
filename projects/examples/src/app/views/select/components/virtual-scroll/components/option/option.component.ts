@@ -9,8 +9,8 @@ import { KcOption, KcOptionDirective } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent implements OnInit {
-  @Input() option!: KcOption<string, string>;
-  @Input() optionTemplate!: KcOptionDirective<string, string>;
+  @Input() option!: KcOption<string, string, string>;
+  @Input() optionTemplate!: KcOptionDirective<string, string, string>;
 
   @ViewChild('outlet', { static: true, read: ViewContainerRef }) protected _outlet!: ViewContainerRef;
 

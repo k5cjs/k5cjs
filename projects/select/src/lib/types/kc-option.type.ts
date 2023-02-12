@@ -1,20 +1,23 @@
-import { MapEmit } from '@k5cjs/selection-model';
-
 /**
  * options type for input options
  */
-export interface KcOption<K, V> {
+// TODO: move K to be second generic and put default to unknown
+
+import { MapEmitSelect } from '../helpers';
+
+// because key is optional
+export interface KcOption<V, K = V, L = string> {
   value: V;
   key?: K;
-  label?: string;
+  label?: L;
 }
 
-export type KcGroup<K, V> = {
-  [K: string]: KcGroup<K, V> | OptionGroup<K, V>;
+export type KcGroup<V, K = V, L = string> = {
+  [K: string]: KcGroup<V, K, L> | OptionGroup<V, K, L>;
 };
 
-export interface OptionGroup<K, V> {
-  value: KcOption<K, V>[] | KcOption<K, V>[][];
+export interface OptionGroup<V, K = V, L = string> {
+  value: KcOption<V, K, L>[] | KcOption<V, K, L>[][];
   label?: string;
 }
 
@@ -30,4 +33,8 @@ export type KcOptionGroupValue<V> = {
 /**
  * options for internal structure
  */
-export type KcOptionSelection<K, V> = MapEmit<string | K | V, KcOption<K, V> | KcOptionSelection<K, V>, boolean>;
+export type KcOptionSelection<V, K, L> = MapEmitSelect<
+  KcOption<V, K, L> | KcOptionSelection<V, K, L>,
+  string | V | K,
+  boolean
+>;

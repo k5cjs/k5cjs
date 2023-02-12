@@ -10,6 +10,7 @@ import {
   KcGroupDirective,
   KcOptionDirective,
   KcOptionsDirective,
+  KcOriginDirective,
   KcSelectAllDirective,
   KcSubmitDirective,
   KcToggleDirective,
@@ -30,6 +31,7 @@ const directives = [
   KcToggleDirective,
   KcClearDirective,
   KcSubmitDirective,
+  KcOriginDirective,
 ];
 
 @NgModule({

@@ -1,15 +1,18 @@
-<div cdk-overlay-origin #origin="cdkOverlayOrigin" (click)="open()">
+<div cdk-overlay-origin #originRef="cdkOverlayOrigin">
   <ng-template #valueRef></ng-template>
 
   <ng-template
     #templateRef
     cdk-connected-overlay
     cdkConnectedOverlayLockPosition
-    [cdkConnectedOverlayOrigin]="origin"
+    [cdkConnectedOverlayFlexibleDimensions]="true"
+    [cdkConnectedOverlayViewportMargin]="20"
+    [cdkConnectedOverlayPositions]="positions"
+    [cdkConnectedOverlayOrigin]="origin || originRef"
     [cdkConnectedOverlayOpen]="panelOpen"
     (overlayKeydown)="keydown($event)"
-    (overlayOutsideClick)="close($event)"
   >
+    <!-- (overlayOutsideClick)="close($event)" -->
     <ng-content></ng-content>
   </ng-template>
 </div>

@@ -1,21 +1,23 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   AfterContentInit,
+  Attribute,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ContentChild,
   ContentChildren,
   EventEmitter,
+  HostBinding,
+  HostListener,
   Input,
   Output,
   QueryList,
   TemplateRef,
   ViewChild,
   ViewContainerRef,
-  ViewEncapsulation,
   forwardRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -33,11 +35,10 @@ import {
   tap,
 } from 'rxjs';
 
-import { MapEmit } from '@k5cjs/selection-model';
-
 import { KcOptionComponent } from './components';
-import { KcGroupDirective, KcOptionsDirective, KcValueDirective } from './directives';
-import { getValues } from './helpers';
+import { DEFAULT_POSITIONS } from './config';
+import { KcGroupDirective, KcOptionsDirective, KcOriginDirective, KcValueDirective } from './directives';
+import { MapEmitSelect, getValues } from './helpers';
 import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
 import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, KcSelect } from './types';
 
@@ -57,35 +58,34 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
     },
     {
       provide: KC_SELECTION,
-      useFactory: (component: KcSelectComponent<unknown, unknown>) => component.selection,
+      useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.selection,
       deps: [forwardRef(() => KcSelectComponent)],
     },
     {
       provide: KC_VALUE,
-      useFactory: (component: KcSelectComponent<unknown, unknown>) => component.value,
+      useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.value,
       deps: [forwardRef(() => KcSelectComponent)],
     },
   ],
-  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAccessor, KcSelect {
+export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValueAccessor, KcSelect {
   @Input()
-  get options(): Observable<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>> {
+  get options(): Observable<KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>> {
     return this._options;
   }
   set options(
     options:
-      | Observable<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>>
-      | KcOption<K, V>[]
-      | KcOption<K, V>[][]
-      | KcGroup<K, V>,
+      | Observable<KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>>
+      | KcOption<V, K, L>[]
+      | KcOption<V, K, L>[][]
+      | KcGroup<V, K, L>,
   ) {
     if (isObservable(options)) this._options = options;
     else this._createObservableOptions(options);
   }
-  private _options!: Observable<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>>;
-  private _optionsCache: ReplaySubject<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>> | undefined;
+  private _options!: Observable<KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>>;
+  private _optionsCache: ReplaySubject<KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>> | undefined;
 
   /**
    * allow user to open selection in modal
@@ -109,6 +109,10 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._dialog = coerceBooleanProperty(value);
   }
   private _dialog = false;
+  /**
+   * allow user to change origin from where selection will be opened
+   */
+  @Input() origin: KcOriginDirective | undefined;
 
   @Output() closed: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
   @Output() submitted: EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>;
@@ -118,16 +122,16 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   @ViewChild('templateRef') templateRef!: TemplateRef<unknown>;
 
   @ContentChildren(KcOptionComponent, { descendants: true })
-  optionComponents!: QueryList<KcOptionComponent<K, V>>;
+  optionComponents!: QueryList<KcOptionComponent<V, K, L>>;
 
   @ContentChild(KcValueDirective, { static: true })
   private _valueDirective?: KcValueDirective;
 
   @ContentChildren(KcGroupDirective, { descendants: true })
-  private _groupDirectives!: QueryList<KcGroupDirective<K, V>>;
+  private _groupDirectives!: QueryList<KcGroupDirective<V, K, L>>;
 
   @ContentChildren(KcOptionsDirective, { descendants: true })
-  private _optionsDirectives!: QueryList<KcOptionsDirective<K, V>>;
+  private _optionsDirectives!: QueryList<KcOptionsDirective<V, K, L>>;
 
   set value(val: KcOptionValue<V> | KcOptionGroupValue<V>) {
     this._value = val;
@@ -137,6 +141,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     return this._value;
   }
   private _value!: KcOptionValue<V> | KcOptionGroupValue<V>;
+
+  @Input() positions: ConnectedPosition[];
+
   /**
    * panelOpen is for open/close the overlay panel
    */
@@ -145,21 +152,32 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
    * selectionOpened variable is for check if the overlay or dialog is open
    */
   selectionOpened = false;
-  selection!: KcOptionSelection<K, V>;
+  selection!: KcOptionSelection<V, K, L>;
 
   allSelected: boolean;
   allSelectedChanged: Observable<boolean>;
+
   private _allSelectedChanged: BehaviorSubject<boolean>;
 
   private _dialogOverlayRef: OverlayRef | undefined;
   private _optionsSubscription: Subscription | undefined;
+
+  private _focused: boolean;
+
+  private _tabIndex: number;
+
   private _destroy: Subject<void>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: unknown) => void = () => {};
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onTouch: () => unknown = () => {};
+  private _onTouch: () => unknown = () => {};
 
-  constructor(private _overlay: Overlay, private _viewContainerRef: ViewContainerRef, private _cdr: ChangeDetectorRef) {
+  constructor(
+    private _overlay: Overlay,
+    private _viewContainerRef: ViewContainerRef,
+    private _cdr: ChangeDetectorRef,
+    @Attribute('tabindex') tabIndex: string,
+  ) {
     this._destroy = new Subject<void>();
 
     this.closed = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
@@ -168,6 +186,11 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this._allSelectedChanged = new BehaviorSubject<boolean>(false);
     this.allSelectedChanged = this._allSelectedChanged.asObservable();
+    this.positions = DEFAULT_POSITIONS;
+
+    this._focused = false;
+
+    this._tabIndex = parseInt(tabIndex) || 0;
   }
 
   ngAfterContentInit(): void {
@@ -180,6 +203,17 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     if (this._valueDirective) this._valueDirective.render(this._valueRef);
   }
 
+  /**
+   * allow element to be focusable
+   */
+  @HostBinding('attr.tabindex') get tabindex(): number {
+    return this._tabIndex;
+  }
+
+  get focused(): boolean {
+    return this._focused;
+  }
+
   writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
     this.value = obj;
     this._updateSelectionModel();
@@ -190,10 +224,48 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   }
 
   registerOnTouched(fn: () => unknown): void {
-    this.onTouch = fn;
+    this._onTouch = fn;
+  }
+
+  @HostListener('keydown', ['$event']) private _keydown(event: KeyboardEvent): void {
+    /**
+     * when user focus on element and press space, open selection
+     */
+    if (event.key === ' ') this.open();
+  }
+
+  /**
+   * open selection when user click on element
+   */
+  @HostListener('click')
+  click(): void {
+    if (this.selectionOpened) this.close();
+    else this.open();
+  }
+
+  /**
+   * open selection when user press tab to focus on element
+   */
+  @HostListener('focus')
+  focus(): void {
+    this._focused = true;
+  }
+
+  /**
+   * close selection when user press tab to blur on element
+   */
+  @HostListener('blur')
+  blur(): void {
+    this._focused = false;
+    this.close();
   }
 
   open(): void {
+    /**
+     * skip to open if selection is already opened
+     */
+    if (this.selectionOpened) return;
+
     if (this.dialog) this._openDialog();
     else this.panelOpen = true;
 
@@ -203,17 +275,19 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this._optionsSubscription = this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length)
-        this._groupDirectives.forEach((group) => group.render(options as KcGroup<K, V>));
+        this._groupDirectives.forEach((group) => group.render(options as KcGroup<V, K, L>));
       else if (this._optionsDirectives.length)
         this._optionsDirectives.forEach((optionDirective, index) =>
-          optionDirective.render(
-            this._getOptions(options as KcOption<K, V>[] | KcOption<K, V>[][])[index] as unknown as KcOption<K, V>[],
-          ),
+          optionDirective.render(this._getOptions(options as KcOption<V, K, L>[] | KcOption<V, K, L>[][])[index]),
         );
     });
   }
 
   close(event?: MouseEvent): void {
+    /**
+     * skip to close if selection is already closed
+     */
+    if (!this.selectionOpened) return;
     /**
      * check if html element contains an attribute called 'prevent-close''
      */
@@ -281,6 +355,32 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._optionsSubscription = undefined;
   }
 
+  private _initSelectionModel(): void {
+    this._getSelectedOptions
+      .pipe(
+        /**
+         * get first event from selected options to initialize selection model
+         */
+        first(),
+        map((options) => options && (this.multiple ? options : options[0])),
+        map(
+          (options) =>
+            new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple, options),
+        ),
+        tap((selection) => (this.selection = selection)),
+        switchMap((selectionModel) => selectionModel.changed),
+        takeUntil(this._destroy),
+      )
+      .subscribe(() => {
+        /**
+         * When the groups are initialized, the selectionModel changes from the AfterContentInit hook
+         * Angular does not expect events to be raised during change detection, so any state change
+         * (such as a form control's 'ng-touched') will cause a changed-after-checked error.
+         */
+        void Promise.resolve().then(() => this._onSelect());
+      });
+  }
+
   private _updateSelectionModel(): void {
     if (!this.selection) return;
 
@@ -297,64 +397,80 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
       .subscribe();
   }
 
-  private _initSelectionModel(): void {
-    this._getSelectedOptions
-      .pipe(
-        /**
-         * get first event from selected options to initialize selection model
-         */
-        first(),
-        map((options) => options && (this.multiple ? options : options[0])),
-        map((options) => new MapEmit<K | V, KcOption<K, V> | KcOptionSelection<K, V>, boolean>(this.multiple, options)),
-        tap((selection) => (this.selection = selection)),
-        switchMap((selectionModel) => selectionModel.changed),
-        takeUntil(this._destroy),
-      )
-      .subscribe(() => {
-        /**
-         * When the groups are initialized, the selectionModel changes from the AfterContentInit hook
-         * Angular does not expect events to be raised during change detection, so any state change
-         * (such as a form control's 'ng-touched') will cause a changed-after-checked error.
-         */
-        void Promise.resolve().then(() => this._onSelect());
-      });
-  }
-
-  private _getOptions(options: KcOption<K, V>[] | KcOption<K, V>[][]): KcOption<K, V>[][] {
+  private _getOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][]): KcOption<V, K, L>[][] {
     if (this._isOptionChunks(options)) return options;
 
     return [options];
   }
 
-  private get _getSelectedOptions(): Observable<[K | V, KcOption<K, V>][] | undefined> {
+  /**
+   * check selected options
+   */
+  private get _getSelectedOptions(): Observable<[K | V, KcOption<V, K, L>][] | undefined> {
     return this.options.pipe(
       map((options) => {
         if (Array.isArray(options)) {
-          if (this._isOptionChunks(options)) {
-            return options.flat().filter((option) => {
-              if (Array.isArray(this.value)) return this.value.some((value) => value === option.value);
+          return this._simpleOptions(options).map((option) => [option.key || option.value, option]);
+        } else if (options) {
+          return (
+            Object.entries(options)
+              .filter(([key]) => (this.value as KcOptionGroupValue<V>)[key])
+              .map(([key, { value }]) => {
+                const allOptions = value as KcOption<V, K, L>[];
+                const selectedValues = this.value as KcOptionGroupValue<V>;
+                const selectedValue = selectedValues[key];
 
-              return this.value === option.value;
-            });
-          } else
-            return options.filter((option) => {
-              if (Array.isArray(this.value)) return this.value.some((value) => value === option.value);
+                const filter = allOptions.filter((option) => {
+                  if (Array.isArray(selectedValue))
+                    return selectedValue.some((value) => value === option.key || value === option.value);
 
-              return this.value === option.value;
-            });
+                  return selectedValue === option.key || selectedValue === option.value;
+                });
+
+                const selectedOptions: [K, V][] = filter.map((option) => [option.key || option.value, option]) as [
+                  K,
+                  V,
+                ][];
+
+                const group = Array.isArray(selectedValue)
+                  ? new MapEmitSelect<V, K, true>(true, selectedOptions as unknown as [K, V][])
+                  : new MapEmitSelect(false, selectedOptions[0]);
+
+                return {
+                  key,
+                  value: group,
+                };
+              }) as unknown as KcOption<V, K, L>[]
+          ).map((option) => [option.key || option.value, option.value as KcOption<V, K, L>]);
         }
 
         return undefined;
       }),
-      map((options) => options?.map((option) => [option.key || option.value, option])),
     );
   }
 
-  private _isOptionChunks(option: KcOption<K, V>[] | KcOption<K, V>[][]): option is KcOption<K, V>[][] {
+  private _simpleOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][]) {
+    if (this._isOptionChunks(options)) {
+      return options.flat().filter((option) => {
+        if (Array.isArray(this.value))
+          return this.value.some((value) => (option.key ? value === option.key : value === option.value));
+
+        return option.key ? this.value === option.key : this.value === option.value;
+      });
+    } else
+      return options.filter((option) => {
+        if (Array.isArray(this.value))
+          return this.value.some((value) => (option.key ? value === option.key : value === option.value));
+
+        return option.key ? this.value === option.key : this.value === option.value;
+      });
+  }
+
+  private _isOptionChunks(option: KcOption<V, K, L>[] | KcOption<V, K, L>[][]): option is KcOption<V, K, L>[][] {
     return Array.isArray(option[0]);
   }
 
-  private _createObservableOptions(options: KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>): void {
+  private _createObservableOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>): void {
     if (!this._optionsCache) {
       this._optionsCache = new ReplaySubject();
       this._options = this._optionsCache;
@@ -384,7 +500,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
   /** Invoked when an option is clicked. */
   private _onSelect(): void {
-    const valueToEmit = getValues<K, V>(this.selection);
+    const valueToEmit = getValues<V, K, L>(this.selection);
 
     this._value = valueToEmit!;
     this._onChange(valueToEmit);

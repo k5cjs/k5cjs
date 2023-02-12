@@ -60,7 +60,7 @@ export class SimpleWrappedSharedComponent<T = unknown> extends WrappedFormContro
 export class SimpleWrappedComponent {
   control: UntypedFormControl;
   search: UntypedFormControl;
-  options: KcOption<string, string>[];
+  options: KcOption<string, string, string>[];
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control(['Location 2']);

@@ -3,7 +3,11 @@
 </ng-container>
 
 <ng-template #placeholder>
-  <div>Choose an option</div>
+  <div #ref>
+    <ng-content placeholder></ng-content>
+  </div>
+
+  <span *ngIf="!ref.children.length">Please choose an option</span>
 </ng-template>
 
 <ng-content></ng-content>

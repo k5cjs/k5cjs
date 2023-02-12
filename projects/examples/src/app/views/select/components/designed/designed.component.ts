@@ -11,7 +11,7 @@ import { KcOption, KcOptionValue } from '@k5cjs/select';
 })
 export class DesignedComponent {
   control: UntypedFormControl;
-  options: KcOption<string, string>[];
+  options: KcOption<string, string, string>[];
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control('Location 2');

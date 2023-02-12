@@ -9,9 +9,9 @@ import { MapEmit } from '@k5cjs/selection-model';
   styleUrls: ['./option-toggle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OptionToggleComponent extends KcOptionComponent<string, boolean> {
+export class OptionToggleComponent extends KcOptionComponent<boolean, string, string> {
   constructor(
-    @Inject(KC_SELECTION) selection: MapEmit<string | boolean, KcOption<string | boolean, boolean>, boolean>,
+    @Inject(KC_SELECTION) selection: MapEmit<string | boolean, KcOption<boolean, string>, boolean>,
     cdr: ChangeDetectorRef,
   ) {
     super(selection, cdr);

@@ -8,4 +8,4 @@ import { KcOptionComponent, provideKcOption } from '@k5cjs/select';
   styleUrls: ['./custom-option.component.scss'],
   providers: [provideKcOption(CustomOptionComponent)],
 })
-export class CustomOptionComponent<K, V> extends KcOptionComponent<K, V> {}
+export class CustomOptionComponent<V, K, L> extends KcOptionComponent<V, K, L> {}

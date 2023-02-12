@@ -20,7 +20,7 @@ import { KcOption } from 'dist/select/public-api';
 })
 export class DefaultPlaceHolderComponent {
   control: UntypedFormControl;
-  options: KcOption<string, string>[];
+  options: KcOption<string, string, string>[];
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control(null);

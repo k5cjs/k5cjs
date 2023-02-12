@@ -2,15 +2,18 @@ import { Directive, Input, TemplateRef } from '@angular/core';
 
 import { KcOption } from '../../types';
 
-type Context<K, V> = { $implicit: KcOption<K, V> };
+type Context<V, K, L> = { $implicit: KcOption<V, K, L> };
 
 @Directive({ selector: '[kcOption]' })
-export class KcOptionDirective<K, V> {
-  @Input('kcOptionType') public type!: KcOption<K, V>;
+export class KcOptionDirective<V, K, L> {
+  @Input('kcOptionType') public type!: KcOption<V, K, L>;
 
-  constructor(public template: TemplateRef<Context<K, V>>) {}
+  constructor(public template: TemplateRef<Context<V, K, L>>) {}
 
-  static ngTemplateContextGuard<K, V>(_dir: KcOptionDirective<K, V>, _ctx: Context<K, V>): _ctx is Context<K, V> {
+  static ngTemplateContextGuard<V, K, L>(
+    _dir: KcOptionDirective<V, K, L>,
+    _ctx: Context<V, K, L>,
+  ): _ctx is Context<V, K, L> {
     return true;
   }
 }

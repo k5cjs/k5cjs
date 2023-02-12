@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/select",
-  "version": "14.0.3",
+  "version": "15.0.0-alpha.0",
   "peerDependencies": {
     "@angular/common": "^14.2.6",
     "@angular/core": "^14.2.6",

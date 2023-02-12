@@ -12,10 +12,10 @@ import { KcOption } from '@k5cjs/select';
 })
 export class VirtualScrollComponent {
   control: UntypedFormControl;
-  options: Observable<KcOption<string, string>[]>;
+  options: Observable<KcOption<string, string, string>[]>;
   loading = false;
 
-  private _options: BehaviorSubject<KcOption<string, string>[]>;
+  private _options: BehaviorSubject<KcOption<string, string, string>[]>;
 
   private _page = 50;
   private _buffer = 5;
@@ -24,7 +24,7 @@ export class VirtualScrollComponent {
   constructor(private _fb: UntypedFormBuilder, private _cdr: ChangeDetectorRef) {
     this.control = this._fb.control(null);
 
-    this._options = new BehaviorSubject<KcOption<string, string>[]>([]);
+    this._options = new BehaviorSubject<KcOption<string, string, string>[]>([]);
     this.options = this._options.asObservable();
 
     this._loaded = new Set();
@@ -54,7 +54,7 @@ export class VirtualScrollComponent {
     }, 300);
   }
 
-  private _generateOptions(length: number, skip: number = 0): KcOption<string, string>[] {
+  private _generateOptions(length: number, skip: number = 0): KcOption<string, string, string>[] {
     return Array.from({ length }).map((_, i) => ({ label: `Location ${i + skip}`, value: `Location ${i + skip}` }));
   }
 }
