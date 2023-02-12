@@ -11,7 +11,7 @@ import { KcGroup } from '@k5cjs/select';
 })
 export class GroupBooleanToggleComponent {
   control: UntypedFormControl;
-  options: KcGroup<string, boolean>;
+  options: KcGroup<boolean, string>;
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control({

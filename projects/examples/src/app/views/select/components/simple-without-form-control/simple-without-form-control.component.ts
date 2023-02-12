@@ -9,7 +9,7 @@ import { KcOption, KcOptionValue } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SimpleWithoutFormControlComponent {
-  options: KcOption<string, string>[];
+  options: KcOption<string, string, string>[];
 
   constructor() {
     this.options = [

@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
 
-import { MapEmit } from '@k5cjs/selection-model';
+import { MapEmitSelect } from '../helpers';
 
-export const KC_SELECTION = new InjectionToken<MapEmit<unknown, unknown>>('KC_SELECTION');
+export const KC_SELECTION = new InjectionToken<MapEmitSelect<unknown>>('KC_SELECTION');

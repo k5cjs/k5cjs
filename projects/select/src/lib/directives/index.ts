@@ -4,6 +4,7 @@ export * from './kc-deselect-all/kc-deselect-all.directive';
 export * from './kc-group/kc-group.directive';
 export * from './kc-option/kc-option.directive';
 export * from './kc-options/kc-options.directive';
+export * from './kc-origin/kc-origin.directive';
 export * from './kc-select-all/kc-select-all.directive';
 export * from './kc-submit/kc-submit.directive';
 export * from './kc-toggle/kc-toggle.directive';

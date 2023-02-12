@@ -1,18 +1,17 @@
-import { MapEmit } from '@k5cjs/selection-model';
-
+import { MapEmitSelect } from '../helpers';
 import { KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue } from '../types';
 
-type Options<K, V> = KcOptionSelection<K, V> | KcOption<K, V>;
+type Options<V, K, L> = KcOptionSelection<V, K, L> | KcOption<V, K, L>;
 type OptionsValue<V> = KcOptionGroupValue<V> | KcOptionValue<V>;
-type Item<K, V> = [K | V, Options<K, V>];
+type Item<V, K, L> = [K | V, Options<V, K, L>];
 
-export function getValues<K, V>(values: KcOptionSelection<K, V>): OptionsValue<V> | undefined {
+export function getValues<V, K, L>(values: KcOptionSelection<V, K, L>): OptionsValue<V> | undefined {
   /**
    * check if map is multiple
    * is is multiple we need to iterate over all values
    */
   if (values.isMultiple()) {
-    return (values.selectedEntries as unknown as Item<K, V>[]).reduce<OptionsValue<V> | undefined>(
+    return (values.selectedEntries as unknown as Item<V, K, L>[]).reduce<OptionsValue<V> | undefined>(
       (acc, [key, item]) => {
         if (checkIsOption(item)) return [...(acc as []), item.value];
         /**
@@ -40,7 +39,7 @@ export function getValues<K, V>(values: KcOptionSelection<K, V>): OptionsValue<V
 
   if (!values.selectedEntries) return;
 
-  const [key, item] = values.selectedEntries as Item<K, V>;
+  const [key, item] = values.selectedEntries as Item<V, K, L>;
 
   if (checkIsOption(item)) return item.value;
 
@@ -69,6 +68,6 @@ function checkIsEmpty<V>(item: OptionsValue<V> | undefined): item is undefined |
   return false;
 }
 
-function checkIsOption<K, V>(item: Options<K, V>): item is KcOption<K, V> {
-  return !(item instanceof MapEmit);
+function checkIsOption<V, K, L>(item: Options<V, K, L>): item is KcOption<V, K, L> {
+  return !(item instanceof MapEmitSelect);
 }

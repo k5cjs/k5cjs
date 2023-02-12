@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, HostBinding, Inject } from '@angular/core';
 import { Observable, map, startWith } from 'rxjs';
 
-import { MapEmit } from '@k5cjs/selection-model';
-
+import { MapEmitSelect } from '../../helpers';
 import { KC_SELECTION } from '../../tokens';
 import { KcOption } from '../../types';
 
@@ -15,11 +14,12 @@ import { KcOption } from '../../types';
 export class KcValueComponent<T extends boolean = false> {
   value!: Observable<string | undefined>;
 
-  constructor(@Inject(KC_SELECTION) private _selection: MapEmit<string, KcOption<string, unknown>, T>) {
+  constructor(@Inject(KC_SELECTION) private _selection: MapEmitSelect<KcOption<string, unknown>, string, T>) {
     this.value = this._selection.changed.pipe(
       startWith({ source: { selected: this._selection.selected } }),
       map(({ source: { selected } }) => {
         if (Array.isArray(selected)) return selected.map(({ label }) => label).join(', ');
+        // TODO: need to check if this is not { value: string, label: string }
         else if (selected && typeof selected === 'object' && Object.keys(selected).length > 0) return 'Object logic';
         else if (selected && selected.label) return selected.label;
 

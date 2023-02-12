@@ -8,7 +8,7 @@ import { KcOptionComponent, provideKcOption } from '@k5cjs/select';
   styleUrls: ['./extend-option.component.scss'],
   providers: [provideKcOption(ExtendOptionComponent)],
 })
-export class ExtendOptionComponent extends KcOptionComponent<unknown, unknown> {
+export class ExtendOptionComponent extends KcOptionComponent<unknown, unknown, unknown> {
   override click(): void {
     console.log('override click');
   }

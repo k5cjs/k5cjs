@@ -11,7 +11,7 @@ import { KcGroup } from 'dist/select/public-api';
 })
 export class GroupBooleanComponent {
   control: UntypedFormControl;
-  options: KcGroup<string, boolean>;
+  options: KcGroup<boolean, string>;
 
   constructor(private _fb: UntypedFormBuilder) {
     this.control = this._fb.control({});

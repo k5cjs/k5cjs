@@ -8,7 +8,7 @@ import { KcOption, KcOptionsComponent } from '@k5cjs/select';
   styleUrls: ['./options.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OptionsComponent extends KcOptionsComponent<string, string> {
+export class OptionsComponent extends KcOptionsComponent<string, string, string> {
   @Output() index: EventEmitter<number>;
 
   constructor() {
@@ -17,7 +17,7 @@ export class OptionsComponent extends KcOptionsComponent<string, string> {
     this.index = new EventEmitter<number>();
   }
 
-  trackBy(_: number, option: KcOption<string, string>): string {
+  trackBy(_: number, option: KcOption<string, string, string>): string {
     return option.value;
   }
 

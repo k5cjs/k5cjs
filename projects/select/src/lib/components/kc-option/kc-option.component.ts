@@ -9,8 +9,7 @@ import {
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
-import { MapEmit } from '@k5cjs/selection-model';
-
+import { MapEmitSelect } from '../../helpers';
 import { KC_SELECTION } from '../../tokens';
 import { KcOption } from '../../types';
 
@@ -20,13 +19,13 @@ import { KcOption } from '../../types';
   styleUrls: ['./kc-option.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcOptionComponent<K, V> implements OnDestroy {
-  @Input() option!: KcOption<K | V, V>;
+export class KcOptionComponent<V, K, L> implements OnDestroy {
+  @Input() option!: KcOption<V, K, L>;
 
   protected _destroy: Subject<void>;
 
   constructor(
-    @Inject(KC_SELECTION) protected _selection: MapEmit<K | V, KcOption<K | V, V>, boolean>,
+    @Inject(KC_SELECTION) protected _selection: MapEmitSelect<KcOption<V, K, L>, K | V, boolean>,
     protected _cdr: ChangeDetectorRef,
   ) {
     this._destroy = new Subject();

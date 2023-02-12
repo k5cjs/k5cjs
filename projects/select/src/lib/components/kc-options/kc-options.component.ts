@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input, ViewChild, ViewContainerRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ContentChild,
+  HostListener,
+  Input,
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 
 import { KcOptionDirective } from '../../directives';
 import { KcOption } from '../../types';
@@ -9,21 +17,21 @@ import { KcOption } from '../../types';
   styleUrls: ['./kc-options.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcOptionsComponent<K, V> {
+export class KcOptionsComponent<V, K, L> {
   @Input()
-  get options(): KcOption<K, V>[] {
+  get options(): KcOption<V, K, L>[] {
     return this._options;
   }
-  set options(options: KcOption<K, V>[]) {
+  set options(options: KcOption<V, K, L>[]) {
     this._options = options;
     this._render();
   }
-  private _options!: KcOption<K, V>[];
+  private _options!: KcOption<V, K, L>[];
 
   /**
    *  { static: true } needs to be set when you want to access the ViewChild in ngOnInit.
    */
-  @ContentChild(KcOptionDirective, { static: true }) public optionTemplate!: KcOptionDirective<K, V>;
+  @ContentChild(KcOptionDirective, { static: true }) public optionTemplate!: KcOptionDirective<V, K, L>;
   @ViewChild('outlet', { static: true, read: ViewContainerRef }) protected _outlet!: ViewContainerRef;
 
   protected _render(): void {
@@ -34,5 +42,14 @@ export class KcOptionsComponent<K, V> {
       const dialog = this.optionTemplate.template.createEmbeddedView({ $implicit: option });
       this._outlet.insert(dialog);
     });
+  }
+
+  @HostListener('mousedown', ['$event'])
+  protected _mousedown(event: MouseEvent): void {
+    /**
+     * Prevents the blur event from firing on the root element.
+     * also prevent to close the dropdown when clicking on the options.
+     */
+    event.preventDefault();
   }
 }

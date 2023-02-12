@@ -12,7 +12,7 @@ import { KcOption, filterNestedOptions } from '@k5cjs/select';
 export class GroupSearchComponent {
   control: UntypedFormControl;
   search: UntypedFormControl;
-  options: KcOption<string, string>[][];
+  options: KcOption<string, string, string>[][];
 
   constructor(private _fb: UntypedFormBuilder, private _cdr: ChangeDetectorRef) {
     this.control = this._fb.control('Location 1');
