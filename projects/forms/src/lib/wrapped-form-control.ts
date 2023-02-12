@@ -1,10 +1,33 @@
-import { Component, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ChangeDetectorRef, Component, DoCheck, Injector, OnInit, ViewChild, inject } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 
 @Component({ template: `` })
+// extends from BaseControlValueAccessor
 // eslint-disable-next-line @angular-eslint/component-class-suffix
-export abstract class WrappedFormControl implements ControlValueAccessor {
+export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValueAccessor {
   @ViewChild(NG_VALUE_ACCESSOR, { static: true }) valueAccessor!: ControlValueAccessor;
+
+  protected _ngControl!: NgControl;
+  protected _injector: Injector;
+  protected _cdr: ChangeDetectorRef;
+
+  constructor() {
+    this._injector = inject(Injector);
+    this._cdr = inject(ChangeDetectorRef);
+  }
+
+  ngOnInit(): void {
+    this._ngControl = this._injector.get(NgControl);
+  }
+  /**
+   * ngDoCheck it's only triggered for the top-most component in the disabled branch,
+   * not for every component in the disabled branch.
+   * And because we wrap the control that works with ngDoCheck it will no longer be top-most
+   * and then we have to call it manually
+   */
+  ngDoCheck(): void {
+    this._cdr.markForCheck();
+  }
 
   writeValue(obj: unknown): void {
     if ((typeof ngDevMode === 'undefined' || ngDevMode) && !this.valueAccessor)
