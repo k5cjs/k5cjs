@@ -202,7 +202,7 @@ export class MapEmit<K, V, T extends boolean = false> {
     this._selected = null;
     this._selectedEntries = null;
 
-    if (this._setToEmit || this._updatedToEmit || this._deletedToEmit) {
+    if (this._setToEmit.length || this._updatedToEmit.length || this._deletedToEmit.length) {
       this._changed.next({
         source: this,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
@@ -238,7 +238,7 @@ export class MapEmit<K, V, T extends boolean = false> {
     /**
      * emit an event if user have emitChanges
      */
-    if (options?.emitEvent && !options.emitEvent) return;
+    if (options && !options.emitEvent) return;
 
     if (this._multiple) (this._setToEmit as Event<K, V>[]).push([key, value]);
     else this._setToEmit = [key, value];
@@ -251,7 +251,7 @@ export class MapEmit<K, V, T extends boolean = false> {
     /**
      * emit an event if user have emitChanges
      */
-    if (options?.emitEvent && !options.emitEvent) return;
+    if (options && !options.emitEvent) return;
 
     if (this._multiple) (this._updatedToEmit as Event<K, V>[]).push([key, value]);
     else this._updatedToEmit = [key, value];
@@ -272,7 +272,7 @@ export class MapEmit<K, V, T extends boolean = false> {
     /**
      * emit an event if user have emitChanges
      */
-    if (options?.emitEvent && !options.emitEvent) return;
+    if (options && !options.emitEvent) return;
 
     if (this._multiple) (this._deletedToEmit as Event<K, V>[]).push([key, value]);
     else this._deletedToEmit = [key, value];
