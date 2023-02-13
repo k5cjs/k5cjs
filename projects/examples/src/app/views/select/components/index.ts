@@ -10,6 +10,7 @@ export * from './group-boolean-toggle/group-boolean-toggle.component';
 export * from './group-boolean/group-boolean.component';
 export * from './group-multiple/group-multiple.component';
 export * from './group-search/group-search.component';
+export * from './overlay-options/overlay-options.component'
 export * from './simple-modal/simple-modal.component';
 export * from './simple-multiple-deselect-all/simple-multiple-deselect-all.component';
 export * from './simple-multiple-select-all/simple-multiple-select-all.component';

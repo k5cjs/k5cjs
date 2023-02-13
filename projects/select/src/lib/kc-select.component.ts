@@ -1,5 +1,13 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import {
+  ConnectedPosition,
+  FlexibleConnectedPositionStrategy,
+  FlexibleConnectedPositionStrategyOrigin,
+  GlobalPositionStrategy,
+  Overlay,
+  OverlayConfig,
+  OverlayRef,
+} from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   AfterContentInit,
@@ -36,6 +44,7 @@ import {
 import { MapEmit } from '@k5cjs/selection-model';
 
 import { KcOptionComponent } from './components';
+import { OVERLAY_DEFAUL_POSITION } from './config';
 import { KcGroupDirective, KcOptionsDirective, KcValueDirective } from './directives';
 import { getValues } from './helpers';
 import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
@@ -86,6 +95,9 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   }
   private _options!: Observable<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>>;
   private _optionsCache: ReplaySubject<KcOption<K, V>[] | KcOption<K, V>[][] | KcGroup<K, V>> | undefined;
+
+  @Input() cdkOverlayConfig: OverlayConfig;
+  @Input() positions: ConnectedPosition[];
 
   /**
    * allow user to open selection in modal
@@ -138,10 +150,6 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
   }
   private _value!: KcOptionValue<V> | KcOptionGroupValue<V>;
   /**
-   * panelOpen is for open/close the overlay panel
-   */
-  panelOpen = false;
-  /**
    * selectionOpened variable is for check if the overlay or dialog is open
    */
   selectionOpened = false;
@@ -168,6 +176,14 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this._allSelectedChanged = new BehaviorSubject<boolean>(false);
     this.allSelectedChanged = this._allSelectedChanged.asObservable();
+
+    this.cdkOverlayConfig = {
+      hasBackdrop: true,
+      disposeOnNavigation: true,
+      backdropClass: 'cdk-overlay-transparent-backdrop',
+    };
+
+    this.positions = OVERLAY_DEFAUL_POSITION;
   }
 
   ngAfterContentInit(): void {
@@ -193,9 +209,8 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this.onTouch = fn;
   }
 
-  open(): void {
-    if (this.dialog) this._openDialog();
-    else this.panelOpen = true;
+  open(target: FlexibleConnectedPositionStrategyOrigin): void {
+    this._openDialog(target);
 
     this.selectionOpened = true;
 
@@ -225,8 +240,7 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     )
       return;
 
-    if (this.dialog) this._closeDialog();
-    else this.panelOpen = false;
+    this._closeDialog();
 
     this.selectionOpened = false;
 
@@ -363,11 +377,10 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
     this._optionsCache.next(options);
   }
 
-  private _openDialog(): void {
+  private _openDialog(target: FlexibleConnectedPositionStrategyOrigin): void {
     const overlayRef = this._overlay.create({
-      hasBackdrop: true,
-      positionStrategy: this._overlay.position().global().centerHorizontally().centerVertically(),
-      disposeOnNavigation: true,
+      positionStrategy: this._getPositionStrategy(target),
+      ...this.cdkOverlayConfig,
     });
 
     const dialogPortal = new TemplatePortal(this.templateRef, this._viewContainerRef);
@@ -375,6 +388,16 @@ export class KcSelectComponent<K, V> implements AfterContentInit, ControlValueAc
 
     this._dialogOverlayRef = overlayRef;
     overlayRef.backdropClick().subscribe((event) => this.close(event));
+  }
+
+  private _getPositionStrategy(
+    elementRef: FlexibleConnectedPositionStrategyOrigin,
+  ): FlexibleConnectedPositionStrategy | GlobalPositionStrategy {
+    if (this.dialog) {
+      return this._overlay.position().global().centerHorizontally().centerVertically();
+    }
+
+    return this._overlay.position().flexibleConnectedTo(elementRef).withPositions(this.positions);
   }
 
   private _closeDialog(): void {

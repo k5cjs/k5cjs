@@ -18,6 +18,7 @@ import {
   OptionComponent,
   OptionToggleComponent,
   OptionsComponent,
+  OverlayOptionsComponent,
   SimpleModalComponent,
   SimpleMultipleComponent,
   SimpleMultipleDeselectAllComponent,
@@ -28,7 +29,7 @@ import {
   SimpleWithoutFormControlComponent,
   SimpleWrappedComponent,
   SimpleWrappedSharedComponent,
-  ValueComponent,
+  ValueComponent
 } from './components';
 import { SelectRoutingModule } from './select-routing.module';
 import { SelectComponent } from './select.component';
@@ -60,6 +61,7 @@ import { SelectComponent } from './select.component';
     CustomPlaceHolderComponent,
     CustomOptionsComponent,
     CustomOptionComponent,
+    OverlayOptionsComponent
   ],
   imports: [CommonModule, SelectRoutingModule, KcSelectModule, FormsModule, ReactiveFormsModule],
 })
