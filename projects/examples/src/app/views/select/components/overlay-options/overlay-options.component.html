@@ -1,0 +1,25 @@
+<pre>{{ control.value | json }}</pre>
+
+<kc-select [formControl]="control" [cdkOverlayConfig]="overlayConfig" [positions]="positions" [options]="options" multiple>
+  <kc-value *kcValue></kc-value>
+
+  <kc-options *kcOptions="let options" [options]="options">
+    <kc-option *kcOption="let option" [option]="option"></kc-option>
+  </kc-options>
+</kc-select>
+
+
+<br>
+<br>
+<br>
+
+<span>Custom position strategy</span>
+<pre>{{ control.value | json }}</pre>
+<kc-select [formControl]="control" [cdkOverlayConfig]="overlayConfig2" [options]="options" multiple>
+  <kc-value *kcValue></kc-value>
+
+  <kc-options *kcOptions="let options" [options]="options">
+    <kc-option *kcOption="let option" [option]="option"></kc-option>
+  </kc-options>
+</kc-select>
+

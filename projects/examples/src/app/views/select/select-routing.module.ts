@@ -10,6 +10,7 @@ import {
   GroupBooleanToggleComponent,
   GroupMultipleComponent,
   GroupSearchComponent,
+  OverlayOptionsComponent,
   SimpleModalComponent,
   SimpleMultipleComponent,
   SimpleMultipleDeselectAllComponent,
@@ -94,6 +95,10 @@ const routes: Routes = [
       {
         path: 'custom-options',
         component: CustomOptionsComponent,
+      },
+      {
+        path: 'overlay-options',
+        component: OverlayOptionsComponent,
       },
       {
         path: 'virtual-scroll',
