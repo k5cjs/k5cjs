@@ -22,7 +22,10 @@ ${fix} \
 const libs = [
   Libs.Rxjs,
   Libs.Forms,
+  Libs.SelectionModel,
   Libs.Select,
+  Libs.Scroll,
+  Libs.Tables,
 ];
 
 const apps = [];

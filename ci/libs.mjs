@@ -3,4 +3,6 @@ export const Libs = {
   Forms: 'forms',
   SelectionModel: 'selection-model',
   Select: 'select',
+  Scroll: 'scroll',
+  Tables: 'tables',
 };
