@@ -1,9 +1,9 @@
 {
   "name": "@k5cjs/rxjs",
-  "version": "14.0.0",
+  "version": "15.0.0",
   "peerDependencies": {
-    "@angular/common": "^14.2.6",
-    "@angular/core": "^14.2.6",
+    "@angular/common": "^15.2.1",
+    "@angular/core": "^15.2.1",
     "rxjs": "^7.5.4"
   },
   "dependencies": {
