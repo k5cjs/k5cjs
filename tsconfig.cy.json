@@ -27,7 +27,7 @@
     "module": "es2020",
     "lib": ["es2020", "dom"],
     "useDefineForClassFields": false,
-    "types": ["cypress"]
+    "types": []
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -36,6 +36,5 @@
     "strictTemplates": true
   },
   "files": ["cypress.config.ts"],
-  "include": ["cypress", "projects/**/*.ts"],
-  "exclude": ["projects/**/*.spec.ts"]
+  "include": ["cypress", "projects/**/*.ts"]
 }

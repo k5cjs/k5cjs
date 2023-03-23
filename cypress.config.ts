@@ -5,6 +5,15 @@ export default defineConfig({
     devServer: {
       framework: 'angular',
       bundler: 'webpack',
+      options: {
+        projectConfig: {
+          root: '',
+          sourceRoot: 'projects/examples/src',
+          buildOptions: {
+            tsConfig: 'projects/examples/tsconfig.cy.json',
+          },
+        },
+      },
     },
     specPattern: '**/*.cy.ts',
   },
