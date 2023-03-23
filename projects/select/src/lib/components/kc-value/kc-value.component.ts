@@ -28,7 +28,7 @@ export class KcValueComponent<T extends boolean = false> {
     );
   }
 
-  @HostBinding('prevent-close') get preventClose(): boolean {
+  @HostBinding('attr.prevent-close') get preventClose(): boolean {
     return true;
   }
 

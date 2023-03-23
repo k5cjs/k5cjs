@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.cy.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["cypress"]
+  }
+}

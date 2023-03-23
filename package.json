@@ -29,7 +29,10 @@
     "coverage:rxjs": "http-server ./coverage/rxjs -p 4200",
     "coverage:forms": "http-server ./coverage/forms -p 4200",
     "coverage:tables": "http-server ./coverage/tables -p 4200",
-    "coverage:scroll": "http-server ./coverage/scroll -p 4200"
+    "coverage:scroll": "http-server ./coverage/scroll -p 4200",
+    "e2e": "ng e2e",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "private": true,
   "dependencies": {
@@ -61,6 +64,7 @@
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "^5.43.0",
     "@typescript-eslint/parser": "^5.43.0",
+    "cypress": "^12.8.1",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-import": "^2.25.4",
