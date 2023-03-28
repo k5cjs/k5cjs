@@ -46,7 +46,16 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KcGroupComponent<V, K, L> implements OnInit, AfterContentInit, OnDestroy {
-  @Input() options!: KcGroup<V, K, L>;
+  @Input()
+  get options(): KcGroup<V, K, L> {
+    return this._options;
+  }
+  set options(options: KcGroup<V, K, L>) {
+    this._options = options;
+    this._render();
+  }
+  private _options!: KcGroup<V, K, L>;
+
   @Input() key!: string;
 
   @Input()
@@ -82,8 +91,7 @@ export class KcGroupComponent<V, K, L> implements OnInit, AfterContentInit, OnDe
   }
 
   ngAfterContentInit(): void {
-    this.groups.forEach((group) => group.render(this._getGroup(this.options)));
-    this.option.forEach((group, index) => group.render(this._getOptions(this.options)[index]));
+    this._render();
   }
 
   ngOnInit(): void {
@@ -106,6 +114,13 @@ export class KcGroupComponent<V, K, L> implements OnInit, AfterContentInit, OnDe
       if (this._selection.has(this.key)) this._selection.update(this.key, this.selection);
       else this._selection.set(this.key, this.selection);
     });
+  }
+
+  private _render(): void {
+    if (!this.groups) return;
+
+    this.groups.forEach((group) => group.render(this._getGroup(this.options)));
+    this.option.forEach((group, index) => group.render(this._getOptions(this.options)[index]));
   }
 
   private _getSelection(): MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, string | K | V, boolean> {
