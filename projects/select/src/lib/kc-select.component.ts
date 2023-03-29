@@ -499,7 +499,10 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
     overlayRef.attach(dialogPortal);
 
     this._dialogOverlayRef = overlayRef;
-    overlayRef.backdropClick().subscribe((event) => this.close(event));
+    overlayRef
+      .backdropClick()
+      .pipe(takeUntil(this._destroy))
+      .subscribe((event) => this.close(event));
   }
 
   private _getPositionStrategy(
