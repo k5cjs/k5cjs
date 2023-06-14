@@ -5,4 +5,6 @@ export const Libs = {
   Select: 'select',
   Scroll: 'scroll',
   Tables: 'tables',
+  Control: 'control',
+  Input: 'input',
 };

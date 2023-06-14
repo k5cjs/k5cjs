@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": ["../../dev-mode-types"]
+    "types": []
   },
   "files": [
     "src/public-api.ts",

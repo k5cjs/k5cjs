@@ -17,19 +17,18 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "paths": {
-      "@k5cjs/rxjs": ["dist/rxjs/rxjs", "dist/rxjs"],
-      "@k5cjs/forms": ["dist/forms/forms", "dist/forms"],
-      "@k5cjs/tables": ["dist/tables/tables", "dist/tables"],
-      "@k5cjs/scroll": ["dist/scroll/scroll", "dist/scroll"],
-      "@k5cjs/select": ["dist/select/select", "dist/select"],
-      "@k5cjs/selection-model": ["dist/selection-model/selection-model", "dist/selection-model"]
+      "@k5cjs/rxjs": ["dist/rxjs"],
+      "@k5cjs/forms": ["dist/forms"],
+      "@k5cjs/tables": ["dist/tables"],
+      "@k5cjs/scroll": ["dist/scroll"],
+      "@k5cjs/select": ["dist/select"],
+      "@k5cjs/selection-model": ["dist/selection-model"],
+      "@k5cjs/control": ["dist/control"],
+      "@k5cjs/input": ["dist/input"]
     },
     "target": "ES2022",
     "module": "es2020",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "useDefineForClassFields": false,
     "composite": true
   },
@@ -39,8 +38,5 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "references": [
-    { "path": "tsconfig.build.json" },
-    { "path": "tsconfig.cy.json" }
-  ]
+  "references": [{ "path": "tsconfig.build.json" }, { "path": "tsconfig.cy.json" }]
 }

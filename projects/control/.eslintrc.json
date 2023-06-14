@@ -5,24 +5,24 @@
     {
       "files": ["*.ts"],
       "parserOptions": {
-        "createDefaultProgram": false,
-        "project": ["projects/forms/tsconfig.eslint.json"]
+        "project": ["projects/control/tsconfig.eslint.json"],
+            "createDefaultProgram": true
       },
       "rules": {
-        "@angular-eslint/component-selector": [
-          "error",
-          {
-            "prefix": "lib",
-            "style": "kebab-case",
-            "type": "element"
-          }
-        ],
         "@angular-eslint/directive-selector": [
           "error",
           {
+            "type": "attribute",
             "prefix": "lib",
-            "style": "camelCase",
-            "type": "attribute"
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "lib",
+            "style": "kebab-case"
           }
         ]
       },
@@ -30,14 +30,14 @@
         {
           "files": ["*.cy.ts"],
           "parserOptions": {
-            "project": ["projects/forms/tsconfig.cy.json"],
+            "project": ["projects/control/tsconfig.cy.json"],
             "createDefaultProgram": true
           }
         },
         {
           "files": ["*.spec.ts"],
           "parserOptions": {
-            "project": ["projects/forms/tsconfig.spec.json"],
+            "project": ["projects/control/tsconfig.spec.json"],
             "createDefaultProgram": true
           }
         }

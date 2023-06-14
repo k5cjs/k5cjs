@@ -7,7 +7,10 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const argv = yargs(hideBin(process.argv)).argv;
-const nbCPUs = cpus().length;
+/**
+ * reserving one for master
+ */
+const CPUs = cpus().length - 1;
 
 $.verbose = false;
 process.env.FORCE_COLOR = 3;
@@ -19,19 +22,26 @@ const commands = [
     { name: Libs.SelectionModel, needs: [] },
     { name: Libs.Scroll, needs: [] },
     { name: Libs.Tables, needs: [] },
+    { name: Libs.Control, needs: [] },
   ],
   [
-
     { name: Libs.Select, needs: [Libs.SelectionModel] },
+    { name: Libs.Input, needs: [Libs.Control] },
   ]
 ];
 
-const libHash = (name) => $`git rev-parse HEAD:projects/${name}/`;
-
+const libHash = (name) => $`git rev-parse --verify --quiet HEAD:projects/${name}/`;
 const libHashPath = (name) => `dist/${name}/.hash`;
 
 const build = (name) =>
-  $`./node_modules/.bin/ng build ${name} --configuration=${argv.prod ? 'production' : 'development'}`;
+  $`./node_modules/.bin/ng build ${name} --configuration=${argv.production ? 'production' : 'development'}`;
+
+const printNewLevelMessage = () => {
+  console.log('\x1b[34m******************************************************************************\x1b[0m');
+  console.log('\x1b[34m                                  New level                                   \x1b[0m');
+  console.log('\x1b[34m******************************************************************************\x1b[0m');
+  console.log();
+};
 
 const printSuccessNGCCMessage = ({ stdout }) => {
   console.log(`\x1b[32m------------------------------------------------------------------------------\x1b[0m`);
@@ -68,10 +78,12 @@ const maxNameLength = Math.max(...commands.flatMap((level) => level.map(({ name 
 
 async function checkLibs(chunk) {
   const libsPromiseHashes = chunk.map(({ name }) => libHash(name));
-  const libsHashes = await Promise.all(libsPromiseHashes);
+  const libsHashes = (await Promise.allSettled(libsPromiseHashes)).map(({ status, value }) =>
+    status === 'fulfilled' ? value.stdout : '',
+  );
 
   return chunk
-    .map((lib, i) => ({ ...lib, hash: libsHashes[i].stdout }))
+    .map((lib, i) => ({ ...lib, hash: libsHashes[i] }))
     .filter(({ name, needs, hash }) => {
       const distHash = fs.existsSync(libHashPath(name)) ? fs.readFileSync(libHashPath(name), { encoding: 'utf8' }) : '';
 
@@ -79,7 +91,7 @@ async function checkLibs(chunk) {
       const lastHash = distHash.replace('\n', '');
 
       const checkParent = needs.some((parent) => builded.has(parent));
-      const checkHash = currentHash !== lastHash;
+      const checkHash = currentHash === '' || lastHash === '' || currentHash !== lastHash;
 
       const parentCheck = checkParent ? `\x1b[31m✘\x1b[0m` : `\x1b[32m✔\x1b[0m`;
       const hashCheck = checkHash ? `\x1b[31m✘\x1b[0m` : `\x1b[32m✔\x1b[0m`;
@@ -113,7 +125,7 @@ async function buildLibs(chunk, chunks) {
   /**
    * returns when the number of libs in the stack equals the number of processors
    */
-  if (stack.size === nbCPUs) return;
+  if (stack.size === CPUs) return;
 
   // return when current chunk is already builded but runStack is not empty
   if (chunk.length === 0 && stack.size !== 0) return;
@@ -126,20 +138,20 @@ async function buildLibs(chunk, chunks) {
   if (chunk.length) {
     level = chunk;
   } else {
-    console.log('\x1b[34m******************************************************************************\x1b[0m');
-    console.log('\x1b[34m                                  New level                                   \x1b[0m');
-    console.log('\x1b[34m******************************************************************************\x1b[0m');
-    console.log();
+    printNewLevelMessage();
+    /**
+     * recreate dist folder
+     * if doesn't exist
+     */
+    await $`mkdir -p dist`;
     /**
      * prebuilt all previous libs when is starting to build a new level
      */
-    const ngcc = await $`./node_modules/.bin/ngcc --create-ivy-entry-points`;
+    const ngcc = await $`./node_modules/.bin/ngcc --source dist --create-ivy-entry-points`;
+
     printSuccessNGCCMessage(ngcc);
 
-    console.log();
     level = await checkLibs(chunks.shift());
-    console.log();
-    console.log();
   }
   /**
    * when the level has nothing to change, move on to the next level
@@ -188,8 +200,15 @@ async function buildLibs(chunk, chunks) {
   buildLibs(level, chunks);
 }
 
-console.log(`\x1b[32mNumber of CPUs: ${nbCPUs}\x1b[0m`);
+console.log(`\x1b[32mNumber of CPUs: ${CPUs}\x1b[0m`);
 console.log();
+
+const ngcc = await $`./node_modules/.bin/ngcc --source node_modules --create-ivy-entry-points`;
+
+printSuccessNGCCMessage(ngcc);
+
+process.env.NGCC_MAX_WORKERS = CPUs;
+process.env.BAZEL_TARGET = true;
 
 await buildLibs(
   [],

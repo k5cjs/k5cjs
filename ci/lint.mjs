@@ -29,6 +29,8 @@ const libs = [
   Libs.Select,
   Libs.Scroll,
   Libs.Tables,
+  Libs.Control,
+  Libs.Input,
 ];
 
 const apps = [];

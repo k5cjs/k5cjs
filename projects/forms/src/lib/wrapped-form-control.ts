@@ -1,9 +1,7 @@
-import { ChangeDetectorRef, Component, DoCheck, Injector, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Directive, DoCheck, Injector, OnInit, ViewChild, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/forms';
 
-@Component({ template: `` })
-// extends from BaseControlValueAccessor
-// eslint-disable-next-line @angular-eslint/component-class-suffix
+@Directive()
 export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValueAccessor {
   @ViewChild(NG_VALUE_ACCESSOR, { static: true }) valueAccessor!: ControlValueAccessor;
 
@@ -17,6 +15,9 @@ export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValu
   }
 
   ngOnInit(): void {
+    /**
+     * WrappedFormControl it's used with provideValueAccessor
+     */
     this._ngControl = this._injector.get(NgControl);
   }
   /**
