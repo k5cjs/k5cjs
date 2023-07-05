@@ -1,0 +1,25 @@
+<div class="label">
+  <ng-content select="[label]"></ng-content>
+</div>
+
+<div class="control">
+  <div class="control__background">
+    <ng-content select="[background]"></ng-content>
+  </div>
+
+  <div class="control__before">
+    <ng-content select="[before]"></ng-content>
+  </div>
+
+  <div class="control__input">
+    <ng-content select="[kc-input]"></ng-content>
+
+    <span *ngIf="empty" class="placeholder">
+      <ng-content select="[placeholder],lib-form-placeholder"></ng-content>
+    </span>
+  </div>
+
+  <div class="control__after">
+    <ng-content select="[after]"></ng-content>
+  </div>
+</div>

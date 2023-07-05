@@ -3,3 +3,4 @@
  */
 
 export * from './lib/control';
+export * from './lib/control.type';

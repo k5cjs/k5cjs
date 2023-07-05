@@ -22,7 +22,7 @@
               "tsConfig": "projects/rxjs/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -35,10 +35,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/rxjs/**/*.ts",
-              "projects/rxjs/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/rxjs/**/*.ts", "projects/rxjs/**/*.html"]
           }
         }
       }
@@ -62,7 +59,7 @@
               "tsConfig": "projects/forms/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -75,10 +72,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/forms/**/*.ts",
-              "projects/forms/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/forms/**/*.ts", "projects/forms/**/*.html"]
           }
         }
       }
@@ -102,7 +96,7 @@
               "tsConfig": "projects/tables/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -115,10 +109,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/tables/**/*.ts",
-              "projects/tables/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/tables/**/*.ts", "projects/tables/**/*.html"]
           }
         }
       }
@@ -146,13 +137,8 @@
             "polyfills": "projects/examples/src/polyfills.ts",
             "tsConfig": "projects/examples/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
-            ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "assets": ["projects/examples/src/favicon.ico", "projects/examples/src/assets"],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -186,7 +172,7 @@
               "namedChunks": true
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -214,23 +200,15 @@
             "tsConfig": "projects/examples/tsconfig.spec.json",
             "karmaConfig": "projects/examples/karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
-            ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "assets": ["projects/examples/src/favicon.ico", "projects/examples/src/assets"],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": []
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/examples/**/*.ts",
-              "projects/examples/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/examples/**/*.ts", "projects/examples/**/*.html"]
           }
         }
       }
@@ -254,7 +232,7 @@
               "tsConfig": "projects/scroll/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -267,10 +245,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/scroll/**/*.ts",
-              "projects/scroll/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/scroll/**/*.ts", "projects/scroll/**/*.html"]
           }
         }
       }
@@ -307,10 +282,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/select/**/*.ts",
-              "projects/select/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/select/**/*.ts", "projects/select/**/*.html"]
           }
         }
       }
@@ -347,10 +319,7 @@
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/selection-model/**/*.ts",
-              "projects/selection-model/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/selection-model/**/*.ts", "projects/selection-model/**/*.html"]
           }
         }
       }
@@ -374,25 +343,19 @@
               "tsConfig": "projects/control/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/control/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/control/**/*.ts",
-              "projects/control/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/control/**/*.ts", "projects/control/**/*.html"]
           }
         }
       }
@@ -416,34 +379,62 @@
               "tsConfig": "projects/input/tsconfig.lib.json"
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "development"
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/input/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/input/**/*.ts",
-              "projects/input/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/input/**/*.ts", "projects/input/**/*.html"]
+          }
+        }
+      }
+    },
+    "form-field": {
+      "projectType": "library",
+      "root": "projects/form-field",
+      "sourceRoot": "projects/form-field/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/form-field/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/form-field/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/form-field/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/form-field/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/form-field/**/*.ts", "projects/form-field/**/*.html"]
           }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
+    "schematicCollections": ["@angular-eslint/schematics"],
     "analytics": false
   },
   "schematics": {

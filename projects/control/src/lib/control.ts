@@ -26,16 +26,24 @@ import {
 } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 
-export const kcControlValueAccessor = <T>(component: Type<T>): Provider => ({
-  provide: NG_VALUE_ACCESSOR,
-  useExisting: forwardRef(() => component),
-  multi: true,
-});
+import { KcControlType } from './control.type';
+
+export const kcControlProviders = <T>(component: Type<T>): Provider[] => [
+  {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => component),
+    multi: true,
+  },
+  {
+    provide: KcControl,
+    useExisting: forwardRef(() => component),
+  },
+];
 
 @Directive()
 export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   extends DefaultValueAccessor
-  implements OnInit, AfterViewInit, OnDestroy
+  implements OnInit, AfterViewInit, OnDestroy, KcControlType<T, E>
 {
   @Input() id: string | undefined;
   @Input() placeholder: string | undefined;
@@ -48,24 +56,28 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   /** Gets the AbstractControlDirective for this control. */
   ngControl!: NgControl | AbstractControlDirective | null;
 
-  /** Whether the control is focused. */
-  focused = false;
-
   /** Whether the control is empty. */
   // readonly empty: boolean;
 
   /** Whether the control is required. */
   // readonly required: boolean;
 
-  /** Whether the control is disabled. */
-  readonly disabled: boolean = false;
-
   /** Whether the control is in an error state. */
   // readonly errorState: boolean;
 
   elementRef: ElementRef<E>;
 
-  private _stateChanges: Subject<void>;
+  // prettier-ignore
+  get focused(): boolean { return this._focused; }
+  // prettier-ignore
+  set focused(value: boolean) { this._focused = value; }
+  private _focused = false;
+
+  get disabled(): boolean {
+    return !!this.ngControl?.disabled;
+  }
+
+  protected _stateChanges: Subject<void>;
 
   protected _platform: Platform;
   protected _autofillMonitor: AutofillMonitor;
@@ -114,6 +126,10 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     return null;
   }
 
+  disable(): void {
+    throw new Error('Method not implemented.');
+  }
+
   focus(): void {
     this.elementRef.nativeElement.focus();
   }
@@ -122,11 +138,7 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     throw new Error('Method not implemented.');
   }
 
-  disable(): void {
-    throw new Error('Method not implemented.');
-  }
-
-  get errors(): Record<string, unknown> | null {
+  get errors(): Record<string, string> | null {
     throw new Error('Method not implemented.');
   }
 

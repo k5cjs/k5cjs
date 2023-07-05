@@ -1,0 +1,100 @@
+:host {
+  @apply
+    inline-flex
+    flex-col
+    w-full
+    my-2
+    mx-1
+    cursor-text;
+}
+
+.label:empty {
+  @apply
+    hidden;
+}
+
+.control {
+  @apply
+    relative
+    flex
+    items-center
+    rounded-lg
+    bg-surface-400
+    text-on-surface
+    text-sm
+    overflow-hidden
+    ring-1
+    ring-outline;
+
+  -webkit-tap-highlight-color: transparent;
+
+  &:hover {
+    @apply
+      ring-primary;
+  }
+
+  &--variant {
+    @apply
+      bg-surface-variant-400/75
+      text-on-surface-variant;
+  }
+
+  :host(.focus) & {
+    @apply
+      text-primary
+      ring-2
+      ring-primary;
+  }
+
+  /**
+   * bug https://bugzilla.mozilla.org/show_bug.cgi?id=418039
+   */
+  &:has(*:-webkit-autofill) {
+    @apply
+      bg-primary;
+  }
+
+  :host(.disabled) & {
+    @apply
+      opacity-40
+      cursor-default;
+  }
+
+  :host(.error) & {
+    @apply
+      ring-on-warning;
+  }
+
+  &__background {
+    @apply
+      absolute
+      inset-0;
+  }
+
+  &__before, &__after {
+    @apply
+      relative
+      flex
+      shrink-0
+      justify-center
+      items-center
+      p-1.5;
+  }
+
+  &__input {
+    @apply
+      relative
+      py-2
+      flex-1;
+  }
+}
+
+.placeholder {
+  @apply
+    absolute
+    inset-0
+    flex
+    items-center
+    text-on-surface/40
+    pointer-events-none;
+}

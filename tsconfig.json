@@ -24,7 +24,8 @@
       "@k5cjs/select": ["dist/select"],
       "@k5cjs/selection-model": ["dist/selection-model"],
       "@k5cjs/control": ["dist/control"],
-      "@k5cjs/input": ["dist/input"]
+      "@k5cjs/input": ["dist/input"],
+      "@k5cjs/form-field": ["dist/form-field"]
     },
     "target": "ES2022",
     "module": "es2020",

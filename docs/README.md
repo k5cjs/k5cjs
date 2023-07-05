@@ -2,26 +2,80 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.2.4.
 
-## Development server
+```mermaid
+classDiagram
+  class KcControl {
+    <<Abstract>>
+  }
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+  class KcControlType~T~{
+    <<interface>>
 
-## Code scaffolding
+    +value: T | null;
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+    +disabled: boolean;
+    +disable(): void;
 
-## Build
+    +focused: boolean;
+    +focus(): void;
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+    +reset(): void;
 
-## Running unit tests
+    +errors: Record<string, unknown> | null;
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+    +elementRef: ElementRef<T>;
+  }
 
-## Running end-to-end tests
+  class KcInputControl { }
+  class KcCheckboxControl { }
+  class KcRadioControl { }
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+  class CustomInput { }
+  class CustomTextarea { }
+  class CustomSelect { }
+  class CustomCheckbox { }
+  class CustomRadio { }
 
-## Further help
+  class InputNative { }
+  class TextareaNative { }
+  class SelectNative { }
+  class CheckboxNative { }
+  class RadioNative { }
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+  class FormField { }
+
+  InputNative *-- KcInputControl : Composition
+  TextareaNative *-- KcTextareaControl : Composition
+  SelectNative *-- KcSelectControl : Composition
+  CheckboxNative *-- KcCheckboxControl : Composition
+  RadioNative *-- KcRadioControl : Composition
+
+  KcControl ..|> KcControlType : Implements
+  FormField ..> KcControl : Dependency
+
+  KcControl <|-- KcInputControl : Inheritance
+  KcControl <|-- KcTextareaControl : Inheritance
+  KcControl <|-- KcSelectControl : Inheritance
+  KcControl <|-- KcCheckboxControl : Inheritance
+  KcControl <|-- KcRadioControl : Inheritance
+
+  CustomInput *-- KcInputControl : Composition
+  CustomInput *-- InputNative : Composition
+  CustomInput o-- FormField : Aggregation
+
+  CustomTextarea *-- KcTextareaControl : Composition
+  CustomTextarea *-- TextareaNative : Composition
+  CustomTextarea o-- FormField : Aggregation
+
+  CustomSelect *-- KcSelectControl : Composition
+  CustomSelect *-- SelectNative : Composition
+  CustomSelect o-- FormField : Aggregation
+
+  CustomCheckbox *-- KcCheckboxControl : Composition
+  CustomCheckbox *-- CheckboxNative : Composition
+  CustomCheckbox o-- FormField : Aggregation
+
+  CustomRadio *-- KcRadioControl : Composition
+  CustomRadio *-- RadioNative : Composition
+  CustomRadio o-- FormField : Aggregation
+```
