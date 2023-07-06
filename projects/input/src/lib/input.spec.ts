@@ -1,4 +1,4 @@
-import { KcInput } from './kc-input';
+import { KcInput } from './input';
 
 describe('InputDirective', () => {
   it('should create an instance', () => {

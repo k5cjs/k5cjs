@@ -31,6 +31,7 @@ const libs = [
   Libs.Tables,
   Libs.Control,
   Libs.Input,
+  Libs.Textarea,
 ];
 
 const apps = [];

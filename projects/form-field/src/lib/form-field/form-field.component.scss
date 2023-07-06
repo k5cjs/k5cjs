@@ -13,37 +13,36 @@
     hidden;
 }
 
+.error:empty {
+  @apply
+    hidden;
+}
+
 .control {
   @apply
     relative
     flex
     items-center
     rounded-lg
-    bg-surface-400
-    text-on-surface
+    bg-white
+    text-slate-900
     text-sm
     overflow-hidden
     ring-1
-    ring-outline;
+    ring-slate-900;
 
   -webkit-tap-highlight-color: transparent;
 
   &:hover {
     @apply
-      ring-primary;
-  }
-
-  &--variant {
-    @apply
-      bg-surface-variant-400/75
-      text-on-surface-variant;
+      ring-blue-500;
   }
 
   :host(.focus) & {
     @apply
-      text-primary
+      text-blue-500
       ring-2
-      ring-primary;
+      ring-blue-500;
   }
 
   /**
@@ -51,7 +50,7 @@
    */
   &:has(*:-webkit-autofill) {
     @apply
-      bg-primary;
+      bg-blue-500;
   }
 
   :host(.disabled) & {
@@ -62,7 +61,7 @@
 
   :host(.error) & {
     @apply
-      ring-on-warning;
+      ring-red-500;
   }
 
   &__background {
@@ -95,6 +94,6 @@
     inset-0
     flex
     items-center
-    text-on-surface/40
+    text-slate-900/40
     pointer-events-none;
 }

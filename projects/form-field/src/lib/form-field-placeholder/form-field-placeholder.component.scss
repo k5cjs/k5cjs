@@ -1,0 +1,11 @@
+:host {
+  @apply
+    flex
+    py-2
+    self-start;
+}
+
+.placeholder {
+  @apply
+    truncate;
+}

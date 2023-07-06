@@ -1,0 +1,44 @@
+.field {
+  @apply
+    w-full
+    m-0
+    py-2
+    px-1;
+}
+
+input {
+  @apply
+    w-full
+    m-0
+    p-0
+    border-none
+    box-border
+    bg-transparent
+    outline-none
+    placeholder-slate-400
+    truncate;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    @apply
+      [background:transparent]
+      bg-[#fff]
+      shadow-inner
+      shadow-transparent
+      transition-colors
+      duration-[5000s];
+  }
+
+  /**
+   * for removing the highlight on iOS
+   */
+  -webkit-tap-highlight-color: transparent;
+
+  &:disabled {
+    /**
+     * for removing opacity on disabled inputs in Safari
+     */
+    @apply opacity-100;
+  }
+}

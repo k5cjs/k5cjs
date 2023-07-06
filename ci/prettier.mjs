@@ -1,6 +1,5 @@
 import { $ } from 'zx';
 import { Libs } from './libs.mjs';
-import { Apps } from './apps.mjs';
 import { cpus } from 'os';
 
 import yargs from 'yargs';
@@ -28,6 +27,7 @@ const libs = [
   Libs.Tables,
   Libs.Control,
   Libs.Input,
+  Libs.Textarea,
 ];
 
 const apps = [];

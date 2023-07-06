@@ -5,7 +5,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, NgControl } from '@angular/for
 export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValueAccessor {
   @ViewChild(NG_VALUE_ACCESSOR, { static: true }) valueAccessor!: ControlValueAccessor;
 
-  protected _ngControl!: NgControl;
+  protected _ngControl!: NgControl | null;
   protected _injector: Injector;
   protected _cdr: ChangeDetectorRef;
 
@@ -18,7 +18,7 @@ export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValu
     /**
      * WrappedFormControl it's used with provideValueAccessor
      */
-    this._ngControl = this._injector.get(NgControl);
+    this._ngControl = this._injector.get(NgControl, null, { optional: true });
   }
   /**
    * ngDoCheck it's only triggered for the top-most component in the disabled branch,

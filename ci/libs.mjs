@@ -7,4 +7,5 @@ export const Libs = {
   Tables: 'tables',
   Control: 'control',
   Input: 'input',
+  Textarea: 'textarea',
 };

@@ -1,0 +1,15 @@
+<kc-form-field>
+  <!-- <form-label *ngIf="label" [value]="label" label></form-label> -->
+
+  <ng-container ngProjectAs="[before]">
+    <ng-content select="[before]"></ng-content>
+  </ng-container>
+
+  <kc-form-field-placeholder *ngIf="placeholder" [value]="placeholder"></kc-form-field-placeholder>
+
+  <input ngDefaultControl kc-input [name]="name" tabindex="0" placeholder="" />
+
+  <ng-container ngProjectAs="[after]">
+    <ng-content select="[after]"></ng-content>
+  </ng-container>
+</kc-form-field>

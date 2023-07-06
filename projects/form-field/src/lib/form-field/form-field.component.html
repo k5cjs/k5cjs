@@ -15,11 +15,15 @@
     <ng-content select="[kc-input]"></ng-content>
 
     <span *ngIf="empty" class="placeholder">
-      <ng-content select="[placeholder],lib-form-placeholder"></ng-content>
+      <ng-content select="[placeholder],kc-form-field-placeholder"></ng-content>
     </span>
   </div>
 
   <div class="control__after">
     <ng-content select="[after]"></ng-content>
   </div>
+</div>
+
+<div class="error">
+  <ng-content select="[error]"></ng-content>
 </div>

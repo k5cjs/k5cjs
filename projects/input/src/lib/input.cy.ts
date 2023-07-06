@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 
 import { MountConfig } from 'cypress/angular';
 
-import { KcInput } from './kc-input';
+import { KcInput } from './input';
 
 @Component({
   selector: 'kc-wrap',

@@ -431,6 +431,42 @@
           }
         }
       }
+    },
+    "textarea": {
+      "projectType": "library",
+      "root": "projects/textarea",
+      "sourceRoot": "projects/textarea/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/textarea/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/textarea/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/textarea/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/textarea/tsconfig.spec.json",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/textarea/**/*.ts", "projects/textarea/**/*.html"]
+          }
+        }
+      }
     }
   },
   "cli": {

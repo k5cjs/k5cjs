@@ -27,6 +27,7 @@ const commands = [
   [
     { name: Libs.Select, needs: [Libs.SelectionModel] },
     { name: Libs.Input, needs: [Libs.Control] },
+    { name: Libs.Textarea, needs: [Libs.Control] },
   ]
 ];
 
