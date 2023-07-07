@@ -44,3 +44,7 @@ Thumbs.db
 .eslintcache/
 
 .cypress-cache/
+
+docs/.vitepress/cache/
+
+docs/.vitepress/dist/
