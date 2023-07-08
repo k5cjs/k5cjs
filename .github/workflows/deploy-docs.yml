@@ -28,6 +28,7 @@ jobs:
         run: |
           npm run build:libs:prod
           npm run build:examples
+          cp dist/examples/index.html dist/examples/404.html
           mv dist/examples docs/public/examples
           npm run docs:build
       - uses: actions/configure-pages@v2

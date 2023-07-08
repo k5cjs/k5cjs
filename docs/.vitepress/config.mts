@@ -32,13 +32,29 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
     },
   },
   vite: {
-    server: {
-      proxy: {
-        '/examples/.*': {
-          target: 'https://k5cjs.github.io/k5cjs/examples/',
-        },
-      },
-    },
+    // resolve: {
+    //   alias: {
+    //     '404': '/docs.html',
+    //   },
+    // },
+    // plugins: [
+    //   {
+    //     name: 'my-plugin',
+    //     configureServer: (server) => {
+    //       server.middlewares.use((req, res, next) => {
+    //         console.log('req.originalUrl', req.originalUrl);
+    //         if (/examples\/.*/.test(req.originalUrl)) {
+    //           res.writeHead(302, {
+    //             Location: `https://google.com`,
+    //           });
+    //           res.end();
+    //         } else {
+    //           next();
+    //         }
+    //       });
+    //     },
+    //   },
+    // ],
   },
 };
 

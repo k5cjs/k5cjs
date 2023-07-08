@@ -1,5 +1,4 @@
 // https://vitepress.dev/guide/custom-theme
-import { h } from 'vue';
 import Theme from 'vitepress/theme';
 import './style.css';
 
@@ -15,7 +14,11 @@ export default {
   // enhanceApp({ app, router, siteData }) {
   //   // ...
   // }
-  enhanceApp({ app }) {
+  enhanceApp({ app, router }) {
     enhanceAppWithTabs(app);
+
+    console.log('router', router);
+
+    router.go('/k5cjs/examples/');
   },
 };

@@ -144,5 +144,5 @@ input {
   width="100%"
   height="315"
   frameBorder="0"
-  src="/k5cjs/examples/input"
+  src="/k5cjs/examples/input/"
 ></iframe>
