@@ -5,6 +5,11 @@ on:
     branches:
       - master
       - select-alpha
+# Ensure only one workflow per branch is running
+concurrency:
+  group: deploy-docs-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

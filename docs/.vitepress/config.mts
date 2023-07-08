@@ -31,31 +31,6 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
       provider: 'local',
     },
   },
-  vite: {
-    // resolve: {
-    //   alias: {
-    //     '404': '/docs.html',
-    //   },
-    // },
-    // plugins: [
-    //   {
-    //     name: 'my-plugin',
-    //     configureServer: (server) => {
-    //       server.middlewares.use((req, res, next) => {
-    //         console.log('req.originalUrl', req.originalUrl);
-    //         if (/examples\/.*/.test(req.originalUrl)) {
-    //           res.writeHead(302, {
-    //             Location: `https://google.com`,
-    //           });
-    //           res.end();
-    //         } else {
-    //           next();
-    //         }
-    //       });
-    //     },
-    //   },
-    // ],
-  },
 };
 
 // https://vitepress.dev/reference/site-config

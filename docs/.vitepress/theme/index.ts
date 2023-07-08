@@ -14,11 +14,7 @@ export default {
   // enhanceApp({ app, router, siteData }) {
   //   // ...
   // }
-  enhanceApp({ app, router }) {
+  enhanceApp({ app }) {
     enhanceAppWithTabs(app);
-
-    console.log('router', router);
-
-    router.go('/k5cjs/examples/');
   },
 };
