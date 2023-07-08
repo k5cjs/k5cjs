@@ -34,14 +34,9 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
   vite: {
     server: {
       proxy: {
-        '/examples': {
-          target: '/examples/index.html',
+        '/examples/.*': {
+          target: 'https://k5cjs.github.io/k5cjs/examples/',
         },
-      },
-    },
-    build: {
-      rollupOptions: {
-        external: new RegExp('/examples/.*'),
       },
     },
   },
