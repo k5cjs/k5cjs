@@ -11,7 +11,7 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/docs' },
-      { text: 'Examples', link: '/example' },
+      { text: 'Examples', link: '/examples' },
     ],
 
     sidebar: [
