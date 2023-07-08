@@ -1,8 +1,8 @@
+import { DefaultTheme, UserConfig } from 'vitepress';
 import { tabsMarkdownPlugin } from 'vitepress-plugin-tabs';
 import { withMermaid } from 'vitepress-plugin-mermaid';
 
-// https://vitepress.dev/reference/site-config
-export default withMermaid({
+const userConfig: UserConfig<DefaultTheme.Config> = {
   title: 'K5cJS',
   description: 'A VitePress Site',
   base: '/k5cjs/',
@@ -11,7 +11,7 @@ export default withMermaid({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/docs' },
-      { text: 'Examples', link: '/examples' },
+      { text: 'Examples', link: '/example' },
     ],
 
     sidebar: [
@@ -31,6 +31,26 @@ export default withMermaid({
       provider: 'local',
     },
   },
+  vite: {
+    server: {
+      proxy: {
+        '/examples': {
+          target: '/examples/index.html',
+        },
+      },
+    },
+    build: {
+      rollupOptions: {
+        external: new RegExp('/examples/.*'),
+      },
+    },
+  },
+};
+
+// https://vitepress.dev/reference/site-config
+export default withMermaid({
+  ...userConfig,
+
   markdown: {
     config(md) {
       md.use(tabsMarkdownPlugin);

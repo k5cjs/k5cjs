@@ -26,10 +26,10 @@ jobs:
       - run: npm ci
       - name: Build
         run: |
-          npm run docs:build
           npm run build:libs:prod
           npm run build:examples
-          mv dist/examples docs/.vitepress/dist/examples
+          mv dist/examples docs/public/examples
+          npm run docs:build
       - uses: actions/configure-pages@v2
       - uses: actions/upload-pages-artifact@v1
         with:
