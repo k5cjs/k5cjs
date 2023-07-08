@@ -25,7 +25,11 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Build
-        run: npm run docs:build
+        run: |
+          npm run docs:build
+          npm run build:libs:prod
+          npm run build:examples
+          mv dist/examples dist/.vitepress/dist/examples
       - uses: actions/configure-pages@v2
       - uses: actions/upload-pages-artifact@v1
         with:

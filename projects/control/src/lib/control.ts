@@ -56,15 +56,6 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   /** Gets the AbstractControlDirective for this control. */
   ngControl!: NgControl | AbstractControlDirective | null;
 
-  /** Whether the control is empty. */
-  // readonly empty: boolean;
-
-  /** Whether the control is required. */
-  // readonly required: boolean;
-
-  /** Whether the control is in an error state. */
-  // readonly errorState: boolean;
-
   elementRef: ElementRef<E>;
 
   // prettier-ignore

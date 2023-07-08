@@ -1,11 +1,11 @@
 <kc-form-field class="field">
-  <!-- <form-label *ngIf="label" [value]="label" label></form-label> -->
+  <span *ngIf="label" label>{{ label }}</span>
 
   <ng-container ngProjectAs="[before]">
     <ng-content select="[before]"></ng-content>
   </ng-container>
 
-  <kc-form-field-placeholder *ngIf="placeholder" [value]="placeholder"></kc-form-field-placeholder>
+  <span *ngIf="placeholder" placeholder>{{ placeholder }}</span>
 
   <input ngDefaultControl kc-input [name]="name" tabindex="0" placeholder="" />
 

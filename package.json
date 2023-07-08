@@ -10,6 +10,7 @@
     "build:libs": "node ci/build-libraries.mjs",
     "build:libs:prod": "node ci/build-libraries.mjs --prod",
     "build:libs:clean": "run-s clear:dist build:libs",
+    "build:examples": "ng build examples --configuration=production --base-href=/k5cjs/examples/",
     "format:prettier": "node ./ci/prettier.mjs",
     "format:prettier:fix": "npm run format:prettier -- --fix",
     "format:eslint": "node ./ci/lint.mjs",

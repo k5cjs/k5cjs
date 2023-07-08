@@ -11,12 +11,21 @@ input {
     w-full
     m-0
     p-0
+    text-inherit
     border-none
     box-border
     bg-transparent
     outline-none
     placeholder-slate-400
     truncate;
+
+  font-size: inherit;
+  line-height: inherit;
+
+  /**
+   * for removing the highlight on iOS
+   */
+  -webkit-tap-highlight-color: transparent;
 
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
@@ -29,11 +38,6 @@ input {
       transition-colors
       duration-[5000s];
   }
-
-  /**
-   * for removing the highlight on iOS
-   */
-  -webkit-tap-highlight-color: transparent;
 
   &:disabled {
     /**

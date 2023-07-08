@@ -11,6 +11,6 @@ export class InputComponent {
   control: FormControl;
 
   constructor() {
-    this.control = new FormControl('initial value');
+    this.control = new FormControl();
   }
 }

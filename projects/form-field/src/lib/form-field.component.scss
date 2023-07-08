@@ -8,9 +8,19 @@
     cursor-text;
 }
 
-.label:empty {
+.label {
   @apply
-    hidden;
+    block
+    mb-2
+    text-sm
+    font-medium
+    leading-6
+    text-gray-900;
+
+  &:empty {
+    @apply
+      hidden;
+  }
 }
 
 .error:empty {
@@ -21,15 +31,16 @@
 .control {
   @apply
     relative
+    rounded-md
     flex
     items-center
-    rounded-lg
-    bg-white
-    text-slate-900
-    text-sm
-    overflow-hidden
     ring-1
-    ring-slate-900;
+    ring-inset
+    ring-gray-300
+    text-base
+    sm:text-sm
+    text-gray-900
+    overflow-hidden;
 
   -webkit-tap-highlight-color: transparent;
 
@@ -40,9 +51,9 @@
 
   :host(.focus) & {
     @apply
-      text-blue-500
       ring-2
-      ring-blue-500;
+      ring-inset
+      ring-indigo-600;
   }
 
   /**
@@ -94,6 +105,6 @@
     inset-0
     flex
     items-center
-    text-slate-900/40
+    text-gray-400
     pointer-events-none;
 }
