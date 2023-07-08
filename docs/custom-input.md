@@ -139,10 +139,4 @@ input {
 
 :::
 
-
-<iframe
-  width="100%"
-  height="315"
-  frameBorder="0"
-  src="/k5cjs/examples/?embed=input"
-></iframe>
+<demo src="input"/>

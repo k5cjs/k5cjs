@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class AppComponent {
   constructor(private _router: Router, private _route: ActivatedRoute) {
     this._route.queryParamMap.subscribe((params) => {
+      console.log('params', { ...params });
       const embed = params.get('embed');
 
       if (embed) void this._router.navigate([embed], { queryParams: { embed: null } });

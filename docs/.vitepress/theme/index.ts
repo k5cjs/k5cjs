@@ -4,6 +4,8 @@ import './style.css';
 
 import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client';
 
+import Demo from '../../components/Demo.vue';
+
 export default {
   extends: Theme,
   // Layout: () => {
@@ -16,5 +18,7 @@ export default {
   // }
   enhanceApp({ app }) {
     enhanceAppWithTabs(app);
+
+    app.component('demo', Demo);
   },
 };
