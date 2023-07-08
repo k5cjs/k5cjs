@@ -28,6 +28,7 @@ const libs = [
   Libs.Control,
   Libs.Input,
   Libs.Textarea,
+  Libs.FormField,
 ];
 
 const apps = [];
