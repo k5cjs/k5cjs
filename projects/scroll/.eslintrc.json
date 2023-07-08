@@ -5,27 +5,42 @@
     {
       "files": ["*.ts"],
       "parserOptions": {
-        "createDefaultProgram": false,
         "project": ["projects/scroll/tsconfig.eslint.json"]
       },
       "rules": {
-        "@angular-eslint/component-selector": [
-          "error",
-          {
-            "prefix": "k5c",
-            "style": "kebab-case",
-            "type": "element"
-          }
-        ],
         "@angular-eslint/directive-selector": [
           "error",
           {
-            "prefix": "k5c",
-            "style": "camelCase",
-            "type": "attribute"
+            "type": "attribute",
+            "prefix": "kc",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "kc",
+            "style": "kebab-case"
           }
         ]
-      }
+      },
+      "overrides": [
+        {
+          "files": ["*.cy.ts"],
+          "parserOptions": {
+            "project": ["projects/scroll/tsconfig.cy.json"],
+            "createDefaultProgram": true
+          }
+        },
+        {
+          "files": ["*.spec.ts"],
+          "parserOptions": {
+            "project": ["projects/scroll/tsconfig.spec.json"],
+            "createDefaultProgram": true
+          }
+        }
+      ]
     },
     {
       "files": ["*.html"],

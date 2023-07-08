@@ -1,6 +1,6 @@
 /* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/lib",
     "declaration": true,
@@ -8,5 +8,8 @@
     "inlineSources": true,
     "types": []
   },
-  "exclude": ["src/test.ts", "**/*.spec.ts"]
+  "files": [
+    "src/public-api.ts",
+    "../../cypress.config.ts",
+  ]
 }
