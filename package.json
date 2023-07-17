@@ -8,7 +8,7 @@
     "ng": "ng",
     "serve": "ng serve --host 0.0.0.0 --port 4200",
     "build:libs": "node ci/build-libraries.mjs",
-    "build:libs:prod": "node ci/build-libraries.mjs --prod",
+    "build:libs:prod": "node ci/build-libraries.mjs --production",
     "build:libs:clean": "run-s clear:dist build:libs",
     "build:examples": "ng build examples --configuration=production --base-href=/k5cjs/examples/",
     "format:prettier": "node ./ci/prettier.mjs",
