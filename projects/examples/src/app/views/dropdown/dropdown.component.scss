@@ -1,0 +1,17 @@
+.modal {
+  @apply
+    flex
+    flex-col
+    rounded-xl
+    bg-gray-300
+    ring-1
+    ring-gray-500
+    p-2
+    text-lg
+    shadow-lg;
+}
+
+span {
+  @apply
+    cursor-pointer;
+}

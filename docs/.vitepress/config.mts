@@ -21,6 +21,7 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
           // { text: 'Markdown Examples', link: '/markdown-examples' },
           // { text: 'Runtime API Examples', link: '/api-examples' },
           { text: 'Custom input', link: '/custom-input' },
+          { text: 'Dropdown', link: '/dropdown' },
         ],
       },
     ],
