@@ -9,4 +9,5 @@ export const Libs = {
   Input: 'input',
   Textarea: 'textarea',
   FormField: 'form-field',
+  Dropdown: 'dropdown',
 };
