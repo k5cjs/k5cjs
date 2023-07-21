@@ -14,6 +14,10 @@ const routes: Routes = [
     path: 'input',
     loadChildren: () => import('./views/input').then((m) => m.InputModule),
   },
+  {
+    path: 'dropdown',
+    loadChildren: () => import('./views/dropdown'),
+  },
 ];
 
 @NgModule({
