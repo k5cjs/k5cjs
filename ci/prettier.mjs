@@ -29,6 +29,7 @@ const libs = [
   Libs.Input,
   Libs.Textarea,
   Libs.FormField,
+  Libs.Dropdown,
 ];
 
 const apps = [];

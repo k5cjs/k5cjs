@@ -23,6 +23,7 @@ const commands = [
     { name: Libs.Scroll, needs: [] },
     { name: Libs.Tables, needs: [] },
     { name: Libs.Control, needs: [] },
+    { name: Libs.Dropdown, needs: [] },
   ],
   [
     { name: Libs.Select, needs: [Libs.SelectionModel] },
