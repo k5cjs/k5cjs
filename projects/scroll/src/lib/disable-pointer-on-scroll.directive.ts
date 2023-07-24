@@ -2,6 +2,7 @@ import { NumberInput, coerceNumberProperty } from '@angular/cdk/coercion';
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[k5cDisablePointerOnScroll]',
 })
 export class DisablePointerOnScrollDirective {

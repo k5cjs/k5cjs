@@ -6,7 +6,7 @@
       "files": ["*.ts"],
       "parserOptions": {
         "project": ["projects/control/tsconfig.eslint.json"],
-            "createDefaultProgram": true
+        "createDefaultProgram": true
       },
       "rules": {
         "@angular-eslint/directive-selector": [

@@ -8,8 +8,5 @@
     "inlineSources": true,
     "types": []
   },
-  "exclude": [
-    "src/public-api.ts",
-    "../../cypress.config.ts",
-  ]
+  "exclude": ["src/public-api.ts", "../../cypress.config.ts"]
 }
