@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { KcCalModule } from '../../cal.module';
+
 import { KcCalComponent } from './kc-cal.component';
 
 describe('CalComponent', () => {
@@ -9,6 +11,7 @@ describe('CalComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [KcCalComponent],
+      imports: [KcCalModule],
     }).compileComponents();
   });
 
