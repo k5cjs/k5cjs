@@ -1,5 +1,6 @@
 import { $ } from 'zx';
 import { Libs } from './libs.mjs';
+import { Apps } from './apps.mjs';
 import { cpus } from 'os';
 
 import yargs from 'yargs';
@@ -36,7 +37,9 @@ const libs = [
   Libs.Dropdown,
 ];
 
-const apps = [];
+const apps = [
+  Apps.Examples,
+];
 
 const lints = [...apps, ...libs];
 

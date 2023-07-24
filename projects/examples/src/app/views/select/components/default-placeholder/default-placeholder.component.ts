@@ -15,7 +15,7 @@ import { KcOption } from 'dist/select/public-api';
         <kc-option *kcOption="let option" [option]="option"></kc-option>
       </kc-options>
     </kc-select>
-`,
+  `,
   styleUrls: [],
 })
 export class DefaultPlaceHolderComponent {

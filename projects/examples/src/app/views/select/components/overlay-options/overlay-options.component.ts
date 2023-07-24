@@ -16,7 +16,7 @@ export class OverlayOptionsComponent {
 
   overlayConfig: OverlayConfig = {
     hasBackdrop: true,
-  }
+  };
 
   positions: ConnectedPosition[] = [
     {
@@ -24,40 +24,39 @@ export class OverlayOptionsComponent {
       originY: 'bottom',
       overlayX: 'start',
       overlayY: 'top',
-      offsetY:50,
-      offsetX:50
+      offsetY: 50,
+      offsetX: 50,
     },
     {
       originX: 'start',
       originY: 'top',
       overlayX: 'start',
       overlayY: 'bottom',
-      offsetY:50,
-      offsetX:50
+      offsetY: 50,
+      offsetX: 50,
     },
     {
       originX: 'end',
       originY: 'top',
       overlayX: 'end',
       overlayY: 'bottom',
-      offsetY:50,
-      offsetX:50
+      offsetY: 50,
+      offsetX: 50,
     },
     {
       originX: 'end',
       originY: 'bottom',
       overlayX: 'end',
       overlayY: 'top',
-      offsetY:50,
-      offsetX:50
+      offsetY: 50,
+      offsetX: 50,
     },
-  ]
+  ];
 
   overlayConfig2: OverlayConfig = {
     hasBackdrop: true,
-    positionStrategy: this._overlay.position().global().centerHorizontally().top('50px')
-  }
-
+    positionStrategy: this._overlay.position().global().centerHorizontally().top('50px'),
+  };
 
   constructor(private _fb: UntypedFormBuilder, private _overlay: Overlay) {
     this.control = this._fb.control('Location 2');

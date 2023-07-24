@@ -10,6 +10,7 @@ import { KcOptionComponent, provideKcOption } from '@k5cjs/select';
 })
 export class ExtendOptionComponent extends KcOptionComponent<unknown, unknown, unknown> {
   override click(): void {
+    // eslint-disable-next-line no-console
     console.log('override click');
   }
 }
