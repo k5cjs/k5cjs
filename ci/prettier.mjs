@@ -9,7 +9,7 @@ import { hideBin } from 'yargs/helpers';
 const argv = yargs(hideBin(process.argv)).argv;
 const nbCPUs = cpus().length - 1;
 
-$.shell = '/bin/zsh';
+$.shell = '/bin/bash';
 $.prefix = '';
 $.verbose = false;
 
