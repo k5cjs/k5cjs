@@ -9,7 +9,10 @@ import { hideBin } from 'yargs/helpers';
 const argv = yargs(hideBin(process.argv)).argv;
 const nbCPUs = cpus().length;
 
+$.shell = '/bin/zsh';
+$.prefix = '';
 $.verbose = false;
+
 process.env.FORCE_COLOR = 3;
 
 const fix = argv.fix ? `--fix` : ``;

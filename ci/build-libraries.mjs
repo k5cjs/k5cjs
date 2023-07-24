@@ -12,7 +12,10 @@ const argv = yargs(hideBin(process.argv)).argv;
  */
 const CPUs = cpus().length - 1;
 
+$.shell = '/bin/zsh';
+$.prefix = '';
 $.verbose = false;
+
 process.env.FORCE_COLOR = 3;
 
 const commands = [
