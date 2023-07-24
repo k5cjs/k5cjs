@@ -29,7 +29,7 @@ module.exports = function (config) {
     coverageReporter: {
       dir: require('path').join(__dirname, '../../coverage/scroll'),
       subdir: '.',
-      reporters: [{ type: 'html' }, { type: 'text-summary' }, {type: 'json-summary'}],
+      reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'json-summary' }],
     },
     reporters: ['progress', 'kjhtml'],
     port: 9876,
@@ -43,8 +43,13 @@ module.exports = function (config) {
         flags: ['--no-sandbox'],
       },
     },
-
     singleRun: false,
     restartOnFileChange: true,
+    formatError: (msg) => msg.replace(/http:\/\/localhost:9876\/_karma_webpack_\//g, ''),
+
+    ...(process.env.CI && {
+      singleRun: true,
+      autoWatch: false,
+    }),
   });
 };

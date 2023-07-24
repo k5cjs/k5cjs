@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
-import { MapEmitSelect } from '../../helpers';
+import { MapEmitSelect } from '../../helpers/map-emit-select.helpers';
 import { KC_SELECTION } from '../../tokens';
 import { KcOption } from '../../types';
 
