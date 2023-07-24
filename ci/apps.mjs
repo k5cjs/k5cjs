@@ -1,1 +1,3 @@
-export const Apps = {};
+export const Apps = {
+  Examples: 'examples',
+};

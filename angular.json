@@ -27,18 +27,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/rxjs/src/test.ts",
             "tsConfig": "projects/rxjs/tsconfig.spec.json",
-            "karmaConfig": "projects/rxjs/karma.conf.js"
+            "karmaConfig": "projects/rxjs/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/rxjs/**/*.ts",
-              "projects/rxjs/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/rxjs/**/*.ts", "projects/rxjs/**/*.html"]
           }
         }
       }
@@ -67,18 +64,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/forms/src/test.ts",
             "tsConfig": "projects/forms/tsconfig.spec.json",
-            "karmaConfig": "projects/forms/karma.conf.js"
+            "karmaConfig": "projects/forms/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/forms/**/*.ts",
-              "projects/forms/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/forms/**/*.ts", "projects/forms/**/*.html"]
           }
         }
       }
@@ -107,18 +101,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/tables/src/test.ts",
             "tsConfig": "projects/tables/tsconfig.spec.json",
-            "karmaConfig": "projects/tables/karma.conf.js"
+            "karmaConfig": "projects/tables/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/tables/**/*.ts",
-              "projects/tables/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/tables/**/*.ts", "projects/tables/**/*.html"]
           }
         }
       }
@@ -146,13 +137,8 @@
             "polyfills": "projects/examples/src/polyfills.ts",
             "tsConfig": "projects/examples/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
-            ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "assets": ["projects/examples/src/favicon.ico", "projects/examples/src/assets"],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": []
           },
           "configurations": {
@@ -209,28 +195,19 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/examples/src/test.ts",
-            "polyfills": "projects/examples/src/polyfills.ts",
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/examples/tsconfig.spec.json",
             "karmaConfig": "projects/examples/karma.conf.js",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
-            ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "assets": ["projects/examples/src/favicon.ico", "projects/examples/src/assets"],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": []
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/examples/**/*.ts",
-              "projects/examples/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/examples/**/*.ts", "projects/examples/**/*.html"]
           }
         }
       }
@@ -259,18 +236,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/scroll/src/test.ts",
             "tsConfig": "projects/scroll/tsconfig.spec.json",
-            "karmaConfig": "projects/scroll/karma.conf.js"
+            "karmaConfig": "projects/scroll/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/scroll/**/*.ts",
-              "projects/scroll/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/scroll/**/*.ts", "projects/scroll/**/*.html"]
           }
         }
       }
@@ -299,18 +273,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/select/src/test.ts",
             "tsConfig": "projects/select/tsconfig.spec.json",
-            "karmaConfig": "projects/select/karma.conf.js"
+            "karmaConfig": "projects/select/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/select/**/*.ts",
-              "projects/select/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/select/**/*.ts", "projects/select/**/*.html"]
           }
         }
       }
@@ -339,18 +310,15 @@
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
-            "main": "projects/selection-model/src/test.ts",
             "tsConfig": "projects/selection-model/tsconfig.spec.json",
-            "karmaConfig": "projects/selection-model/karma.conf.js"
+            "karmaConfig": "projects/selection-model/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/selection-model/**/*.ts",
-              "projects/selection-model/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/selection-model/**/*.ts", "projects/selection-model/**/*.html"]
           }
         }
       }
@@ -380,19 +348,14 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/control/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "karmaConfig": "projects/control/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/control/**/*.ts",
-              "projects/control/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/control/**/*.ts", "projects/control/**/*.html"]
           }
         }
       }
@@ -422,19 +385,14 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/input/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "karmaConfig": "projects/input/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/input/**/*.ts",
-              "projects/input/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/input/**/*.ts", "projects/input/**/*.html"]
           }
         }
       }
@@ -464,19 +422,14 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/form-field/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "karmaConfig": "projects/form-field/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/form-field/**/*.ts",
-              "projects/form-field/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/form-field/**/*.ts", "projects/form-field/**/*.html"]
           }
         }
       }
@@ -506,19 +459,14 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/textarea/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "karmaConfig": "projects/textarea/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/textarea/**/*.ts",
-              "projects/textarea/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/textarea/**/*.ts", "projects/textarea/**/*.html"]
           }
         }
       }
@@ -548,28 +496,21 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/dropdown/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "karmaConfig": "projects/dropdown/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "projects/dropdown/**/*.ts",
-              "projects/dropdown/**/*.html"
-            ]
+            "lintFilePatterns": ["projects/dropdown/**/*.ts", "projects/dropdown/**/*.html"]
           }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
+    "schematicCollections": ["@angular-eslint/schematics"],
     "analytics": false
   },
   "schematics": {

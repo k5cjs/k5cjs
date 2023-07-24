@@ -1,5 +1,6 @@
-import { MapEmitSelect } from '../helpers';
 import { KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue } from '../types';
+
+import { MapEmitSelect } from './map-emit-select.helpers';
 
 type Options<V, K, L> = KcOptionSelection<V, K, L> | KcOption<V, K, L>;
 type OptionsValue<V> = KcOptionGroupValue<V> | KcOptionValue<V>;

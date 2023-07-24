@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - 'master'
+      - 'alpha'
 
 # Ensure only one workflow per branch is running
 concurrency:

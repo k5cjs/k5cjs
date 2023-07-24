@@ -29,7 +29,7 @@ import {
   SimpleWithoutFormControlComponent,
   SimpleWrappedComponent,
   SimpleWrappedSharedComponent,
-  ValueComponent
+  ValueComponent,
 } from './components';
 import { SelectRoutingModule } from './select-routing.module';
 import { SelectComponent } from './select.component';
@@ -61,7 +61,7 @@ import { SelectComponent } from './select.component';
     CustomPlaceHolderComponent,
     CustomOptionsComponent,
     CustomOptionComponent,
-    OverlayOptionsComponent
+    OverlayOptionsComponent,
   ],
   imports: [CommonModule, SelectRoutingModule, KcSelectModule, FormsModule, ReactiveFormsModule],
 })

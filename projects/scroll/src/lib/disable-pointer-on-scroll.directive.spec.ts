@@ -45,6 +45,7 @@ describe('SelectionModel', () => {
 });
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'k5c-dummy',
   template: `
     <div #container class="container" k5cDisablePointerOnScroll>
@@ -91,6 +92,7 @@ class DummyComponent {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'k5c-dummy',
   template: `
     <div #container class="container" [k5cDisablePointerOnScroll]="1500">

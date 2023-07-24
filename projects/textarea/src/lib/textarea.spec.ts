@@ -1,14 +1,14 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { KcInput } from './input';
+import { KcTextarea } from './textarea';
 
 @Component({
-  imports: [KcInput],
+  imports: [KcTextarea],
 })
 class DumpyComponent {}
 
-describe('KcInput', () => {
+describe('KcTextarea', () => {
   let component: DumpyComponent;
   let fixture: ComponentFixture<DumpyComponent>;
 

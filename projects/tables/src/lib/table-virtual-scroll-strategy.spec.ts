@@ -480,6 +480,7 @@ const template = `
   `;
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'lib-dummy',
   template,
   styles: [
@@ -561,6 +562,7 @@ class DummyComponent {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'lib-dummy-2',
   template,
   styles: [
@@ -660,6 +662,7 @@ class Dummy2Component {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'lib-dummy',
   template,
   styles: [
@@ -740,6 +743,7 @@ class Dummy3Component {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'lib-dummy',
   template,
   styles: [
@@ -821,6 +825,7 @@ class Dummy4Component {
 }
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'lib-dummy',
   template,
   styles: [
