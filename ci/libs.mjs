@@ -10,4 +10,5 @@ export const Libs = {
   Textarea: 'textarea',
   FormField: 'form-field',
   Dropdown: 'dropdown',
+  Cal: 'cal',
 };

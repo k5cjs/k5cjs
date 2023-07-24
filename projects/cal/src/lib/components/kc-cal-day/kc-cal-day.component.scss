@@ -1,0 +1,43 @@
+:host.kd-cal-day {
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0.125rem;
+  font-size: 0.875rem;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+
+  &--selected {
+    color: #fff;
+    background-color: #ff9e1b;
+  }
+
+  &--disabled {
+    color: #94a3b8;
+    cursor: default;
+  }
+
+  &--empty {
+    cursor: default;
+    background: transparent;
+  }
+
+  &--start {
+    // rounded;
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+
+  &--end {
+    // rounded;
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+
+  &--rounded {
+    // rounded;
+    border-radius: 0.25rem;
+  }
+}

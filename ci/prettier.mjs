@@ -31,6 +31,7 @@ const libs = [
   Libs.Textarea,
   Libs.FormField,
   Libs.Dropdown,
+  Libs.Cal,
 ];
 
 const apps = [

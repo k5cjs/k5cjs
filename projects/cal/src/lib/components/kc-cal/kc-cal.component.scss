@@ -1,0 +1,25 @@
+.cal {
+  display: flex;
+  flex-direction: column;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__month {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  &__button {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+
+    &:first-child {
+      margin-right: 0.75rem;
+    }
+  }
+}

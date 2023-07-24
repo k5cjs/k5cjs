@@ -18,6 +18,10 @@ const routes: Routes = [
     path: 'dropdown',
     loadChildren: () => import('./views/dropdown'),
   },
+  {
+    path: 'cal',
+    loadChildren: () => import('./views/cal'),
+  },
 ];
 
 @NgModule({
