@@ -134,7 +134,7 @@
             "outputPath": "dist/examples",
             "index": "projects/examples/src/index.html",
             "main": "projects/examples/src/main.ts",
-            "polyfills": "projects/examples/src/polyfills.ts",
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/examples/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": ["projects/examples/src/favicon.ico", "projects/examples/src/assets"],
