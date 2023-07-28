@@ -169,7 +169,8 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "preserveSymlinks": true
             }
           },
           "defaultConfiguration": "development"
@@ -544,11 +545,51 @@
           }
         }
       }
+    },
+    "animations": {
+      "projectType": "library",
+      "root": "projects/animations",
+      "sourceRoot": "projects/animations/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/animations/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/animations/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/animations/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/animations/tsconfig.spec.json",
+            "karmaConfig": "projects/animations/karma.conf.js",
+            "polyfills": ["zone.js", "zone.js/testing"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["projects/animations/**/*.ts", "projects/animations/**/*.html"]
+          }
+        }
+      }
     }
   },
   "cli": {
     "schematicCollections": ["@angular-eslint/schematics"],
-    "analytics": false
+    "analytics": false,
+    "cache": {
+      "enabled": false
+    }
   },
   "schematics": {
     "@angular-eslint/schematics:application": {

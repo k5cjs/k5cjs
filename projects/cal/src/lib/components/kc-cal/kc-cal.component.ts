@@ -12,11 +12,12 @@ import {
   ViewContainerRef,
   ViewRef,
 } from '@angular/core';
-import { Subject, distinctUntilChanged, takeUntil } from 'rxjs';
+import { Observable, Subject, distinctUntilChanged, takeUntil } from 'rxjs';
 
 import { KcCalDayDirective, KcCalMonthDirective, KcCalWeekDirective, KcCalWeekOutletDirective } from '../../directives';
 import { KcCal } from '../../services';
-import { KcCalData, KcCalWeekData } from '../../types';
+import { KC_CAL_SELECTOR } from '../../tokens';
+import { KcCalBaseSelector, KcCalData, KcCalWeekData } from '../../types';
 import { KcCalDayComponent } from '../kc-cal-day/kc-cal-day.component';
 import { KcCalWeekComponent } from '../kc-cal-week/kc-cal-week.component';
 
@@ -37,13 +38,18 @@ export class KcCalComponent implements AfterContentInit, OnDestroy {
 
   private _destroy: Subject<void>;
 
+  test: Observable<any>;
+
   constructor(
     public kcCal: KcCal,
     private _viewContainerRef: ViewContainerRef,
     @Optional()
     @Inject(LOCALE_ID)
     private _locale: string = 'en-US',
+    @Inject(KC_CAL_SELECTOR) private kc: KcCalBaseSelector<unknown>,
   ) {
+    this.test = this.kc.changed;
+
     this.cal = {
       weeks: Array.from(
         /**

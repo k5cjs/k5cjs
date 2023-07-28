@@ -1,0 +1,40 @@
+input {
+  @apply
+    w-full
+    m-0
+    p-0
+    text-inherit
+    border-none
+    box-border
+    bg-transparent
+    outline-none
+    placeholder-slate-400
+    truncate;
+
+  font-size: inherit;
+  line-height: inherit;
+
+  /**
+   * for removing the highlight on iOS
+   */
+  -webkit-tap-highlight-color: transparent;
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus {
+    @apply
+      [background:transparent]
+      bg-white
+      shadow-inner
+      shadow-transparent
+      transition-colors
+      duration-[5000s];
+  }
+
+  &:disabled {
+    /**
+     * for removing opacity on disabled inputs in Safari
+     */
+    @apply opacity-100;
+  }
+}
