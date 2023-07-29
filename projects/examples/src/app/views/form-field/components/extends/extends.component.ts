@@ -1,14 +1,35 @@
+import { animateChild, query, stagger, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { map, timer } from 'rxjs';
 
 import { toggleY } from '@k5cjs/animations';
 
+const sgr = trigger('stagger', [
+  transition('* => *', [
+    query(
+      '@toggleY',
+      [
+        //
+        // style({ opacity: 0 }),
+        stagger(1000, [
+          //
+          // animate('0.5s', style({ opacity: 1 })),
+          animateChild(),
+        ]),
+      ],
+      {
+        optional: true,
+      },
+    ),
+  ]),
+]);
+
 @Component({
   selector: 'app-extends',
   templateUrl: './extends.component.html',
   styleUrls: ['./extends.component.scss'],
-  animations: [toggleY],
+  animations: [toggleY, sgr],
 })
 export class ExtendsComponent {
   name?: string;
@@ -39,7 +60,7 @@ export class ExtendsComponent {
     this.placeholder = 'Username';
     this.label = 'Username';
 
-    this.control = new FormControl<string>('', {
+    this.control = new FormControl<string>('a', {
       nonNullable: true,
       validators: [
         Validators.required.bind(Validators),

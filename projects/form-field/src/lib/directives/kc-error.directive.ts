@@ -32,8 +32,10 @@ export class KcError<T = unknown> {
     const context = this.context(error);
 
     const embeddedViewRef = this.templateRef.createEmbeddedView(context);
-    this.vcr.insert(embeddedViewRef);
+    const viewRef = this.vcr.insert(embeddedViewRef);
     this._embeddedViewRef = embeddedViewRef;
+
+    return viewRef;
 
     // this._embeddedViewRef = this.vcr.createEmbeddedView(this.templateRef, context);
 

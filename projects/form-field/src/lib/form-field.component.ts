@@ -176,6 +176,7 @@ export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
       return;
     }
 
+    // error.render(errorContext);
     const render = error.render(errorContext);
     // this._errorsContainer.insert(render);
 

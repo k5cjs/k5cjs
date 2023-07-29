@@ -7,7 +7,7 @@
 
   <span *ngIf="placeholder" placeholder>{{ placeholder }}</span>
 
-  <input [formControl]="control" kc-input [name]="name" tabindex="0" placeholder="" />
+  <input [formControl]="control" kc-input name="tarbuc" tabindex="0" placeholder="" />
 
   <ng-container ngProjectAs="[after]">
     <ng-content select="[after]"></ng-content>
@@ -17,15 +17,15 @@
 
   <!-- <span *kcError="'required'">Required</span> -->
 
-  <!-- <div [@stagger]="control.errors" error class="test"> -->
-  <!-- <div [@stagger]="control.errors" class="test"> -->
-  <!-- <div @toggleY *ngFor="let item of items">test</div> -->
-  <ng-container *ngFor="let error of errors | keyvalue: sort">
-    <span @toggleY *kcError="error.key; label: error.value; let value; let error = error">
-      {{ value }}; raw: {{ error | json }}
-    </span>
-  </ng-container>
-  <!-- </div> -->
+  <div [@stagger]="control.touched && control.errors" error class="test">
+    <!-- <div [@stagger]="control.errors" class="test"> -->
+    <!-- <div error> -->
+    <ng-container *ngFor="let error of errors | keyvalue: sort">
+      <span @toggleY *kcError="error.key; label: error.value; let value; let error = error">
+        {{ value }}; raw: {{ error | json }}
+      </span>
+    </ng-container>
+  </div>
 
   <!-- <span *ngFor="let a of [1, 2]" ngForTrackBy="asd">{{ a }}</span> -->
 </app-extends-form-field>

@@ -4,6 +4,8 @@ const enter = (fromState: string, toState: string) => {
   const fromStateString = String(fromState);
   const toStateString = String(toState);
 
+  console.log('fromStateString', fromStateString, 'toStateString', toStateString);
+
   if (fromStateString === toStateString) return false;
   /**
    * this is use when user use animation [@modal]="true | false"
@@ -48,7 +50,10 @@ export const toggleY = trigger('toggleY', [
   state('void, false', style({ overflowY: 'hidden', height: 0, opacity: 0 })),
   state('*, true', style({ overflowY: '*', height: '*', opacity: '*' })),
 
-  transition(enter, [animate('3s', style({ opacity: 1, height: '*' }))]),
+  transition(enter, [
+    style({ overflowY: 'hidden', height: 0, opacity: 0 }),
+    animate('3s', style({ opacity: 1, height: '*' })),
+  ]),
   transition(leave, [animate('3s', style({ opacity: 0, height: 0 }))]),
 ]);
 

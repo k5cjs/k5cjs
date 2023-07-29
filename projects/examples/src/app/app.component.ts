@@ -18,5 +18,48 @@ export class AppComponent {
 
       if (embed) void this._router.navigate([embed], { queryParams: { embed: null } });
     });
+
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    // const temp = window.HTMLElement.prototype.animate;
+
+    // window.HTMLElement.prototype.animate = function (keyframes, options) {
+    //   console.warn('animate', keyframes, options);
+    //   return temp(keyframes, options);
+    // };
+
+    const element = document.createElement('div');
+
+    const originalApply = window.HTMLElement.prototype.animate;
+
+    window.HTMLElement.prototype.animate = function (keyframes, options) {
+      console.trace('INTERCEPTING APPLY', keyframes, options);
+      const ret = originalApply.call(this, keyframes, options);
+
+      // "cancel": AnimationPlaybackEvent;
+      // "finish": AnimationPlaybackEvent;
+      // "remove": Event;
+
+      ret.addEventListener('cancel', () => console.log('CANCEL'));
+      ret.addEventListener('finish', () => console.log('FINISH'));
+      ret.addEventListener('remove', () => console.log('REMOVE'));
+
+      const temp = ret.cancel;
+
+      ret.cancel = function () {
+        console.trace('INTERCEPTING CANCEL');
+        // temp.call(this);
+      };
+
+      const finish = ret.finish;
+
+      ret.finish = function () {
+        console.trace('INTERCEPTING FINISH');
+        // temp.call(this);
+
+        return finish.call(this);
+      };
+
+      return ret;
+    };
   }
 }
