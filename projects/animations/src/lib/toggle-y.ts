@@ -2,6 +2,10 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 
 import { stateChangeEnter, stateChangeLeave } from './state-change-fn';
 
+/**
+ *
+ * element need to be a block element
+ */
 export const toggleY = (time: number = 100) =>
   trigger('toggleY', [
     state('void, false', style({ overflowY: 'hidden', height: 0, opacity: 0 })),

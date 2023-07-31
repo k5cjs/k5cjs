@@ -3,6 +3,5 @@
   "dest": "../../dist/animations",
   "lib": {
     "entryFile": "src/public-api.ts"
-  },
-  "allowedNonPeerDependencies": ["patch-package"]
+  }
 }

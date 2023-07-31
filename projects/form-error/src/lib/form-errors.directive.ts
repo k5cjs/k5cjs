@@ -92,7 +92,7 @@ export class KcErrors implements OnDestroy {
     errors: T,
     key: K,
   ): errors is T & { [key in K]: unknown } {
-    return Object.prototype.hasOwnProperty.call(errors, key);
+    return Object.prototype.hasOwnProperty.call(errors || {}, key);
   }
 
   private _addError(error: KcError, errorContext: unknown): number {
