@@ -1,5 +1,5 @@
 {
-  "name": "animations",
+  "name": "@k5cjs/animations",
   "version": "0.0.1",
   "scripts": {
     "postinstall": "patch-package"
