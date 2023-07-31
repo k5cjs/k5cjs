@@ -27,7 +27,10 @@
       "@k5cjs/form-field": ["dist/form-field"],
       "@k5cjs/input": ["dist/input"],
       "@k5cjs/textarea": ["dist/textarea"],
-      "@k5cjs/dropdown": ["dist/dropdown"]
+      "@k5cjs/dropdown": ["dist/dropdown"],
+      "@k5cjs/cal": ["dist/cal"],
+      "@k5cjs/animations": ["dist/animations"],
+      "@k5cjs/form-error": ["dist/form-error"],
     },
     "target": "ES2022",
     "module": "es2020",

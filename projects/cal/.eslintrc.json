@@ -1,0 +1,50 @@
+{
+  "extends": "../../.eslintrc.json",
+  "ignorePatterns": ["!**/*"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["projects/cal/tsconfig.eslint.json"]
+      },
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "kc",
+            "style": "kebab-case"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "kc",
+            "style": "kebab-case"
+          }
+        ]
+      },
+      "overrides": [
+        {
+          "files": ["*.cy.ts"],
+          "parserOptions": {
+            "project": ["projects/cal/tsconfig.cy.json"],
+            "createDefaultProgram": true
+          }
+        },
+        {
+          "files": ["*.spec.ts"],
+          "parserOptions": {
+            "project": ["projects/cal/tsconfig.spec.json"],
+            "createDefaultProgram": true
+          }
+        }
+      ]
+    },
+    {
+      "files": ["*.html"],
+      "rules": {}
+    }
+  ]
+}

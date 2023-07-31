@@ -1,0 +1,34 @@
+<app-extends-form-field class="field">
+  <span *ngIf="label" label class="label">{{ label }}</span>
+
+  <ng-container ngProjectAs="[before]">
+    <ng-content select="[before]"></ng-content>
+  </ng-container>
+
+  <span *ngIf="placeholder" placeholder>{{ placeholder }}</span>
+
+  <input [formControl]="control" kc-input name="tarbuc" tabindex="0" placeholder="" />
+
+  <ng-container ngProjectAs="[after]">
+    <ng-content select="[after]"></ng-content>
+  </ng-container>
+
+  <div
+    error
+    kcErrors
+    multiple
+    #error="kcErrors"
+    [@staggerChild]="{ value: error.stagger, params: { time: 140 } }"
+    [staggerTime]="140"
+    class="errors"
+  >
+    <ng-container *ngFor="let error of errors | keyvalue: sort">
+      <span
+        [@toggleY]="{ value: null, params: { time: 150 } }"
+        *kcError="error.key; label: error.value; let value; let error = error"
+      >
+        {{ value }}
+      </span>
+    </ng-container>
+  </div>
+</app-extends-form-field>

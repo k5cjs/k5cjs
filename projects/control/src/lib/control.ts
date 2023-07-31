@@ -130,7 +130,7 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   }
 
   get errors(): Record<string, string> | null {
-    throw new Error('Method not implemented.');
+    return this.ngControl?.errors || null;
   }
 
   @HostListener('focus', ['true'])

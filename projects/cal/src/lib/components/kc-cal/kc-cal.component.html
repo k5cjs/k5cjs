@@ -1,0 +1,24 @@
+<div class="cal">
+  <div class="cal__header">
+    <ng-container *ngIf="kcCal.monthChanges | async as month">
+      <ng-container *ngIf="monthRef; else defaultMonth">
+        <ng-container *ngTemplateOutlet="monthRef.template; context: { $implicit: month }"></ng-container>
+      </ng-container>
+
+      <ng-template #defaultMonth>
+        <div class="cal__month">{{ month | date:'MMMM yyyy' }}</div>
+      </ng-template>
+    </ng-container>
+
+    <div>
+      <button (click)="kcCal.prev()" class="cal__button">
+        <kc-control-left></kc-control-left>
+      </button>
+      <button (click)="kcCal.next()" class="cal__button">
+        <kc-control-right></kc-control-right>
+      </button>
+    </div>
+  </div>
+  <kc-cal-days-name></kc-cal-days-name>
+  <ng-template #outlet></ng-template>
+</div>

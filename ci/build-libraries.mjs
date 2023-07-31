@@ -12,7 +12,10 @@ const argv = yargs(hideBin(process.argv)).argv;
  */
 const CPUs = cpus().length - 1;
 
+$.shell = '/bin/bash';
+$.prefix = '';
 $.verbose = false;
+
 process.env.FORCE_COLOR = 3;
 
 const commands = [
@@ -24,12 +27,17 @@ const commands = [
     { name: Libs.Tables, needs: [] },
     { name: Libs.Control, needs: [] },
     { name: Libs.Dropdown, needs: [] },
+    { name: Libs.Cal, needs: [] },
+    { name: Libs.Animations, needs: [] },
   ],
   [
     { name: Libs.Select, needs: [Libs.SelectionModel] },
     { name: Libs.FormField, needs: [Libs.Control] },
     { name: Libs.Input, needs: [Libs.Control] },
     { name: Libs.Textarea, needs: [Libs.Control] },
+  ],
+  [
+    { name: Libs.FormError, needs: [Libs.FormField] },
   ]
 ];
 

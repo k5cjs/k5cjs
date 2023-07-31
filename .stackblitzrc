@@ -1,0 +1,7 @@
+{
+  "installDependencies": true,
+  "startCommand": "npm run build:libs && npm run serve",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

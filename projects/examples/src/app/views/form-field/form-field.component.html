@@ -1,0 +1,20 @@
+<kc-form-field class="field">
+  <span *ngIf="label" label class="label">{{ label }}</span>
+
+  <ng-container ngProjectAs="[before]">
+    <ng-content select="[before]"></ng-content>
+  </ng-container>
+
+  <span *ngIf="placeholder" placeholder>{{ placeholder }}</span>
+
+  <input [formControl]="control" kc-input [name]="name" tabindex="0" placeholder="" />
+
+  <ng-container ngProjectAs="[after]">
+    <ng-content select="[after]"></ng-content>
+  </ng-container>
+
+  <div error kcErrors>
+    <span *kcError="'required'; label: 'required'; let value">{{ value }}</span>
+    <span *kcError="'email'">Please enter a valid email address</span>
+  </div>
+</kc-form-field>

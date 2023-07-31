@@ -1,0 +1,21 @@
+<kc-cal>
+  <div *kc-cal-month="let month">{{ month | date:'MMMM yyyy' }}</div>
+
+  <kc-cal-week *kc-cal-week></kc-cal-week>
+  <kc-cal-day *kc-cal-day="let day" [day]="day"></kc-cal-day>
+</kc-cal>
+
+<!-- <kc-cal>
+  <kc-cal-week *kc-cal-week></kc-cal-week>
+  <kc-cal-day *kc-cal-day="let day" [day]="day"></kc-cal-day>
+</kc-cal>
+
+<kc-cal>
+  <kc-cal-week *kc-cal-week></kc-cal-week>
+</kc-cal>
+
+<kc-cal>
+  <kc-cal-day *kc-cal-day="let day" [day]="day"></kc-cal-day>
+</kc-cal>
+
+<kc-cal></kc-cal> -->

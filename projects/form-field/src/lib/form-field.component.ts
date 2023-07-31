@@ -8,12 +8,16 @@ import {
   ElementRef,
   HostBinding,
   HostListener,
+  InjectionToken,
   OnDestroy,
+  forwardRef,
   inject,
 } from '@angular/core';
-import { EMPTY, Subject, merge, takeUntil } from 'rxjs';
+import { EMPTY, Observable, Subject, isObservable, merge, of, switchMap, takeUntil } from 'rxjs';
 
 import { KcControl, KcControlType } from '@k5cjs/control';
+
+export const KC_FORM_FIELD = new InjectionToken<KcFormField>('kc-form-field');
 
 @Component({
   standalone: true,
@@ -22,6 +26,7 @@ import { KcControl, KcControlType } from '@k5cjs/control';
   templateUrl: './form-field.component.html',
   styleUrls: ['./form-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: KC_FORM_FIELD, useExisting: forwardRef(() => KcFormField) }],
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
@@ -29,13 +34,26 @@ export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
 
   elementRef: ElementRef<HTMLElement>;
 
+  changes: Observable<void>;
+
+  private _changes: Subject<void | Observable<void>>;
   protected _cdr: ChangeDetectorRef;
+
   private _destroyed: Subject<void>;
 
   constructor() {
+    this._changes = new Subject();
+
+    this.changes = this._changes.asObservable().pipe(
+      switchMap((value) => {
+        if (isObservable(value)) return value;
+
+        return of(value);
+      }),
+    );
+
     this.elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
     this._cdr = inject(ChangeDetectorRef);
-
     this._destroyed = new Subject();
   }
 
@@ -43,7 +61,13 @@ export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
     // Run change detection if the value changes.
     merge(this.control.stateChanges, this.control.ngControl?.statusChanges || EMPTY)
       .pipe(takeUntil(this._destroyed))
-      .subscribe(() => this._cdr.markForCheck());
+      .subscribe(() => {
+        this._cdr.markForCheck();
+      });
+
+    this._changes.next(
+      merge(this.control.stateChanges, this.control.ngControl?.statusChanges || EMPTY) as Observable<void>,
+    );
   }
 
   ngOnDestroy(): void {
