@@ -5,7 +5,9 @@ export const staggerChild = (time: number = 150) =>
     transition(
       //
       '* <=> *',
-      [query('@*', [stagger(`{{ time }}ms`, [animateChild()])], { optional: true })],
+      // issue: https://github.com/angular/angular/pull/47233
+      // [query('@*', [stagger(`{{ time }}ms`, [animateChild()])], { optional: true })],
+      [query('@*', [stagger(`${time}ms`, [animateChild()])], { optional: true })],
       { params: { time } },
     ),
   ]);
