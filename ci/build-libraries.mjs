@@ -28,12 +28,16 @@ const commands = [
     { name: Libs.Control, needs: [] },
     { name: Libs.Dropdown, needs: [] },
     { name: Libs.Cal, needs: [] },
+    { name: Libs.Animations, needs: [] },
   ],
   [
     { name: Libs.Select, needs: [Libs.SelectionModel] },
     { name: Libs.FormField, needs: [Libs.Control] },
     { name: Libs.Input, needs: [Libs.Control] },
     { name: Libs.Textarea, needs: [Libs.Control] },
+  ],
+  [
+    { name: Libs.FormError, needs: [Libs.FormField] },
   ]
 ];
 

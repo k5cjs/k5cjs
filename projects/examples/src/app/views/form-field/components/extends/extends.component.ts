@@ -1,35 +1,14 @@
-import { animateChild, query, stagger, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
-import { map, timer } from 'rxjs';
+import { FormControl, ValidationErrors, Validators } from '@angular/forms';
+import { Observable, Subject, distinctUntilChanged } from 'rxjs';
 
-import { toggleY } from '@k5cjs/animations';
-
-const sgr = trigger('stagger', [
-  transition('* => *', [
-    query(
-      '@toggleY',
-      [
-        //
-        // style({ opacity: 0 }),
-        stagger(1000, [
-          //
-          // animate('0.5s', style({ opacity: 1 })),
-          animateChild(),
-        ]),
-      ],
-      {
-        optional: true,
-      },
-    ),
-  ]),
-]);
+import { staggerChild, toggleY } from '@k5cjs/animations';
 
 @Component({
   selector: 'app-extends',
   templateUrl: './extends.component.html',
   styleUrls: ['./extends.component.scss'],
-  animations: [toggleY, sgr],
+  animations: [staggerChild(), toggleY()],
 })
 export class ExtendsComponent {
   name?: string;
@@ -39,12 +18,8 @@ export class ExtendsComponent {
 
   control: FormControl<string>;
 
-  items = [1, 2, 3, 4];
-
-  delay = timer(5000).pipe(
-    //
-    map(() => ['a', 'b', 'c', 'd']),
-  );
+  errorsChanged: Observable<ValidationErrors | null>;
+  _errorsChanged: Subject<ValidationErrors | null>;
 
   errors: Record<string, string | ((params: { requiredLength: number; actualLength: number }) => string)> = {
     required: 'This field is required',
@@ -69,6 +44,20 @@ export class ExtendsComponent {
         Validators.maxLength(10).bind(Validators),
         Validators.min(5).bind(Validators),
       ],
+    });
+
+    this._errorsChanged = new Subject();
+    this.errorsChanged = this._errorsChanged
+      .asObservable()
+      .pipe(
+        distinctUntilChanged(
+          (previous, current) =>
+            JSON.stringify(Object.keys(previous || {})) === JSON.stringify(Object.keys(current || {})),
+        ),
+      );
+
+    this.control.statusChanges.subscribe(() => {
+      this._errorsChanged.next(this.control.errors);
     });
   }
 

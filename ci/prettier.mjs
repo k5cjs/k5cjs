@@ -35,6 +35,8 @@ const libs = [
   Libs.FormField,
   Libs.Dropdown,
   Libs.Cal,
+  Libs.FormError,
+  Libs.Animations,
 ];
 
 const apps = [

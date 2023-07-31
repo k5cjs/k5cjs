@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { KcError, KcFormField } from '@k5cjs/form-field';
+import { KcError, KcErrors } from '@k5cjs/form-error';
+import { KcFormField } from '@k5cjs/form-field';
 import { KcInput } from '@k5cjs/input';
 
 import { ExtendsComponent, ExtendsFormFieldComponent } from './components';
@@ -11,6 +12,15 @@ import { FormFieldComponent } from './form-field.component';
 
 @NgModule({
   declarations: [FormFieldComponent, ExtendsComponent, ExtendsFormFieldComponent],
-  imports: [CommonModule, FormFieldRoutingModule, FormsModule, ReactiveFormsModule, KcFormField, KcInput, KcError],
+  imports: [
+    CommonModule,
+    FormFieldRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    KcFormField,
+    KcInput,
+    KcError,
+    KcErrors,
+  ],
 })
 export class FormFieldModule {}

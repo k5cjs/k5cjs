@@ -11,4 +11,6 @@ export const Libs = {
   FormField: 'form-field',
   Dropdown: 'dropdown',
   Cal: 'cal',
+  FormError: 'form-error',
+  Animations: 'animations',
 };

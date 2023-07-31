@@ -30,8 +30,7 @@
       "@k5cjs/dropdown": ["dist/dropdown"],
       "@k5cjs/cal": ["dist/cal"],
       "@k5cjs/animations": ["dist/animations"],
-      "@angular/animations": ["animations"],
-      "@angular/animations/browser": ["browser"]
+      "@k5cjs/form-error": ["dist/form-error"],
     },
     "target": "ES2022",
     "module": "es2020",

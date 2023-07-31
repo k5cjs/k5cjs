@@ -38,3 +38,9 @@ input {
     @apply opacity-100;
   }
 }
+
+.errors {
+  @apply
+    flex
+    flex-col;
+}

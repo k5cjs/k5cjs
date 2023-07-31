@@ -1,4 +1,4 @@
-import { Directive, EmbeddedViewRef, Input, Optional, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Directive, EmbeddedViewRef, Input, TemplateRef, ViewContainerRef } from '@angular/core';
 
 type LabelFn<T = unknown> = (args: T) => string;
 type Label<T = unknown> = string | LabelFn<T>;
@@ -16,7 +16,7 @@ interface Context<T = unknown> {
 // eslint-disable-next-line @angular-eslint/directive-class-suffix
 export class KcError<T = unknown> {
   @Input('kcError') name!: string;
-  @Input('kcErrorLabel') label!: Label<T>;
+  @Input('kcErrorLabel') label?: Label<T>;
 
   private _embeddedViewRef?: EmbeddedViewRef<unknown>;
 
@@ -26,20 +26,15 @@ export class KcError<T = unknown> {
     return true;
   }
 
-  constructor(private vcr: ViewContainerRef, @Optional() public templateRef: TemplateRef<unknown>) {}
+  constructor(private _vcr: ViewContainerRef, private _templateRef: TemplateRef<Context>) {}
 
   render(error: T) {
     const context = this.context(error);
 
-    const embeddedViewRef = this.templateRef.createEmbeddedView(context);
-    const viewRef = this.vcr.insert(embeddedViewRef);
+    const embeddedViewRef = this._templateRef.createEmbeddedView(context);
+    this._vcr.insert(embeddedViewRef);
+
     this._embeddedViewRef = embeddedViewRef;
-
-    return viewRef;
-
-    // this._embeddedViewRef = this.vcr.createEmbeddedView(this.templateRef, context);
-
-    // return this._embeddedViewRef;
   }
 
   update(error: T): void {
@@ -57,7 +52,7 @@ export class KcError<T = unknown> {
   }
 
   context(error: T): Context<T> {
-    const label: string = this._isLabelFn(this.label) ? this.label(error) : this.label;
+    const label: string = this._isLabelFn(this.label) ? this.label(error) : this.label || '';
 
     return {
       $implicit: label,
@@ -65,7 +60,7 @@ export class KcError<T = unknown> {
     };
   }
 
-  private _isLabelFn(label: Label<T>): label is LabelFn<T> {
+  private _isLabelFn(label?: Label<T>): label is LabelFn<T> {
     return typeof label === 'function';
   }
 }
