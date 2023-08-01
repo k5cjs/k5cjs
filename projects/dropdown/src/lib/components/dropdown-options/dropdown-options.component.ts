@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angular/core';
 
 import { KcInternalDropdownComponent } from '../internal-dropdown/internal-dropdown.component';
 
@@ -9,9 +9,11 @@ import { KcInternalDropdownComponent } from '../internal-dropdown/internal-dropd
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KcDropdownOptionsComponent {
-  constructor(private _test: KcInternalDropdownComponent) {}
+  @Input() preventClose!: boolean;
+
+  constructor(private _internalDropdown: KcInternalDropdownComponent) {}
   @HostListener('click')
   onClick(): void {
-    this._test.close();
+    if (!this.preventClose) this._internalDropdown.close();
   }
 }

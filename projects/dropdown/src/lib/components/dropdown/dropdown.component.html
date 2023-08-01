@@ -4,7 +4,7 @@
       <ng-content select="[icon]"></ng-content>
     </kc-dropdown-option-base>
   </ng-container>
-  <kc-dropdown-options *kc-dropdown>
+  <kc-dropdown-options [preventClose]="preventClose" *kc-dropdown>
     <ng-content></ng-content>
   </kc-dropdown-options>
 </kc-internal-dropdown>
