@@ -99,6 +99,10 @@ export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
     this.control.reset();
   }
 
+  get invalid(): boolean {
+    return this.control.invalid;
+  }
+
   get errors(): Record<string, string> | null {
     return this.control.errors;
   }

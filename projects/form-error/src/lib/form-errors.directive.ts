@@ -1,5 +1,14 @@
 import { coerceBooleanProperty, coerceNumberProperty } from '@angular/cdk/coercion';
-import { ChangeDetectorRef, ContentChildren, Directive, Inject, Input, OnDestroy, QueryList } from '@angular/core';
+import {
+  AfterContentInit,
+  ChangeDetectorRef,
+  ContentChildren,
+  Directive,
+  Inject,
+  Input,
+  OnDestroy,
+  QueryList,
+} from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 
 import { KC_FORM_FIELD, KcFormField } from '@k5cjs/form-field';
@@ -13,7 +22,7 @@ import { KcError } from './form-error.directive';
   exportAs: 'kcErrors',
 })
 // eslint-disable-next-line @angular-eslint/directive-class-suffix
-export class KcErrors implements OnDestroy {
+export class KcErrors implements OnDestroy, AfterContentInit {
   // prettier-ignore
   @Input()
   set multiple(value: boolean | string) { this._multiple = coerceBooleanProperty(value); }
@@ -43,6 +52,10 @@ export class KcErrors implements OnDestroy {
     this._formField.changes.pipe(takeUntil(this._destroy)).subscribe(() => this._render());
   }
 
+  ngAfterContentInit(): void {
+    this._render();
+  }
+
   ngOnDestroy(): void {
     this._destroy.next();
   }
@@ -50,11 +63,7 @@ export class KcErrors implements OnDestroy {
   private _render(): void {
     const delay = this._removeErrors() * this.staggerTime;
 
-    if (delay)
-      setTimeout(() => {
-        this._addErrors();
-        this._cdr.detectChanges();
-      }, delay);
+    if (delay) setTimeout(() => this._addErrors(), delay);
     else this._addErrors();
   }
 
@@ -69,7 +78,10 @@ export class KcErrors implements OnDestroy {
       removed += this._removeError(error);
     }
 
-    if (removed) this.stagger += 1;
+    if (removed) {
+      this.stagger += 1;
+      this._cdr.detectChanges();
+    }
 
     return removed;
   }
@@ -79,11 +91,13 @@ export class KcErrors implements OnDestroy {
 
     let added = 0;
 
-    for (const error of this._errors) {
+    for (const error of this._errors)
       if (this._hasError(errors, error.name)) added = this._addError(error, errors[error.name]);
-    }
 
-    if (added) this.stagger -= 1;
+    if (added) {
+      this.stagger -= 1;
+      this._cdr.detectChanges();
+    }
 
     return added;
   }
@@ -96,10 +110,11 @@ export class KcErrors implements OnDestroy {
   }
 
   private _addError(error: KcError, errorContext: unknown): number {
-    const parallelErrors = this.multiple ? this._errors.length : this._errors.length ? 1 : 0;
+    const parallelErrors = this.multiple ? this._errors.length : 1;
     if (this._cache.size >= parallelErrors) return 0;
 
-    if (!this._formField.control.invalid) return 0;
+    if (!this._formField.invalid) return 0;
+
     if (this._cache.has(error.name)) {
       error.update(errorContext);
 
@@ -107,7 +122,6 @@ export class KcErrors implements OnDestroy {
     }
 
     error.render(errorContext);
-
     this._cache.set(error.name, error);
 
     return 1;
