@@ -2,9 +2,9 @@
   "name": "@k5cjs/select",
   "version": "15.0.0-alpha.3",
   "peerDependencies": {
-    "@angular/common": "^14.0.0 || ^15.0.0",
-    "@angular/core": "^14.0.0 || ^15.0.0",
-    "@angular/cdk": "^14.0.0 || ^15.0.0"
+    "@angular/common": "^14.0.0 || ^15.0.0 || ^16.0.0",
+    "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0",
+    "@angular/cdk": "^14.0.0 || ^15.0.0 || ^16.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0",

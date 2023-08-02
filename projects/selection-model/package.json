@@ -2,8 +2,8 @@
   "name": "@k5cjs/selection-model",
   "version": "15.0.0",
   "peerDependencies": {
-    "@angular/common": "^15.2.1",
-    "@angular/core": "^15.2.1"
+    "@angular/common": "^14.0.0 || ^15.0.0 || ^16.0.0",
+    "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"
