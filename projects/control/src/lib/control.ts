@@ -16,6 +16,7 @@ import {
   inject,
 } from '@angular/core';
 import {
+  AbstractControl,
   AbstractControlDirective,
   COMPOSITION_BUFFER_MODE,
   DefaultValueAccessor,
@@ -98,6 +99,8 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
 
   ngOnInit(): void {
     this.ngControl = this._injector.get(NgControl, null, { optional: true });
+
+    if (this.ngControl && this.ngControl.control) this._interceptMarkAsTouched(this.ngControl.control);
   }
 
   ngAfterViewInit(): void {
@@ -162,5 +165,18 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
    */
   protected get _parent(): FormGroupDirective | NgForm | null {
     return this._parentFormGroup || this._parentForm;
+  }
+
+  /**
+   * intercepts the markAsTouched method of the control
+   * to emit a state change
+   */
+  private _interceptMarkAsTouched(control: AbstractControl): void {
+    const tmpMarkAsTouched = control.markAsTouched.bind(control);
+
+    control.markAsTouched = () => {
+      tmpMarkAsTouched();
+      this._stateChanges.next();
+    };
   }
 }

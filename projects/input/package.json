@@ -2,7 +2,7 @@
   "name": "@k5cjs/input",
   "version": "0.0.1-alpha.2",
   "peerDependencies": {
-    "@angular/core": "^15.0.0 || ^16.0.0",
+    "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0",
     "@k5cjs/control": "^0.0.1-alpha.1"
   },
   "dependencies": {
