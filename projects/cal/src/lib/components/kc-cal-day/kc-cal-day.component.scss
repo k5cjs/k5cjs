@@ -40,4 +40,10 @@
     // rounded;
     border-radius: 0.25rem;
   }
+
+  &--current {
+    border-radius: 0.25rem;
+    outline: 1px solid #ff9e1b;
+    outline-offset: -1px;
+  }
 }

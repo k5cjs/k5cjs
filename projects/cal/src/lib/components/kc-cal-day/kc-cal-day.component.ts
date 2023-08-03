@@ -61,6 +61,17 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
     return this.day.getTime() === this._selector.to.getTime();
   }
 
+  @HostBinding('class.kd-cal-day--current')
+  get current(): boolean {
+    if (!this.day) return false;
+
+    return (
+      this.day.getFullYear() === new Date().getFullYear() &&
+      this.day.getMonth() === new Date().getMonth() &&
+      this.day.getDate() === new Date().getDate()
+    );
+  }
+
   @HostBinding('class.kd-cal-day--rounded')
   get rounded(): boolean {
     if (!this.day) return false;
