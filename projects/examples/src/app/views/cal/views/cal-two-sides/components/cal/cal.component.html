@@ -1,0 +1,10 @@
+<div>Back</div>
+<div>Next</div>
+<ng-container #container></ng-container>
+
+<ng-container *ngTemplateOutlet="monthRef.template; context: { $implicit: date1 }"></ng-container>
+<ng-container *ngTemplateOutlet="monthRef.template; context: { $implicit: date2 }"></ng-container>
+
+<select [formControl]="control">
+  <option *ngFor="let option of options" [value]="option">{{ option | date: 'short' }}</option>
+</select>

@@ -4,7 +4,7 @@ import { KcCalModule } from '../../cal.module';
 
 import { KcCalDayComponent } from './kc-cal-day.component';
 
-describe('CalDayComponent', () => {
+describe('CalDay', () => {
   let component: KcCalDayComponent;
   let fixture: ComponentFixture<KcCalDayComponent>;
 

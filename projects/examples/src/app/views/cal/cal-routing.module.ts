@@ -8,6 +8,14 @@ const routes: Routes = [
     path: '',
     component: CalComponent,
   },
+  {
+    path: 'scroll',
+    loadChildren: () => import('./views/cal-scroll'),
+  },
+  {
+    path: 'two-sides',
+    loadChildren: () => import('./views/cal-two-sides'),
+  },
 ];
 
 @NgModule({

@@ -12,7 +12,6 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { KcCalSelector } from '../../services';
 import { KC_CAL_SELECTOR } from '../../tokens';
-import { KcCalDayData } from '../../types';
 
 @Component({
   selector: 'kc-cal-day',
@@ -21,7 +20,7 @@ import { KcCalDayData } from '../../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implements OnDestroy {
-  @Input() day!: KcCalDayData | null;
+  @Input() day!: Date | null;
 
   private _destroy: Subject<void>;
 
@@ -38,37 +37,37 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
   @HostBinding('class.kd-cal-day--selected')
   get selected(): boolean {
-    return this.day ? this._selector.isSelected(this.day.date) : false;
+    return this.day ? this._selector.isSelected(this.day) : false;
   }
 
   @HostBinding('class.kd-cal-day--disabled')
   get disabled(): boolean {
     if (!this.day) return false;
 
-    return this.day.date > new Date();
+    return this.day > new Date();
   }
 
   @HostBinding('class.kd-cal-day--start')
   get start(): boolean {
     if (!this.day || !this._selector.from || !this._selector.to) return false;
 
-    return this.day.date.getTime() === this._startDay(this._selector.from).getTime();
+    return this.day.getTime() === this._startDay(this._selector.from).getTime();
   }
 
   @HostBinding('class.kd-cal-day--end')
   get end(): boolean {
     if (!this.day || !this._selector.from || !this._selector.to) return false;
 
-    return this.day.date.getTime() === this._selector.to.getTime();
+    return this.day.getTime() === this._selector.to.getTime();
   }
 
   @HostBinding('class.kd-cal-day--rounded')
   get rounded(): boolean {
     if (!this.day) return false;
 
-    if (this._selector.from && !this._selector.to) return this.day.date.getTime() === this._selector.from.getTime();
+    if (this._selector.from && !this._selector.to) return this.day.getTime() === this._selector.from.getTime();
 
-    if (this._selector.to && !this._selector.from) return this.day.date.getTime() === this._selector.to.getTime();
+    if (this._selector.to && !this._selector.from) return this.day.getTime() === this._selector.to.getTime();
 
     return this._selector.from?.getTime() === this._selector.to?.getTime();
   }
@@ -77,7 +76,7 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
   select(): void {
     if (!this.day || this.disabled) return;
 
-    this._selector.select(this.day.date);
+    this._selector.select(this.day);
   }
 
   ngOnDestroy(): void {

@@ -1,0 +1,7 @@
+<ng-container #container></ng-container>
+
+<cdk-virtual-scroll-viewport itemSize="216" (scrolledIndexChange)="indexChanged()" class="example-viewport">
+  <ng-container *cdkVirtualFor="let month of months; templateCacheSize: 0" class="example-item">
+    <ng-container *ngTemplateOutlet="monthRef.template; context: { $implicit: month }"></ng-container>
+  </ng-container>
+</cdk-virtual-scroll-viewport>

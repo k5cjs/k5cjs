@@ -1,0 +1,11 @@
+<app-cal>
+  <app-month *kc-cal-month="let month" [month]="month">
+    <kc-cal-week *kc-cal-week="let week" [week]="week">
+      <kc-cal-day *kc-cal-day="let day" [day]="day"></kc-cal-day>
+    </kc-cal-week>
+  </app-month>
+</app-cal>
+
+<select [formControl]="control">
+  <option *ngFor="let option of options" [value]="option">{{ option | date: 'short' }}</option>
+</select>

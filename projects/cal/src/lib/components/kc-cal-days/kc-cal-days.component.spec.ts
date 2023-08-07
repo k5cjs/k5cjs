@@ -1,17 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ControlRightComponent } from './control-right.component';
+import { KcCalDaysComponent } from './kc-cal-days.component';
 
-describe('ControlRightComponent', () => {
-  let component: ControlRightComponent;
-  let fixture: ComponentFixture<ControlRightComponent>;
+describe('KcCalDaysComponent', () => {
+  let component: KcCalDaysComponent;
+  let fixture: ComponentFixture<KcCalDaysComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ControlRightComponent],
+      declarations: [KcCalDaysComponent],
     }).compileComponents();
+  });
 
-    fixture = TestBed.createComponent(ControlRightComponent);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(KcCalDaysComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

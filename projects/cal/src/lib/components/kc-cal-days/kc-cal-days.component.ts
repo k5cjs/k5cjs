@@ -2,12 +2,12 @@ import { getLocaleFirstDayOfWeek } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, LOCALE_ID, Optional } from '@angular/core';
 
 @Component({
-  selector: 'kc-cal-days-name',
-  templateUrl: './kc-cal-days-name.component.html',
-  styleUrls: ['./kc-cal-days-name.component.scss'],
+  selector: 'kc-cal-days',
+  templateUrl: './kc-cal-days.component.html',
+  styleUrls: ['./kc-cal-days.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcCalDaysNameComponent {
+export class KcCalDaysComponent {
   days: Date[];
 
   constructor(
@@ -18,8 +18,6 @@ export class KcCalDaysNameComponent {
     this.days = [];
     const localeStartDay = getLocaleFirstDayOfWeek(this._locale);
 
-    for (let i = localeStartDay; i < 7 + localeStartDay; i++) {
-      this.days.push(new Date(0, 0, i));
-    }
+    for (let i = localeStartDay; i < 7 + localeStartDay; i++) this.days.push(new Date(0, 0, i));
   }
 }
