@@ -40,7 +40,7 @@ export class CalComponent extends KcCalComponent {
     });
   }
 
-  protected override _renderMonths({ month, type }: KcCalEvent): void {
+  protected override _renderMonths({ month }: KcCalEvent): void {
     this._container.clear();
 
     const prevMonth = new Date(month.getFullYear(), month.getMonth() - 1);

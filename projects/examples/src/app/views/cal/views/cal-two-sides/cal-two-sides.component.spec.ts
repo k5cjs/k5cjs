@@ -8,9 +8,8 @@ describe('CalTwoSidesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CalTwoSidesComponent ]
-    })
-    .compileComponents();
+      declarations: [CalTwoSidesComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CalTwoSidesComponent);
     component = fixture.componentInstance;

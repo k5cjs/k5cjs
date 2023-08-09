@@ -14,4 +14,6 @@ export interface KcCalBaseSelector<T> {
   select(date: Date): void;
   isSelected(date: Date): boolean;
   changed: Observable<T>;
+  from: Date | null;
+  to: Date | null;
 }

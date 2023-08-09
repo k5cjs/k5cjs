@@ -20,7 +20,15 @@ import { KC_CAL_SELECTOR } from '../../tokens';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implements OnDestroy {
-  @Input() day!: Date | null;
+  @Input()
+  set day(value: Date | null) {
+    if (value) this._day = this._removeTime(value);
+    else this._day = null;
+  }
+  get day(): Date | null {
+    return this._day;
+  }
+  private _day!: Date | null;
 
   private _destroy: Subject<void>;
 
@@ -30,57 +38,57 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
     this._selector.changed.pipe(takeUntil(this._destroy)).subscribe(() => this._cdr.markForCheck());
   }
 
-  @HostBinding('class.kd-cal-day') class = true;
-  @HostBinding('class.kd-cal-day--empty') get empty(): boolean {
+  @HostBinding('class.kc-cal-day') class = true;
+  @HostBinding('class.kc-cal-day--empty') get empty(): boolean {
     return !this.day;
   }
 
-  @HostBinding('class.kd-cal-day--selected')
+  @HostBinding('class.kc-cal-day--selected')
   get selected(): boolean {
     return this.day ? this._selector.isSelected(this.day) : false;
   }
 
-  @HostBinding('class.kd-cal-day--disabled')
+  @HostBinding('class.kc-cal-day--disabled')
   get disabled(): boolean {
     if (!this.day) return false;
 
-    return this.day > new Date();
+    const current = this._removeTime(new Date());
+
+    return this.day.getTime() > current.getTime();
   }
 
-  @HostBinding('class.kd-cal-day--start')
+  @HostBinding('class.kc-cal-day--start')
   get start(): boolean {
     if (!this.day || !this._selector.from || !this._selector.to) return false;
 
-    return this.day.getTime() === this._startDay(this._selector.from).getTime();
+    return this._isDateEqual(this.day, this._selector.from);
   }
 
-  @HostBinding('class.kd-cal-day--end')
+  @HostBinding('class.kc-cal-day--end')
   get end(): boolean {
     if (!this.day || !this._selector.from || !this._selector.to) return false;
 
-    return this.day.getTime() === this._selector.to.getTime();
+    return this._isDateEqual(this.day, this._selector.to);
   }
 
-  @HostBinding('class.kd-cal-day--current')
-  get current(): boolean {
-    if (!this.day) return false;
-
-    return (
-      this.day.getFullYear() === new Date().getFullYear() &&
-      this.day.getMonth() === new Date().getMonth() &&
-      this.day.getDate() === new Date().getDate()
-    );
-  }
-
-  @HostBinding('class.kd-cal-day--rounded')
+  @HostBinding('class.kc-cal-day--rounded')
   get rounded(): boolean {
     if (!this.day) return false;
 
-    if (this._selector.from && !this._selector.to) return this.day.getTime() === this._selector.from.getTime();
+    if (this._selector.from && !this._selector.to) return this._isDateEqual(this.day, this._selector.from);
 
-    if (this._selector.to && !this._selector.from) return this.day.getTime() === this._selector.to.getTime();
+    if (this._selector.to && !this._selector.from) return this._isDateEqual(this.day, this._selector.to);
 
-    return this._selector.from?.getTime() === this._selector.to?.getTime();
+    if (!this._selector.to || !this._selector.from) return false;
+
+    return this._isDateEqual(this._selector.from, this._selector.to);
+  }
+
+  @HostBinding('class.kc-cal-day--current')
+  get current(): boolean {
+    if (!this.day) return false;
+
+    return this._isDateEqual(this.day, this._removeTime(new Date()));
   }
 
   @HostListener('click')
@@ -94,7 +102,11 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
     this._destroy.next();
   }
 
-  private _startDay(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  private _isDateEqual(date1: Date, date2: Date): boolean {
+    return date1.getTime() === date2.getTime();
+  }
+
+  private _removeTime(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
   }
 }

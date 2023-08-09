@@ -1,4 +1,7 @@
-:host.kd-cal-day {
+:host.kc-cal-day {
+  @apply
+    relative;
+
   box-sizing: content-box;
   display: flex;
   align-items: center;
@@ -23,7 +26,6 @@
 
   &--empty {
     cursor: default;
-    background: transparent;
   }
 
   &--start {
@@ -37,13 +39,17 @@
   }
 
   &--rounded {
-    // rounded;
-    border-radius: 0.25rem;
+    @apply
+      rounded;
   }
 
-  &--current {
-    border-radius: 0.25rem;
-    outline: 1px solid #ff9e1b;
-    outline-offset: -1px;
+  &--current::after {
+    @apply
+      content-['']
+      absolute
+      inset-0
+      border
+      rounded
+      border-rose-600;
   }
 }

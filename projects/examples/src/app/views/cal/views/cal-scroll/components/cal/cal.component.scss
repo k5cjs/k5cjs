@@ -1,9 +1,12 @@
-.example-viewport {
-  width: 200px;
-  height: 444px;
-  border: 1px solid black;
+.viewport {
+  @apply
+    w-56
+    h-96
+    border
+    border-black;
 }
 
-.example-item {
-  height: 50px;
+.item {
+  @apply
+    h-14;
 }
