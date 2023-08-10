@@ -25,17 +25,6 @@ export class KcTextarea
     }
   }
 
-  override ngAfterViewInit(): void {
-    if (this._platform.isBrowser)
-      this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(() => this._stateChanges.next());
-  }
-
-  override ngOnDestroy(): void {
-    this._stateChanges.complete();
-
-    if (this._platform.isBrowser) this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
-  }
-
   @HostListener('focus', ['true'])
   @HostListener('blur', ['false'])
   protected _focusChanged(isFocused: boolean): void {

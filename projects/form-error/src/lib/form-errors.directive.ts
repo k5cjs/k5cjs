@@ -49,7 +49,7 @@ export class KcErrors implements OnDestroy, AfterContentInit {
     this._staggerTime = 0;
     this.stagger = 0;
 
-    this._formField.changes.pipe(takeUntil(this._destroy)).subscribe(() => this._render());
+    this._formField.stateChanges.pipe(takeUntil(this._destroy)).subscribe(() => this._render());
   }
 
   ngAfterContentInit(): void {
@@ -58,6 +58,7 @@ export class KcErrors implements OnDestroy, AfterContentInit {
 
   ngOnDestroy(): void {
     this._destroy.next();
+    this._destroy.complete();
   }
 
   private _render(): void {

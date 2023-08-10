@@ -1,6 +1,5 @@
 import { NgIf } from '@angular/common';
 import {
-  AfterContentInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -10,10 +9,11 @@ import {
   HostListener,
   InjectionToken,
   OnDestroy,
+  OnInit,
   forwardRef,
   inject,
 } from '@angular/core';
-import { EMPTY, Observable, Subject, isObservable, merge, of, switchMap, takeUntil } from 'rxjs';
+import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { KcControl, KcControlType } from '@k5cjs/control';
 
@@ -29,45 +29,33 @@ export const KC_FORM_FIELD = new InjectionToken<KcFormField>('kc-form-field');
   providers: [{ provide: KC_FORM_FIELD, useExisting: forwardRef(() => KcFormField) }],
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
-export class KcFormField implements AfterContentInit, OnDestroy, KcControlType {
+export class KcFormField implements OnInit, OnDestroy, KcControlType {
   @ContentChild(KcControl, { static: true }) control!: KcControl;
 
   elementRef: ElementRef<HTMLElement>;
 
-  changes: Observable<void>;
+  stateChanges!: Observable<void>;
+  private _stateChanges!: Subject<Observable<void>>;
 
-  private _changes: Subject<void | Observable<void>>;
   protected _cdr: ChangeDetectorRef;
 
   private _destroyed: Subject<void>;
 
   constructor() {
-    this._changes = new Subject();
-
-    this.changes = this._changes.asObservable().pipe(
-      switchMap((value) => {
-        if (isObservable(value)) return value;
-
-        return of(value);
-      }),
-    );
-
     this.elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
     this._cdr = inject(ChangeDetectorRef);
+
     this._destroyed = new Subject();
+
+    this._stateChanges = new Subject();
+
+    this.stateChanges = this._stateChanges.asObservable().pipe(switchMap((value) => value));
+
+    this.stateChanges.pipe(takeUntil(this._destroyed)).subscribe(() => this._cdr.markForCheck());
   }
 
-  ngAfterContentInit(): void {
-    // Run change detection if the value changes.
-    merge(this.control.stateChanges, this.control.ngControl?.statusChanges || EMPTY)
-      .pipe(takeUntil(this._destroyed))
-      .subscribe(() => {
-        this._cdr.markForCheck();
-      });
-
-    this._changes.next(
-      merge(this.control.stateChanges, this.control.ngControl?.statusChanges || EMPTY) as Observable<void>,
-    );
+  ngOnInit(): void {
+    this._stateChanges.next(this.control.stateChanges);
   }
 
   ngOnDestroy(): void {
