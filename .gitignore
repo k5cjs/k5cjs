@@ -48,3 +48,7 @@ Thumbs.db
 docs/.vitepress/cache/
 
 docs/.vitepress/dist/
+
+reports/
+
+.nyc_output/
