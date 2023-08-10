@@ -1,4 +1,3 @@
-import { Platform } from '@angular/cdk/platform';
 import { AutofillMonitor } from '@angular/cdk/text-field';
 import {
   AfterViewInit,
@@ -7,6 +6,7 @@ import {
   HostListener,
   Injector,
   Input,
+  NgZone,
   OnDestroy,
   OnInit,
   Provider,
@@ -24,8 +24,9 @@ import {
   NG_VALUE_ACCESSOR,
   NgControl,
   NgForm,
+  ValidationErrors,
 } from '@angular/forms';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { KcControlType } from './control.type';
 
@@ -71,11 +72,13 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
 
   protected _stateChanges: Subject<void>;
 
-  protected _platform: Platform;
   protected _autofillMonitor: AutofillMonitor;
   protected _parentForm: NgForm | null;
   protected _parentFormGroup: FormGroupDirective | null;
   protected _injector: Injector;
+  protected _ngZone: NgZone;
+
+  private _destroy: Subject<void>;
 
   constructor() {
     const renderer = inject(Renderer2);
@@ -86,12 +89,13 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
 
     this.elementRef = elementRef;
 
-    this._platform = inject(Platform);
     this._autofillMonitor = inject(AutofillMonitor);
     this._parentForm = inject(NgForm, { optional: true });
     this._parentFormGroup = inject(FormGroupDirective, { optional: true });
     this._injector = inject(Injector);
+    this._ngZone = inject(NgZone);
 
+    this._destroy = new Subject();
     this._stateChanges = new Subject<void>();
 
     this.stateChanges = this._stateChanges.asObservable();
@@ -100,18 +104,26 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   ngOnInit(): void {
     this.ngControl = this._injector.get(NgControl, null, { optional: true });
 
-    if (this.ngControl && this.ngControl.control) this._interceptMarkAsTouched(this.ngControl.control);
+    if (this.ngControl && this.ngControl.control) {
+      this._interceptMarkAsTouched(this.ngControl.control);
+
+      this.ngControl.control.statusChanges.pipe(takeUntil(this._destroy)).subscribe(() => this._stateChanges.next());
+    }
+
+    if (this._parent) this._interceptNgSubmit(this._parent);
   }
 
   ngAfterViewInit(): void {
-    if (this._platform.isBrowser)
-      this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(() => this._stateChanges.next());
+    this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(() => this._stateChanges.next());
   }
 
   ngOnDestroy(): void {
     this._stateChanges.complete();
 
-    if (this._platform.isBrowser) this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
+    this._destroy.next();
+    this._destroy.complete();
+
+    this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
   }
 
   get value(): T | null {
@@ -129,10 +141,10 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   }
 
   reset(): void {
-    throw new Error('Method not implemented.');
+    if (this.ngControl) this.ngControl.reset();
   }
 
-  get errors(): Record<string, string> | null {
+  get errors(): ValidationErrors | null {
     return this.ngControl?.errors || null;
   }
 
@@ -166,7 +178,19 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   protected get _parent(): FormGroupDirective | NgForm | null {
     return this._parentFormGroup || this._parentForm;
   }
+  /**
+   * intercepts the ngSubmit method of the form
+   * to emit a state change when the form is submitted
+   */
+  private _interceptNgSubmit(form: FormGroupDirective | NgForm): void {
+    const onSubmit = form.onSubmit.bind(form);
 
+    form.onSubmit = (...args) => {
+      void this._ngZone.runOutsideAngular(() => Promise.resolve().then(() => this._stateChanges.next()));
+
+      return onSubmit(...args);
+    };
+  }
   /**
    * intercepts the markAsTouched method of the control
    * to emit a state change
@@ -175,8 +199,9 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     const tmpMarkAsTouched = control.markAsTouched.bind(control);
 
     control.markAsTouched = () => {
-      tmpMarkAsTouched();
-      this._stateChanges.next();
+      void this._ngZone.runOutsideAngular(() => Promise.resolve().then(() => this._stateChanges.next()));
+
+      return tmpMarkAsTouched();
     };
   }
 }

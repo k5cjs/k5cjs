@@ -178,3 +178,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ./coverage/rxjs/coverage-summary.json
           title: Karma Test Coverage
+
+      - name: Monitor coverage
+        uses: slavcodev/coverage-monitor-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          coverage_path: ./coverage/control/coverage-summary.json

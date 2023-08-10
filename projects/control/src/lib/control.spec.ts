@@ -1,32 +1,221 @@
-import { Component, Directive } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, Directive, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { take } from 'rxjs';
 
-import { KcControl } from './control';
+import { KcControl, kcControlProviders } from './control';
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
-  selector: 'test',
+  selector: '[libControl]',
+  providers: kcControlProviders(DumpyDirective),
 })
-class TestDirective extends KcControl {}
+class DumpyDirective extends KcControl {}
 
-@Component({})
-class TestComponent {}
+@Component({
+  template: `
+    <input #dir1 [formControl]="control" libControl />
+    <input #dir2 libControl />
+
+    <form [formGroup]="form" (ngSubmit)="ngSubmit()">
+      <input #dir3 formControlName="control" libControl />
+
+      <button #submit type="submit">Submit</button>
+    </form>
+  `,
+})
+class DumpyComponent {
+  @ViewChild('dir1', { read: DumpyDirective }) dir1!: DumpyDirective;
+  @ViewChild('dir2', { read: DumpyDirective }) dir2!: DumpyDirective;
+  @ViewChild('dir3', { read: DumpyDirective }) dir3!: DumpyDirective;
+
+  @ViewChildren(KcControl) controls!: QueryList<KcControl>;
+
+  @ViewChild('submit') submit!: ElementRef<HTMLButtonElement>;
+
+  control = new FormControl('', { validators: Validators.required.bind(Validators), nonNullable: true });
+
+  form = new FormGroup({
+    control: new FormControl('', { validators: Validators.required.bind(Validators), nonNullable: true }),
+  });
+
+  ngSubmit(): void {
+    return;
+  }
+}
 
 describe('InputDirective', () => {
-  let component: TestComponent;
-  let fixture: ComponentFixture<TestComponent>;
+  let component: DumpyComponent;
+  let fixture: ComponentFixture<DumpyComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestComponent, TestDirective],
+      declarations: [DumpyComponent, DumpyDirective],
+      imports: [FormsModule, ReactiveFormsModule],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
-    fixture = TestBed.createComponent(TestComponent);
+    fixture = TestBed.createComponent(DumpyComponent);
     component = fixture.componentInstance;
-
-    fixture.detectChanges(); // initial binding
   });
 
   it('should create an instance', () => {
+    fixture.detectChanges();
     expect(component).toBeTruthy();
+  });
+
+  it('check have same value as control', () => {
+    component.control.setValue('test');
+
+    fixture.detectChanges();
+
+    expect(component.dir1.value).toEqual('test');
+  });
+
+  it('prevent throw error when form control is not defined', () => {
+    component.control.setValue('test');
+
+    fixture.detectChanges();
+
+    expect(component.dir2.value).toBeNull();
+  });
+
+  it('check if input is invalid when form is submitted', () => {
+    fixture.detectChanges();
+
+    expect(component.dir3.invalid).toBeFalse();
+
+    component.submit.nativeElement.click();
+
+    expect(component.dir3.invalid).toBeTrue();
+  });
+
+  it('check if input is invalid when control is touched', () => {
+    fixture.detectChanges();
+
+    expect(component.dir1.invalid).toBeFalse();
+
+    component.control.markAsTouched();
+
+    expect(component.dir1.invalid).toBeTrue();
+  });
+
+  it('check if input is valid', () => {
+    fixture.detectChanges();
+
+    expect(component.dir1.invalid).toBeFalse();
+
+    component.control.setValue('test');
+
+    expect(component.dir1.invalid).toBeFalse();
+  });
+
+  it('check if control is disabled', () => {
+    fixture.detectChanges();
+
+    component.control.disable();
+
+    expect(component.dir1.disabled).toBeTrue();
+  });
+
+  it('check focus from control', () => {
+    fixture.detectChanges();
+
+    const focus = spyOn(component.dir1.elementRef.nativeElement, 'focus');
+
+    component.dir1.focus();
+
+    expect(focus).toHaveBeenCalled();
+  });
+
+  it('check focus from input', () => {
+    fixture.detectChanges();
+
+    const input = component.dir1.elementRef.nativeElement;
+    const event = new Event('focus', { bubbles: true });
+
+    input.dispatchEvent(event);
+
+    expect(component.dir1.focused).toBeTrue();
+  });
+
+  it('check reset method', fakeAsync(() => {
+    component.control.setValue('test');
+
+    fixture.detectChanges();
+
+    expect(component.dir1.value).toEqual('test');
+
+    component.dir1.reset();
+
+    expect(component.dir1.value).toEqual('');
+  }));
+
+  it('check errors', () => {
+    component.control.markAsTouched();
+
+    fixture.detectChanges();
+
+    expect(component.dir1.errors).toEqual({ required: true });
+  });
+
+  it('check errors', () => {
+    fixture.detectChanges();
+
+    expect(component.dir2.errors).toBeNull();
+  });
+
+  it('check autofill', () => {
+    fixture.detectChanges();
+
+    const spy = jasmine.createSpy('autofillStream');
+
+    component.dir1.stateChanges.subscribe({ next: spy });
+
+    const input = component.dir1.elementRef.nativeElement;
+
+    const animation: AnimationEvent = new AnimationEvent('animationstart', {
+      animationName: 'cdk-text-field-autofill-start',
+    });
+
+    input.dispatchEvent(animation);
+
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('tests unimplemented functions', () => {
+    fixture.detectChanges();
+
+    let expectError: unknown = null;
+
+    try {
+      component.dir2.disable();
+    } catch (error) {
+      expectError = error;
+    }
+
+    expect(expectError).toEqual(new Error('Method not implemented.'));
+  });
+
+  it('skip emit one more event if input is focused', () => {
+    fixture.detectChanges();
+
+    const input = component.dir1.elementRef.nativeElement;
+    const event = new Event('focus', { bubbles: true });
+
+    let test = 0;
+
+    component.dir1.stateChanges.pipe(take(2)).subscribe(() => (test += 1));
+
+    input.dispatchEvent(event);
+    input.dispatchEvent(event);
+
+    expect(test).toEqual(1);
+  });
+
+  it('check providers', () => {
+    fixture.detectChanges();
+
+    expect(component.controls.length).toEqual(3);
   });
 });

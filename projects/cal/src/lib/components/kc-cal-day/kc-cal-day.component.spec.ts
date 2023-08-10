@@ -28,7 +28,7 @@ fdescribe('CalDay', () => {
         ChangeDetectorRef,
       ],
       teardown: {
-        destroyAfterEach: false,
+        destroyAfterEach: true,
       },
     }).compileComponents();
   });
