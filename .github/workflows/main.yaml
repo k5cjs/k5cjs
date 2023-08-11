@@ -170,109 +170,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Tests
-        run: npm run tests
+        run: |
+          npm run tests
+          npm run merge:coverage
 
-      - name: Comment Rxjs Coverage
+      - name: Comment Test Coverage
         uses: AthleticNet/comment-test-coverage@1.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/rxjs/coverage-summary.json
-          title: Rxjs Coverage
-
-      - name: Comment Forms Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/forms/coverage-summary.json
-          title: Forms Coverage
-
-      - name: Comment Selection model Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/selection-model/coverage-summary.json
-          title: Selection model Coverage
-
-      - name: Comment Scroll Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/scroll/coverage-summary.json
-          title: Scroll Coverage
-
-      - name: Comment Tables Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/tables/coverage-summary.json
-          title: Tables Coverage
-
-      - name: Comment Control Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/control/coverage-summary.json
-          title: Control Coverage
-
-      - name: Comment Dropdown Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/dropdown/coverage-summary.json
-          title: Dropdown Coverage
-
-      - name: Comment Cal Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/cal/coverage-summary.json
-          title: Cal Coverage
-
-      - name: Comment Animations Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/animations/coverage-summary.json
-          title: Animations Coverage
-
-      - name: Comment Select Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/select/coverage-summary.json
-          title: Select Coverage
-
-      - name: Comment Form field Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/form-field/coverage-summary.json
-          title: Form field Coverage
-
-      - name: Comment Input Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/input/coverage-summary.json
-          title: Input Coverage
-
-      - name: Comment Textarea Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/textarea/coverage-summary.json
-          title: Textarea Coverage
-
-      - name: Comment Form error Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/form-error/coverage-summary.json
-          title: Form error Coverage
-
-      - name: Comment Examples Coverage
-        uses: AthleticNet/comment-test-coverage@1.2.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./coverage/examples/coverage-summary.json
-          title: Examples Coverage
+          path: coverage/merged/coverage-summary.json
+          title: Comment Test Coverage
