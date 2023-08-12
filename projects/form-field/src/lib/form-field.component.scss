@@ -65,10 +65,7 @@
       ring-indigo-600;
   }
 
-  /**
-   * bug https://bugzilla.mozilla.org/show_bug.cgi?id=418039
-   */
-  &:has(*:-webkit-autofill) {
+  :host(.autofilled) & {
     @apply
       bg-blue-500;
   }

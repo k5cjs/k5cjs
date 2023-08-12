@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 export interface KcControlType<T = string, E = HTMLElement> {
   value: T | null;
 
+  get autofilled(): boolean;
+
   get invalid(): boolean;
 
   get disabled(): boolean;
@@ -12,6 +14,8 @@ export interface KcControlType<T = string, E = HTMLElement> {
 
   get focused(): boolean;
   focus(): void;
+
+  get empty(): boolean;
 
   reset(): void;
 

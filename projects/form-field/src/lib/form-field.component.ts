@@ -7,17 +7,17 @@ import {
   ElementRef,
   HostBinding,
   HostListener,
-  InjectionToken,
   OnDestroy,
   OnInit,
   forwardRef,
   inject,
 } from '@angular/core';
+import { ValidationErrors } from '@angular/forms';
 import { Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { KcControl, KcControlType } from '@k5cjs/control';
 
-export const KC_FORM_FIELD = new InjectionToken<KcFormField>('kc-form-field');
+import { KC_FORM_FIELD } from './form-field.token';
 
 @Component({
   standalone: true,
@@ -91,18 +91,16 @@ export class KcFormField implements OnInit, OnDestroy, KcControlType {
     return this.control.invalid;
   }
 
-  get errors(): Record<string, string> | null {
+  get errors(): ValidationErrors | null {
     return this.control.errors;
   }
-  /**
-   * empty is used to now when we should show the placeholder
-   */
+
+  get autofilled(): boolean {
+    return this.control.autofilled;
+  }
+
   get empty(): boolean {
-    if (Array.isArray(this.value)) return !this.value.length;
-
-    if (typeof this.value === 'object' && this.value !== null) return !Object.keys(this.value).length;
-
-    return !this.value;
+    return this.control.empty;
   }
 
   @HostBinding('class')
@@ -111,6 +109,7 @@ export class KcFormField implements OnInit, OnDestroy, KcControlType {
       disabled: this.control.disabled,
       focus: this.control.focused,
       error: this.control.invalid,
+      autofilled: this.control.autofilled,
     };
   }
 

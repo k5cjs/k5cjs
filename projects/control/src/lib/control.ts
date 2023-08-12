@@ -66,6 +66,12 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   set focused(value: boolean) { this._focused = value; }
   private _focused = false;
 
+  // prettier-ignore
+  get autofilled(): boolean { return this._autofilled; }
+  // prettier-ignore
+  set autofilled(value: boolean) { this._autofilled = value; }
+  private _autofilled = false;
+
   get disabled(): boolean {
     return !!this.ngControl?.disabled;
   }
@@ -114,7 +120,10 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   }
 
   ngAfterViewInit(): void {
-    this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(() => this._stateChanges.next());
+    this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(({ isAutofilled }) => {
+      this.autofilled = isAutofilled;
+      this._stateChanges.next();
+    });
   }
 
   ngOnDestroy(): void {
@@ -170,6 +179,19 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
      * if the parent form has been submitted, then we show the invalidity
      */
     return !!this._parent?.submitted;
+  }
+  get empty(): boolean {
+    if (!this.ngControl) return true;
+
+    const value: unknown = this.ngControl.value;
+    /**
+     * return true if the value is an array and the length is 0
+     */
+    if (Array.isArray(value)) return !value.length;
+
+    if (typeof value === 'object' && value !== null) return !Object.keys(value).length;
+
+    return !value;
   }
   /**
    * Gets the parent form to which this control belongs.
