@@ -2,7 +2,7 @@ import { Directive, HostBinding, Input } from '@angular/core';
 
 import { KcControl, kcControlProviders } from '@k5cjs/control';
 
-type InputType = 'text' | 'number' | 'password' | 'checkbox' | 'radio';
+import { InputType } from './input.type';
 
 @Directive({
   selector: 'input[kc-input]',

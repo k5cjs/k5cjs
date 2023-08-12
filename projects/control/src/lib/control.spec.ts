@@ -183,6 +183,20 @@ describe('InputDirective', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('check autofill test autofilled', () => {
+    fixture.detectChanges();
+
+    const input = component.dir1.elementRef.nativeElement;
+
+    const animation: AnimationEvent = new AnimationEvent('animationstart', {
+      animationName: 'cdk-text-field-autofill-start',
+    });
+
+    input.dispatchEvent(animation);
+
+    expect(component.dir1.autofilled).toBeTrue();
+  });
+
   it('tests unimplemented functions', () => {
     fixture.detectChanges();
 

@@ -3,3 +3,4 @@
  */
 
 export * from './lib/form-field.component';
+export * from './lib/form-field.token';
