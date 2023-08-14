@@ -9,6 +9,7 @@ import {
   HostListener,
   OnDestroy,
   OnInit,
+  ViewChild,
   forwardRef,
   inject,
 } from '@angular/core';
@@ -27,9 +28,11 @@ import { KC_FORM_FIELD } from './form-field.token';
   styleUrls: ['./form-field.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [{ provide: KC_FORM_FIELD, useExisting: forwardRef(() => KcFormField) }],
+  exportAs: 'kcFormField',
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class KcFormField implements OnInit, OnDestroy, KcControlType {
+  @ViewChild('controlRef', { static: true }) controlRef!: ElementRef<HTMLElement>;
   @ContentChild(KcControl, { static: true }) control!: KcControl;
 
   elementRef: ElementRef<HTMLElement>;
@@ -100,6 +103,12 @@ export class KcFormField implements OnInit, OnDestroy, KcControlType {
   }
 
   get empty(): boolean {
+    /**
+     * chrome bug: autofill does not trigger onchange and input is empty but control is not empty
+     * https://stackoverflow.com/questions/55244590/autofill-does-not-trigger-onchange
+     */
+    if (this.control.autofilled) return false;
+
     return this.control.empty;
   }
 
