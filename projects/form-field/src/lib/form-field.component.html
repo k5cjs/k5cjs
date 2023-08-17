@@ -2,7 +2,7 @@
   <ng-content select="[label]"></ng-content>
 </div>
 
-<div class="control">
+<div #controlRef class="control">
   <div class="control__background">
     <ng-content select="[background]"></ng-content>
   </div>
@@ -12,7 +12,7 @@
   </div>
 
   <div class="control__input">
-    <ng-content select="[kc-input]"></ng-content>
+    <ng-content select="[kc-input],[control]"></ng-content>
 
     <span *ngIf="empty" class="placeholder">
       <ng-content select="[placeholder]"></ng-content>

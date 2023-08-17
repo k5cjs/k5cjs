@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { KcCalModule } from '../../cal.module';
+import { KcCal } from '../kc-cal/kc-cal.service';
 
 import { KcCalSelector } from './kc-cal-selector.service';
 
@@ -9,8 +9,7 @@ describe('KcCalSelector', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [KcCalModule],
-      providers: [KcCalSelector],
+      providers: [KcCal, KcCalSelector],
     });
     service = TestBed.inject(KcCalSelector);
   });

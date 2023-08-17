@@ -4,6 +4,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { toggleY } from './toggle-y';
 
+const delay = (time: number) => {
+  return new Promise<void>((resolve) => {
+    const start = new Date().getTime();
+
+    const loop = () => {
+      const delta = new Date().getTime() - start;
+
+      if (delta >= time) return resolve();
+
+      requestAnimationFrame(loop);
+    };
+
+    requestAnimationFrame(loop);
+  });
+};
+
 @Component({
   template: `
     <div id="state1" *ngIf="state1" @toggleY>Default state</div>
@@ -78,7 +94,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toEqual(0);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeGreaterThan(0);
   });
@@ -88,7 +104,7 @@ describe('Toggle y', () => {
     component.state1 = true;
     fixture.detectChanges();
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeGreaterThan(0);
 
@@ -97,7 +113,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeGreaterThanOrEqual(8);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state1')).toBeNull();
   });
@@ -110,7 +126,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state2')!.offsetHeight).toEqual(0);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state2')!.offsetHeight).toBeGreaterThan(0);
   });
@@ -120,7 +136,7 @@ describe('Toggle y', () => {
     component.state2 = true;
     fixture.detectChanges();
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state2')!.offsetHeight).toBeGreaterThan(0);
 
@@ -129,7 +145,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state2')!.offsetHeight).toBeGreaterThanOrEqual(8);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state2')).toBeNull();
   });
@@ -142,7 +158,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toEqual(0);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toBeGreaterThan(0);
 
@@ -151,7 +167,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toBeLessThanOrEqual(16);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toBeGreaterThan(16);
   });
@@ -162,12 +178,12 @@ describe('Toggle y', () => {
     component.message = 'Hello world 2';
     fixture.detectChanges();
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     component.message = 'Hello world big message two line';
     fixture.detectChanges();
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toBeGreaterThan(16);
 
@@ -176,7 +192,7 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state3')!.offsetHeight).toBeGreaterThanOrEqual(24);
 
-    await new Promise((resolve) => setTimeout(resolve, 80));
+    await delay(80);
 
     expect(compiled.querySelector<HTMLElement>('#state1')).toBeNull();
   });
@@ -201,12 +217,13 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toEqual(0);
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await delay(30);
 
+    expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeGreaterThan(0);
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeLessThanOrEqual(8);
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await delay(80);
 
-    expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toBeGreaterThanOrEqual(12);
+    expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toEqual(16);
   });
 });

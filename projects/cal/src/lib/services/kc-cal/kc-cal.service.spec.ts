@@ -1,7 +1,5 @@
 import { TestBed } from '@angular/core/testing';
 
-import { KcCalModule } from '../../cal.module';
-
 import { KcCal } from './kc-cal.service';
 
 describe('KcCal', () => {
@@ -9,7 +7,7 @@ describe('KcCal', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [KcCalModule],
+      providers: [KcCal],
     });
     service = TestBed.inject(KcCal);
   });

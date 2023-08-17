@@ -11,7 +11,7 @@ const removeTime = (date: Date): Date => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
 };
 
-fdescribe('CalDay', () => {
+describe('CalDay', () => {
   let component: KcCalDayComponent;
   let fixture: ComponentFixture<KcCalDayComponent>;
   let selector: KcCalBaseSelector<unknown>;
