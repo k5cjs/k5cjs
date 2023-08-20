@@ -22,6 +22,7 @@ import {
   HostBinding,
   HostListener,
   Input,
+  OnInit,
   Output,
   QueryList,
   TemplateRef,
@@ -29,7 +30,7 @@ import {
   ViewContainerRef,
   forwardRef,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, ValidationErrors } from '@angular/forms';
 import {
   BehaviorSubject,
   Observable,
@@ -44,10 +45,12 @@ import {
   tap,
 } from 'rxjs';
 
+import { KcControlType, kcControlProviders } from '@k5cjs/control';
+
 import { KcOptionComponent } from './components';
 import { DEFAULT_CONNECTED_POSITIONS } from './config';
 import { KcGroupDirective, KcOptionsDirective, KcOriginDirective, KcValueDirective } from './directives';
-import { MapEmitSelect, getValues } from './helpers';
+import { MapEmitSelect, getSelectedOptions, getValues, isOptionChunks } from './helpers';
 import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
 import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, KcSelect } from './types';
 
@@ -56,11 +59,7 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
   templateUrl: './kc-select.component.html',
   styleUrls: ['./kc-select.component.scss'],
   providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => KcSelectComponent),
-      multi: true,
-    },
+    kcControlProviders(KcSelectComponent),
     {
       provide: KC_SELECT,
       useExisting: forwardRef(() => KcSelectComponent),
@@ -78,7 +77,14 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValueAccessor, KcSelect {
+export class KcSelectComponent<V, K, L>
+  implements
+    OnInit,
+    AfterContentInit,
+    ControlValueAccessor,
+    KcSelect,
+    KcControlType<KcOptionValue<V> | KcOptionGroupValue<V>>
+{
   @Input()
   get options(): Observable<KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>> {
     return this._options;
@@ -163,6 +169,9 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
   allSelected: boolean;
   allSelectedChanged: Observable<boolean>;
 
+  stateChanges: Observable<void>;
+  private _stateChanges: Subject<void>;
+
   private _allSelectedChanged: BehaviorSubject<boolean>;
 
   private _dialogOverlayRef: OverlayRef | undefined;
@@ -182,10 +191,13 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
     private _overlay: Overlay,
     private _viewContainerRef: ViewContainerRef,
     private _cdr: ChangeDetectorRef,
-    private _elementRef: ElementRef<HTMLElement>,
+    public elementRef: ElementRef<HTMLElement>,
     @Attribute('tabindex') tabIndex: string,
   ) {
     this._destroy = new Subject<void>();
+
+    this._stateChanges = new Subject<void>();
+    this.stateChanges = this._stateChanges.asObservable();
 
     this.closed = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
     this.submitted = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
@@ -203,6 +215,62 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
       disposeOnNavigation: true,
       backdropClass: 'cdk-overlay-transparent-backdrop',
     };
+  }
+
+  ngOnInit(): void {
+    if (this.origin) {
+      (this.origin.elementRef.nativeElement as HTMLElement).addEventListener('click', (event) => {
+        if (this.selectionOpened) return;
+
+        this.elementRef.nativeElement.focus();
+        this.click(event);
+      });
+    }
+  }
+
+  get autofilled(): boolean {
+    // eslint-disable-next-line no-console
+    console.warn('autofilled method not implemented.');
+
+    return false;
+  }
+
+  get invalid(): boolean {
+    // eslint-disable-next-line no-console
+    console.warn('invalid method not implemented.');
+
+    return false;
+  }
+
+  get disabled(): boolean {
+    // eslint-disable-next-line no-console
+    console.warn('disabled method not implemented.');
+
+    return false;
+  }
+
+  disable(): void {
+    // eslint-disable-next-line no-console
+    console.warn('disable method not implemented.');
+  }
+
+  get empty(): boolean {
+    // eslint-disable-next-line no-console
+    console.warn('empty method not implemented.');
+
+    return false;
+  }
+
+  reset(): void {
+    // eslint-disable-next-line no-console
+    console.warn('reset method not implemented.');
+  }
+
+  get errors(): ValidationErrors | null {
+    // eslint-disable-next-line no-console
+    console.warn('reset method not implemented.');
+
+    return null;
   }
 
   ngAfterContentInit(): void {
@@ -244,21 +312,22 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
      * when user focus on element and press space, open selection
      */
     if (event.key === ' ') this.open();
+    else if (event.key === 'Escape') this.close();
   }
 
   /**
    * open selection when user click on element
    */
-  @HostListener('click')
-  click(): void {
-    if (this.selectionOpened) this.close();
-    else this.open();
+  @HostListener('click', ['$event'])
+  click(event: MouseEvent): void {
+    if (this.selectionOpened) this.close(event);
+    else this.open(event);
   }
-
   /**
-   * open selection when user press tab to focus on element
+   * focus on element when user press tab to focus on element
+   * and don't open selection, to open selection user need to press space
    */
-  @HostListener('focus')
+  @HostListener('focus', ['$event'])
   focus(): void {
     this._focused = true;
   }
@@ -266,13 +335,14 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
   /**
    * close selection when user press tab to blur on element
    */
-  @HostListener('blur')
-  blur(): void {
+  @HostListener('blur', ['$event'])
+  blur(event: FocusEvent): void {
     this._focused = false;
-    this.close();
+    this.close(event);
   }
 
-  open(): void {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  open(event?: MouseEvent): void {
     /**
      * skip to open if selection is already opened
      */
@@ -294,7 +364,7 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
     });
   }
 
-  close(event?: MouseEvent): void {
+  close(event?: MouseEvent | FocusEvent): void {
     /**
      * skip to close if selection is already closed
      */
@@ -366,19 +436,12 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
   }
 
   private _initSelectionModel(): void {
+    this.selection = new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
+
     this._getSelectedOptions
       .pipe(
-        /**
-         * get first event from selected options to initialize selection model
-         */
-        first(),
-        map((options) => options && (this.multiple ? options : options[0])),
-        map(
-          (options) =>
-            new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple, options),
-        ),
-        tap((selection) => (this.selection = selection)),
-        switchMap((selectionModel) => selectionModel.changed),
+        tap((options) => options && this.selection.set(options, { emitEvent: false })),
+        switchMap(() => this.selection.changed),
         takeUntil(this._destroy),
       )
       .subscribe(() => {
@@ -396,7 +459,6 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
 
     this._getSelectedOptions
       .pipe(
-        first(),
         tap((options) => {
           if (!options) return;
 
@@ -408,7 +470,7 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
   }
 
   private _getOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][]): KcOption<V, K, L>[][] {
-    if (this._isOptionChunks(options)) return options;
+    if (isOptionChunks(options)) return options;
 
     return [options];
   }
@@ -418,66 +480,9 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
    */
   private get _getSelectedOptions(): Observable<[K | V, KcOption<V, K, L>][] | undefined> {
     return this.options.pipe(
-      map((options) => {
-        if (Array.isArray(options)) {
-          return this._simpleOptions(options).map((option) => [option.key || option.value, option]);
-        } else if (options) {
-          return (
-            Object.entries(options)
-              .filter(([key]) => (this.value as KcOptionGroupValue<V>)[key])
-              .map(([key, { value }]) => {
-                const allOptions = value as KcOption<V, K, L>[];
-                const selectedValues = this.value as KcOptionGroupValue<V>;
-                const selectedValue = selectedValues[key];
-
-                const filter = allOptions.filter((option) => {
-                  if (Array.isArray(selectedValue))
-                    return selectedValue.some((value) => value === option.key || value === option.value);
-
-                  return selectedValue === option.key || selectedValue === option.value;
-                });
-
-                const selectedOptions: [K, V][] = filter.map((option) => [option.key || option.value, option]) as [
-                  K,
-                  V,
-                ][];
-
-                const group = Array.isArray(selectedValue)
-                  ? new MapEmitSelect<V, K, true>(true, selectedOptions as unknown as [K, V][])
-                  : new MapEmitSelect(false, selectedOptions[0]);
-
-                return {
-                  key,
-                  value: group,
-                };
-              }) as unknown as KcOption<V, K, L>[]
-          ).map((option) => [option.key || option.value, option.value as KcOption<V, K, L>]);
-        }
-
-        return undefined;
-      }),
+      map((options) => getSelectedOptions(options, this.value)),
+      first(),
     );
-  }
-
-  private _simpleOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][]) {
-    if (this._isOptionChunks(options)) {
-      return options.flat().filter((option) => {
-        if (Array.isArray(this.value))
-          return this.value.some((value) => (option.key ? value === option.key : value === option.value));
-
-        return option.key ? this.value === option.key : this.value === option.value;
-      });
-    } else
-      return options.filter((option) => {
-        if (Array.isArray(this.value))
-          return this.value.some((value) => (option.key ? value === option.key : value === option.value));
-
-        return option.key ? this.value === option.key : this.value === option.value;
-      });
-  }
-
-  private _isOptionChunks(option: KcOption<V, K, L>[] | KcOption<V, K, L>[][]): option is KcOption<V, K, L>[][] {
-    return Array.isArray(option[0]);
   }
 
   private _createObservableOptions(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>): void {
@@ -491,7 +496,7 @@ export class KcSelectComponent<V, K, L> implements AfterContentInit, ControlValu
 
   private _openDialog(): void {
     const overlayRef = this._overlay.create({
-      positionStrategy: this._getPositionStrategy(this.origin?.elementRef || this._elementRef),
+      positionStrategy: this._getPositionStrategy(this.origin?.elementRef || this.elementRef),
       ...this.cdkOverlayConfig,
     });
 

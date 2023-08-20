@@ -1,4 +1,7 @@
-import { KcGroup, KcOption, OptionGroup } from '../types';
+import { KcGroup, KcOption } from '../types';
+
+import { isOptionChunks } from './is-option-chunks.helper';
+import { isOptionGroup } from './is-option-group.helper';
 
 export function filterNestedOptions(options: KcOption<string, string>[], search: string): KcOption<string, string>[];
 export function filterNestedOptions(
@@ -15,7 +18,7 @@ export function filterNestedOptions(
     return options.filter((option) => option.label?.toLowerCase().includes(search.toLowerCase()));
   else {
     return Object.entries(options).reduce<KcGroup<string, string>>((acc, [key, item]) => {
-      if (isOptionObject(item))
+      if (isOptionGroup(item))
         acc[key] = {
           ...item,
           value: isOptionChunks(item.value)
@@ -27,16 +30,4 @@ export function filterNestedOptions(
       return acc;
     }, {});
   }
-}
-
-export function isOptionChunks(
-  option: KcOption<string, string>[] | KcOption<string, string>[][] | KcGroup<string, string>,
-): option is KcOption<string, string>[][] {
-  return Array.isArray(option) && Array.isArray(option[0]);
-}
-
-export function isOptionObject(
-  option: KcGroup<string, string> | OptionGroup<string, string>,
-): option is OptionGroup<string, string> {
-  return !!option.value;
 }

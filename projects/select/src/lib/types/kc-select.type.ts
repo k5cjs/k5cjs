@@ -7,7 +7,7 @@ export interface KcSelect<V = unknown> {
   allSelectedChanged: Observable<boolean>;
   multiple: boolean;
   focused: boolean;
-  click: (event?: MouseEvent) => void;
+  click: (event: MouseEvent) => void;
   open: (event?: MouseEvent) => void;
   close: (event?: MouseEvent) => void;
   submit: () => void;

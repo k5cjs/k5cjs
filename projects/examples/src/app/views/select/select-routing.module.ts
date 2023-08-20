@@ -27,84 +27,86 @@ const routes: Routes = [
   {
     path: '',
     component: SelectComponent,
-    children: [
-      {
-        path: 'simple-multiple',
-        component: SimpleMultipleComponent,
-      },
-      {
-        path: 'simple-multiple-select-all',
-        component: SimpleMultipleSelectAllComponent,
-      },
-      {
-        path: 'simple-multiple-deselect-all',
-        component: SimpleMultipleDeselectAllComponent,
-      },
-      {
-        path: 'simple-multiple-toggle',
-        component: SimpleMultipleToggleComponent,
-      },
-      {
-        path: 'simple-multiple-submit',
-        component: SimpleMultipleSubmitComponent,
-      },
-      {
-        path: 'simple-modal',
-        component: SimpleModalComponent,
-      },
-      {
-        path: 'simple-search',
-        component: SimpleSearchComponent,
-      },
-      {
-        path: 'simple-wrapped',
-        component: SimpleWrappedComponent,
-      },
-      {
-        path: 'simple-without-form-control',
-        component: SimpleWithoutFormControlComponent,
-      },
-      {
-        path: 'group-search',
-        component: GroupSearchComponent,
-      },
-      {
-        path: 'group-multiple',
-        component: GroupMultipleComponent,
-      },
-      {
-        path: 'group-boolean',
-        component: GroupBooleanComponent,
-      },
-      {
-        path: 'group-boolean-toggle',
-        component: GroupBooleanToggleComponent,
-      },
-      {
-        path: 'designed',
-        component: DesignedComponent,
-      },
-      {
-        path: 'default-placeholder',
-        component: DefaultPlaceHolderComponent,
-      },
-      {
-        path: 'custom-placeholder',
-        component: CustomPlaceHolderComponent,
-      },
-      {
-        path: 'custom-options',
-        component: CustomOptionsComponent,
-      },
-      {
-        path: 'overlay-options',
-        component: OverlayOptionsComponent,
-      },
-      {
-        path: 'virtual-scroll',
-        loadChildren: () => import('./components/virtual-scroll').then((m) => m.VirtualScrollModule),
-      },
-    ],
+  },
+  {
+    path: 'simple-multiple',
+    component: SimpleMultipleComponent,
+  },
+  {
+    path: 'simple-multiple-select-all',
+    component: SimpleMultipleSelectAllComponent,
+  },
+  {
+    path: 'simple-multiple-deselect-all',
+    component: SimpleMultipleDeselectAllComponent,
+  },
+  {
+    path: 'simple-multiple-toggle',
+    component: SimpleMultipleToggleComponent,
+  },
+  {
+    path: 'simple-multiple-submit',
+    component: SimpleMultipleSubmitComponent,
+  },
+  {
+    path: 'simple-modal',
+    component: SimpleModalComponent,
+  },
+  {
+    path: 'simple-search',
+    component: SimpleSearchComponent,
+  },
+  {
+    path: 'simple-wrapped',
+    component: SimpleWrappedComponent,
+  },
+  {
+    path: 'simple-without-form-control',
+    component: SimpleWithoutFormControlComponent,
+  },
+  {
+    path: 'group-search',
+    component: GroupSearchComponent,
+  },
+  {
+    path: 'group-multiple',
+    component: GroupMultipleComponent,
+  },
+  {
+    path: 'group-boolean',
+    component: GroupBooleanComponent,
+  },
+  {
+    path: 'group-boolean-toggle',
+    component: GroupBooleanToggleComponent,
+  },
+  {
+    path: 'designed',
+    component: DesignedComponent,
+  },
+  {
+    path: 'default-placeholder',
+    component: DefaultPlaceHolderComponent,
+  },
+  {
+    path: 'custom-placeholder',
+    component: CustomPlaceHolderComponent,
+  },
+  {
+    path: 'custom-options',
+    component: CustomOptionsComponent,
+  },
+  {
+    path: 'overlay-options',
+    component: OverlayOptionsComponent,
+  },
+  {
+    path: 'virtual-scroll',
+    loadChildren: () => import('./views/virtual-scroll'),
+  },
+  {
+    path: 'form-field',
+    loadChildren: () => import('./views/form-field'),
   },
 ];
 

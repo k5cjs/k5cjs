@@ -1,0 +1,20 @@
+<kc-form-field #kcFormFiled="kcFormField">
+  <kc-select
+    control
+    [formControl]="control"
+    [options]="options"
+    [origin]="{ elementRef: kcFormFiled.controlRef }"
+    [positions]="positions"
+    multiple
+  >
+    <kc-value *kcValue></kc-value>
+
+    <div prevent-close class="modal" (mousedown)="mousedown($event)">
+      <div kcSelectAll>Select all</div>
+
+      <kc-options *kcOptions="let options" [options]="options">
+        <kc-option *kcOption="let option" [option]="option"></kc-option>
+      </kc-options>
+    </div>
+  </kc-select>
+</kc-form-field>
