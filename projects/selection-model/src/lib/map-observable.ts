@@ -93,7 +93,7 @@ export class MapEmit<K, V, T extends boolean = false> {
   set(first: K | [key: K, value: V][], second?: V | Options, options?: Options): void {
     if (Array.isArray(first)) {
       this._verifyValueAssignment(first);
-      first.forEach((value) => this._markSet(...value, options));
+      first.forEach((value) => this._markSet(...value, second as Options));
     } else {
       this._markSet(first, second as V, options);
     }

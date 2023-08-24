@@ -11,7 +11,7 @@ import { KcOption } from '@k5cjs/select';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldComponent {
-  control: FormControl<string>;
+  control: FormControl<string[]>;
   options: KcOption<string, string, string>[];
 
   positions: ConnectedPosition[] = [
@@ -25,7 +25,7 @@ export class FormFieldComponent {
   ];
 
   constructor(private _fb: NonNullableFormBuilder) {
-    this.control = this._fb.control('Location 1');
+    this.control = this._fb.control(['Location 1']);
 
     this.options = [
       { label: 'Location 1', value: 'Location 1' },

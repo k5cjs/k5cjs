@@ -181,6 +181,8 @@ export class KcSelectComponent<V, K, L>
 
   private _tabIndex: number;
 
+  private _subscriptionChanges?: Subscription;
+
   private _destroy: Subject<void>;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: unknown) => void = () => {};
@@ -278,7 +280,7 @@ export class KcSelectComponent<V, K, L>
      * init selection after writeValue is called
      * ngOnInit -> writeValue -> ngAfterContentInit
      */
-    this._initSelectionModel();
+    this._subscriptionChanges = this._initSelectionModel();
 
     if (this._valueDirective) this._valueDirective.render(this._valueRef);
   }
@@ -435,10 +437,10 @@ export class KcSelectComponent<V, K, L>
     this._optionsSubscription = undefined;
   }
 
-  private _initSelectionModel(): void {
-    this.selection = new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
+  private _initSelectionModel(): Subscription {
+    this.selection ??= new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
 
-    this._getSelectedOptions
+    return this._getSelectedOptions
       .pipe(
         tap((options) => options && this.selection.set(options, { emitEvent: false })),
         switchMap(() => this.selection.changed),
@@ -462,8 +464,12 @@ export class KcSelectComponent<V, K, L>
         tap((options) => {
           if (!options) return;
 
+          this._subscriptionChanges?.unsubscribe();
+
           this.selection.clear({ emitEvent: false });
           this.selection.set(options);
+
+          this._subscriptionChanges = this._initSelectionModel();
         }),
       )
       .subscribe();
