@@ -90,18 +90,18 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     return this._selector;
   }
 
-  changeFormState(options?: { goMonth?: boolean }): void {
+  changeFromState(options?: { goMonth?: boolean }): void {
     this._selector = Selector.From;
     this._rangeSelector.next(this._selector);
 
-    if (options?.goMonth && this.from) this._kcCal.goMonth(this.from);
+    if (options?.goMonth && this.from) this._kcCal.goMonth(this.from, 'left');
   }
 
   changeToState(options?: { goMonth?: boolean }): void {
     this._selector = Selector.To;
     this._rangeSelector.next(this._selector);
 
-    if (options?.goMonth && this.to) this._kcCal.goMonth(this.to);
+    if (options?.goMonth && this.to) this._kcCal.goMonth(this.to, 'right');
   }
 
   protected _toFrom(from: Date | null, options?: { goMonth?: boolean }): void {
