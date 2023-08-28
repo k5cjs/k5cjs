@@ -48,8 +48,8 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
       goMonth?: boolean;
     },
   ): void {
-    if (this._selector === Selector.To) this._fromTo(date);
-    else this._toFrom(date);
+    if (this._selector === Selector.To) this._selectTo(date);
+    else this._selectFrom(date);
 
     if (options?.emitEvent !== false) this._changeRange();
 
@@ -84,8 +84,8 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     this._rangeSelector.next(this._selector);
 
     if (options?.goMonth)
-      if (this._selector === Selector.From && this.from) this._kcCal.goMonth(this.from);
-      else if (this._selector === Selector.To && this.to) this._kcCal.goMonth(this.to);
+      if (this._selector === Selector.From && this.from) this._kcCal.goMonth(this.from, 'from');
+      else if (this._selector === Selector.To && this.to) this._kcCal.goMonth(this.to, 'to');
 
     return this._selector;
   }
@@ -94,26 +94,26 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     this._selector = Selector.From;
     this._rangeSelector.next(this._selector);
 
-    if (options?.goMonth && this.from) this._kcCal.goMonth(this.from, 'left');
+    if (options?.goMonth && this.from) this._kcCal.goMonth(this.from, 'from');
   }
 
   changeToState(options?: { goMonth?: boolean }): void {
     this._selector = Selector.To;
     this._rangeSelector.next(this._selector);
 
-    if (options?.goMonth && this.to) this._kcCal.goMonth(this.to, 'right');
+    if (options?.goMonth && this.to) this._kcCal.goMonth(this.to, 'to');
   }
 
-  protected _toFrom(from: Date | null, options?: { goMonth?: boolean }): void {
+  protected _selectFrom(from: Date | null, options?: { goMonth?: boolean }): void {
     this._from = from;
 
-    if (from && options?.goMonth) this._kcCal.goMonth(from);
+    if (from && options?.goMonth) this._kcCal.goMonth(from, 'from');
   }
 
-  protected _fromTo(to: Date | null, options?: { goMonth?: boolean }): void {
+  protected _selectTo(to: Date | null, options?: { goMonth?: boolean }): void {
     this._to = to;
 
-    if (to && options?.goMonth) this._kcCal.goMonth(to);
+    if (to && options?.goMonth) this._kcCal.goMonth(to, 'to');
   }
 
   protected _changeRange(): void {
