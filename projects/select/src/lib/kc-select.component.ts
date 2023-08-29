@@ -221,7 +221,7 @@ export class KcSelectComponent<V, K, L>
 
   ngOnInit(): void {
     if (this.origin) {
-      (this.origin.elementRef.nativeElement as HTMLElement).addEventListener('click', (event) => {
+      this.origin.elementRef.nativeElement.addEventListener('click', (event) => {
         if (this.selectionOpened) return;
 
         this.elementRef.nativeElement.focus();
@@ -501,9 +501,13 @@ export class KcSelectComponent<V, K, L>
   }
 
   private _openDialog(): void {
+    const elementRef: ElementRef<HTMLElement> = this.origin?.elementRef || this.elementRef;
+    const minWidth: number = elementRef.nativeElement.offsetWidth;
+
     const overlayRef = this._overlay.create({
-      positionStrategy: this._getPositionStrategy(this.origin?.elementRef || this.elementRef),
+      positionStrategy: this._getPositionStrategy(elementRef),
       ...this.cdkOverlayConfig,
+      minWidth,
     });
 
     const dialogPortal = new TemplatePortal(this.templateRef, this._viewContainerRef);
