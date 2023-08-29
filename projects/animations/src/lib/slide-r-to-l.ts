@@ -4,8 +4,8 @@ import { stateChangeEnter, stateChangeLeave } from './state-change-fn';
 
 export const slideRToL = (time: number = 100) =>
   trigger('slideRToL', [
-    state('void, false', style({ opacity: 0 })),
-    state('*, true', style({ opacity: '*' })),
+    state('void, false', style({ opacity: 0, transform: 'translateX(100%)' })),
+    state('*, true', style({ opacity: '*', transform: '*' })),
 
     transition(
       stateChangeEnter,

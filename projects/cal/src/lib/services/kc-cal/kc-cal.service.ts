@@ -45,22 +45,18 @@ export class KcCal {
   }
 
   goMonth(date: Date, type: KcCalEvent['type'] = null): void {
-    const { month } = this._changes.value;
-
-    if (month.getMonth() !== date.getMonth() || month.getFullYear() !== date.getFullYear())
-      this._changes.next({
-        month: new Date(date.getFullYear(), date.getMonth()),
-        type,
-      });
+    this._changes.next({
+      month: new Date(date.getFullYear(), date.getMonth()),
+      type,
+    });
   }
 
   goYear(date: Date, type: KcCalEvent['type'] = null): void {
     const { month } = this._changes.value;
 
-    if (month.getFullYear() !== date.getFullYear())
-      this._changes.next({
-        month: new Date(date.getFullYear(), month.getMonth()),
-        type,
-      });
+    this._changes.next({
+      month: new Date(date.getFullYear(), month.getMonth()),
+      type,
+    });
   }
 }
