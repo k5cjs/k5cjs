@@ -76,6 +76,7 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
     },
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  exportAs: 'kcSelect',
 })
 export class KcSelectComponent<V, K, L>
   implements
