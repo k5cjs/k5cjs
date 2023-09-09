@@ -19,8 +19,7 @@
         "prettier",
         "plugin:import/errors",
         "plugin:import/warnings",
-        "plugin:import/typescript",
-        "plugin:@angular-eslint/recommended--extra"
+        "plugin:import/typescript"
       ],
       "plugins": ["unused-imports", "sort-export-all"],
       "rules": {

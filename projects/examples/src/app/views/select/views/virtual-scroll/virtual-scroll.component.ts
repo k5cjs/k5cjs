@@ -54,7 +54,7 @@ export class VirtualScrollComponent {
     }, 300);
   }
 
-  private _generateOptions(length: number, skip: number = 0): KcOption<string, string, string>[] {
+  private _generateOptions(length: number, skip = 0): KcOption<string, string, string>[] {
     return Array.from({ length }).map((_, i) => ({ label: `Location ${i + skip}`, value: `Location ${i + skip}` }));
   }
 }

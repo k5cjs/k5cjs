@@ -10,8 +10,8 @@ import {
 } from 'rxjs';
 
 export const delayAnimation = <T extends boolean>(
-  cycleTime: number = 300,
-  skipTime: number = 100,
+  cycleTime = 300,
+  skipTime = 100,
 ): MonoTypeOperatorFunction<T> => {
   return (animationState: Observable<T>): Observable<T> =>
     animationState.pipe(

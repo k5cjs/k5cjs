@@ -6,7 +6,7 @@ import { stateChangeEnter, stateChangeLeave, stateChanged } from './state-change
  *
  * element need to be a block element
  */
-export const toggleY = (time: number = 100) =>
+export const toggleY = (time = 100) =>
   trigger('toggleY', [
     state('void, false', style({ overflowY: 'hidden', height: 0, opacity: 0 })),
     state('*, true', style({ overflowY: '*', height: '*', opacity: '*' })),

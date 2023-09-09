@@ -6,7 +6,7 @@ import { stateChangeEnter, stateChangeLeave } from './state-change-fn';
  *
  * element need to be a block element
  */
-export const toggleO = (time: number = 100) =>
+export const toggleO = (time = 100) =>
   trigger('toggleO', [
     state('void, false', style({ opacity: 0 })),
     state('*, true', style({ opacity: '*' })),
