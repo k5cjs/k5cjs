@@ -9,10 +9,7 @@ import {
   timer,
 } from 'rxjs';
 
-export const delayAnimation = <T extends boolean>(
-  cycleTime = 300,
-  skipTime = 100,
-): MonoTypeOperatorFunction<T> => {
+export const delayAnimation = <T extends boolean>(cycleTime = 300, skipTime = 100): MonoTypeOperatorFunction<T> => {
   return (animationState: Observable<T>): Observable<T> =>
     animationState.pipe(
       // remove duplicate events that come one after the other
