@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AnimationDriver } from '@angular/animations/browser';
+import { MockAnimationDriver, MockAnimationPlayer } from '@angular/animations/browser/testing';
+import { AfterContentChecked, ChangeDetectorRef, Component } from '@angular/core';
+import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { toggleO } from './toggle-o';
 import { toggleY } from './toggle-y';
 
 const delay = (time: number) => {
@@ -20,50 +23,8 @@ const delay = (time: number) => {
   });
 };
 
-@Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
-    <div id="state2" *ngIf="state2" [@toggleY]="state2">Boolean state</div>
-    <div id="state3" #ref *ngIf="state3" [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
-      {{ message }}
-    </div>
-  `,
-  styles: [
-    `
-      div {
-        width: 200px;
-        font-size: 16px;
-        line-height: 16px;
-      }
-    `,
-  ],
-  animations: [toggleY(40)],
-})
-class DumpyComponent {
-  state1 = false;
-  state2 = false;
-  state3 = false;
-
-  message = 'Hello world';
-}
-
-@Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
-  `,
-  styles: [
-    `
-      div {
-        width: 200px;
-        font-size: 16px;
-        line-height: 16px;
-      }
-    `,
-  ],
-  animations: [toggleY()],
-})
-class Dumpy1Component {
-  state1 = false;
+function getLog(): MockAnimationPlayer[] {
+  return MockAnimationDriver.log as MockAnimationPlayer[];
 }
 
 describe('Toggle y', () => {
@@ -226,4 +187,186 @@ describe('Toggle y', () => {
 
     expect(compiled.querySelector<HTMLElement>('#state1')!.offsetHeight).toEqual(16);
   });
+
+  it('nested animations', fakeAsync(() => {
+    TestBed.resetTestingModule();
+
+    TestBed.configureTestingModule({
+      declarations: [Dumpy2Component],
+      imports: [BrowserAnimationsModule],
+      providers: [{ provide: AnimationDriver, useClass: MockAnimationDriver }],
+      teardown: {
+        destroyAfterEach: false,
+      },
+    });
+
+    fixture = TestBed.createComponent(Dumpy2Component) as unknown as ComponentFixture<DumpyComponent>;
+    component = fixture.componentInstance;
+
+    component.state1 = true;
+
+    fixture.detectChanges();
+
+    let player = getLog().pop()!;
+    player.finish();
+
+    expect(player.keyframes).toEqual([
+      new Map<string, string | number>([
+        ['overflowY', 'hidden'],
+        ['height', '0'],
+        ['opacity', '0'],
+        ['offset', 0],
+      ]),
+      new Map<string, string | number>([
+        ['overflowY', 'hidden'],
+        ['height', '*'],
+        ['opacity', '1'],
+        ['offset', 1],
+      ]),
+    ]);
+
+    component.state2 = true;
+    component.message = 'Hello world 2 test test';
+
+    fixture.detectChanges();
+
+    player = getLog().pop()!;
+    player.finish();
+
+    expect(player.keyframes).toEqual([
+      new Map<string, string | number>([
+        ['height', '0px'],
+        ['offset', 0],
+      ]),
+      new Map<string, string | number>([
+        ['height', '*'],
+        ['offset', 1],
+      ]),
+    ]);
+
+    player = getLog().pop()!;
+    player.finish();
+
+    expect(player.keyframes).toEqual([
+      new Map<string, string | number>([
+        ['opacity', '0'],
+        ['offset', 0],
+      ]),
+      new Map<string, string | number>([
+        ['opacity', '*'],
+        ['offset', 1],
+      ]),
+    ]);
+
+    player = getLog().pop()!;
+    player.finish();
+
+    expect(player.keyframes).toEqual([
+      new Map<string, string | number>([
+        ['overflowY', 'hidden'],
+        ['height', '0px'],
+        ['opacity', '*'],
+        ['offset', 0],
+      ]),
+      new Map<string, string | number>([
+        ['overflowY', 'hidden'],
+        ['height', '0px'],
+        ['opacity', '*'],
+        ['offset', 1],
+      ]),
+    ]);
+
+    player = getLog().pop()!;
+    player.finish();
+
+    expect(player.keyframes).toEqual([
+      new Map<string, string | number>([
+        ['opacity', '0'],
+        ['offset', 0],
+      ]),
+      new Map<string, string | number>([
+        ['opacity', '*'],
+        ['offset', 1],
+      ]),
+    ]);
+  }));
 });
+
+@Component({
+  template: `
+    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
+    <div id="state2" *ngIf="state2" [@toggleY]="state2">Boolean state</div>
+    <div id="state3" #ref *ngIf="state3" [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
+      {{ message }}
+    </div>
+  `,
+  styles: [
+    `
+      div {
+        width: 200px;
+        font-size: 16px;
+        line-height: 16px;
+      }
+    `,
+  ],
+  animations: [toggleY(40)],
+})
+class DumpyComponent {
+  state1 = false;
+  state2 = false;
+  state3 = false;
+
+  message = 'Hello world';
+}
+
+@Component({
+  template: `
+    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
+  `,
+  styles: [
+    `
+      div {
+        width: 200px;
+        font-size: 16px;
+        line-height: 16px;
+      }
+    `,
+  ],
+  animations: [toggleY()],
+})
+class Dumpy1Component {
+  state1 = false;
+}
+
+@Component({
+  template: `
+    <div>test</div>
+    <div id="state1" #ref *ngIf="state1" [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
+      <div @toggleO *ngIf="state2">
+        {{ message }}
+      </div>
+    </div>
+  `,
+  styles: [
+    `
+      div {
+        width: 200px;
+        font-size: 16px;
+        line-height: 16px;
+      }
+    `,
+  ],
+  animations: [toggleY(), toggleO()],
+})
+class Dumpy2Component implements AfterContentChecked {
+  state1 = false;
+  state2 = false;
+
+  message = 'Hello world';
+
+  constructor(private _cdr: ChangeDetectorRef) {}
+
+  ngAfterContentChecked() {
+    this._cdr.detectChanges();
+  }
+}
