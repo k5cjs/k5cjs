@@ -506,6 +506,7 @@ export class KcSelectComponent<V, K, L>
     const minWidth: number = elementRef.nativeElement.offsetWidth;
 
     const overlayRef = this._overlay.create({
+      scrollStrategy: this._overlay.scrollStrategies.reposition(),
       positionStrategy: this._getPositionStrategy(elementRef),
       ...this.cdkOverlayConfig,
       minWidth,
@@ -528,7 +529,7 @@ export class KcSelectComponent<V, K, L>
       return this._overlay.position().global().centerHorizontally().centerVertically();
     }
 
-    return this._overlay.position().flexibleConnectedTo(elementRef).withPositions(this.positions);
+    return this._overlay.position().flexibleConnectedTo(elementRef).withPositions(this.positions).withPush(false);
   }
 
   private _closeDialog(): void {
