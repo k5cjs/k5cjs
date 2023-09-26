@@ -119,6 +119,7 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
   protected _changeRange(): void {
     if (this.from && this.to && this.from.getTime() > this.to.getTime()) {
       [this._from, this._to] = [this._to, this._from];
+      this._selector ^= Selector.To;
     }
 
     this._range.next({

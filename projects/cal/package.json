@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/cal",
-  "version": "0.0.1-alpha.1",
+  "version": "0.0.1-alpha.2",
   "peerDependencies": {
     "@angular/common": "^14.0.0 || ^15.0.0 || ^16.0.0",
     "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0"
