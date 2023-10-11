@@ -48,7 +48,12 @@ export class KcInternalDropdownComponent implements OnDestroy {
 
   private _openDialog(): void {
     const overlayRef = this._overlay.create({
-      positionStrategy: this._overlay.position().flexibleConnectedTo(this.icon).withPositions(POSITIONS),
+      scrollStrategy: this._overlay.scrollStrategies.reposition(),
+      positionStrategy: this._overlay
+        .position()
+        .flexibleConnectedTo(this.icon)
+        .withPositions(POSITIONS)
+        .withPush(false),
       ...this.cdkOverlayConfig,
     });
 
@@ -61,7 +66,7 @@ export class KcInternalDropdownComponent implements OnDestroy {
   }
 
   private _closeDialog(): void {
-    this._dialogOverlayRef!.dispose();
+    this._dialogOverlayRef?.dispose();
     this._dialogOverlayRef = undefined;
   }
 }
