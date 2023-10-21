@@ -13,4 +13,6 @@ export const Libs = {
   Cal: 'cal',
   FormError: 'form-error',
   Animations: 'animations',
+  Store: 'store',
+  Types: 'types',
 };

@@ -196,7 +196,7 @@ describe('Toggle y', () => {
       imports: [BrowserAnimationsModule],
       providers: [{ provide: AnimationDriver, useClass: MockAnimationDriver }],
       teardown: {
-        destroyAfterEach: false,
+        destroyAfterEach: true,
       },
     });
 
@@ -263,15 +263,11 @@ describe('Toggle y', () => {
 
     expect(player.keyframes).toEqual([
       new Map<string, string | number>([
-        ['overflowY', 'hidden'],
-        ['height', '0px'],
-        ['opacity', '*'],
+        ['opacity', '0'],
         ['offset', 0],
       ]),
       new Map<string, string | number>([
-        ['overflowY', 'hidden'],
-        ['height', '0px'],
-        ['opacity', '*'],
+        ['opacity', '0'],
         ['offset', 1],
       ]),
     ]);
@@ -281,10 +277,14 @@ describe('Toggle y', () => {
 
     expect(player.keyframes).toEqual([
       new Map<string, string | number>([
-        ['opacity', '0'],
+        ['overflowY', 'hidden'],
+        ['height', '0px'],
+        ['opacity', '*'],
         ['offset', 0],
       ]),
       new Map<string, string | number>([
+        ['overflowY', 'hidden'],
+        ['height', '0px'],
         ['opacity', '*'],
         ['offset', 1],
       ]),

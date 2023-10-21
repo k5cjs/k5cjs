@@ -29,6 +29,8 @@
       "@k5cjs/cal": ["dist/cal"],
       "@k5cjs/animations": ["dist/animations"],
       "@k5cjs/form-error": ["dist/form-error"],
+      "@k5cjs/store": ["dist/store"],
+      "@k5cjs/types": ["dist/types"],
     },
     "target": "ES2022",
     "module": "es2020",
