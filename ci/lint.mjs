@@ -41,6 +41,8 @@ const libs = [
   Libs.Cal,
   Libs.FormError,
   Libs.Animations,
+  Libs.Store,
+  Libs.Types,
 ];
 
 const apps = [

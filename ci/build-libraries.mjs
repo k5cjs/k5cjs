@@ -20,6 +20,7 @@ process.env.FORCE_COLOR = 3;
 
 const commands = [
   [
+    { name: Libs.Types, needs: [] },
     { name: Libs.Rxjs, needs: [] },
     { name: Libs.Forms, needs: [] },
     { name: Libs.SelectionModel, needs: [] },
@@ -31,6 +32,7 @@ const commands = [
     { name: Libs.Animations, needs: [] },
   ],
   [
+    { name: Libs.Store, needs: [Libs.Types] },
     { name: Libs.Select, needs: [Libs.SelectionModel] },
     { name: Libs.FormField, needs: [Libs.Control] },
     { name: Libs.Input, needs: [Libs.Control] },

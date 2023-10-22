@@ -16,6 +16,8 @@ mv coverage/dropdown/coverage-final.json reports/dropdown.json
 mv coverage/cal/coverage-final.json reports/cal.json
 mv coverage/form-error/coverage-final.json reports/form.json
 mv coverage/animations/coverage-final.json reports/animations.json
+mv coverage/store/coverage-final.json reports/store.json
+mv coverage/types/coverage-final.json reports/types.json
 
 mkdir -p .nyc_output
 
