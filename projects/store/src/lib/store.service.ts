@@ -8,7 +8,7 @@ import { sha1 } from 'object-hash';
 
 import { ActionsBase } from './store.actions';
 import { SelectorsBase } from './store.selectors';
-import { ActionAllOptions, ActionCreatorType } from './store.type';
+import { ActionAllOptions, ActionCreatorType, ByQueryParams } from './store.type';
 
 export class StoreServiceBase<T extends { id: PropertyKey }> {
   all: Observable<T[]>;
@@ -29,9 +29,9 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   }
 
   getByQuery(
-    params: Record<string, string | number | boolean>,
+    params: ByQueryParams,
     options: ActionAllOptions['options'] = {},
-  ): Observable<{ items: T[] } & object> {
+  ): Observable<{ items: T[] } & Record<PropertyKey, unknown>> {
     const query = this._query(params);
 
     return this._dispatch(
@@ -117,7 +117,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     );
   }
 
-  byQuery(params: Record<string, string | number | boolean>): Observable<{ items: T[] } & object> {
+  byQuery(params: ByQueryParams): Observable<{ items: T[] } & object> {
     const query = this._query(params);
 
     return this._store.select(this._selectors.queryAll(query)).pipe(filter(isNotUndefined));
@@ -127,7 +127,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     return this._store.select(this._selectors.entity(id));
   }
 
-  error(params: Record<string, string | number | boolean>): Observable<string | undefined> {
+  error(params: ByQueryParams): Observable<string | undefined> {
     const query = this._query(params);
 
     return this._store.select(this._selectors.error(query));
