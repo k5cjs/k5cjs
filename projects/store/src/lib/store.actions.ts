@@ -2,10 +2,10 @@
 import { AtLeastDeep } from '@k5cjs/types';
 import { createAction, props } from '@ngrx/store';
 
-import { ActionCreatorType } from './store.type';
+import { ActionCreatorType, ByQueryParams } from './store.type';
 
 export class ActionsBase<T extends { id: PropertyKey }> {
-  getByQuery: ActionCreatorType<{ params: Record<PropertyKey, unknown> }>;
+  getByQuery: ActionCreatorType<{ params: ByQueryParams }>;
   getByQueryIsLoaded: ActionCreatorType;
   getByQuerySuccess: ActionCreatorType<{ response: { items: T[] } }>;
   getByQueryError: ActionCreatorType<{ error: string }>;

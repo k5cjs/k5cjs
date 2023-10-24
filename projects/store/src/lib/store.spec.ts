@@ -109,7 +109,7 @@ class StoreService extends StoreServiceBase<FeatureStoreType> {
   }
 }
 
-fdescribe('Store', () => {
+describe('Store', () => {
   let service: StoreService;
   let http: HttpService;
   let store: Store<{ [key]: StateBase<FeatureStoreType> }>;

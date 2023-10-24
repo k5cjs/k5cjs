@@ -26,23 +26,30 @@ export interface ActionSkip {}
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ActionError {}
 
-export type ActionAllOptions<P = object, R = object, E = string> = {
+export interface ActionOptions {
+  init?: ActionInit;
+  success?: ActionSuccess;
+  skip?: ActionSkip;
+  error?: ActionError;
+}
+
+export type ObjectParams<T = unknown> = Record<PropertyKey, T>;
+
+export type ActionAllOptions<P = ObjectParams, R = ObjectParams, E = string> = {
   query: string;
-  options?: {
-    init?: ActionInit;
-    success?: ActionSuccess;
-    skip?: ActionSkip;
-    error?: ActionError;
-  };
-} & (P extends object ? { params: P } : object) &
-  (R extends object ? { response: R } : object) &
-  (E extends string ? { error: E } : object);
+  options?: ActionOptions;
+} & (P extends ObjectParams ? { params: P } : ObjectParams) &
+  (R extends ObjectParams ? { response: R } : ObjectParams) &
+  (E extends string ? { error: E } : ObjectParams);
 
 export type ActionCreatorType<
-  K extends { params?: object; response?: object; error?: string } = object,
+  K extends { params?: ObjectParams; response?: ObjectParams; error?: string } = ObjectParams,
   T extends ActionAllOptions<K['params'], K['response'], K['error']> = ActionAllOptions<
     K['params'],
     K['response'],
     K['error']
   >,
 > = ActionCreator<string, (props: T & NotAllowedCheck<T>) => T & Action>;
+
+export type ByQueryParams<T extends string | undefined = undefined> = (T extends undefined ? object : { url: T }) &
+  ObjectParams<string | number | boolean>;

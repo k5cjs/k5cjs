@@ -2,14 +2,16 @@ import { Observable } from 'rxjs';
 
 import { AtLeastDeep } from '@k5cjs/types';
 
-export abstract class HttpServiceBase<T extends { id: PropertyKey }> {
-  abstract getByQuery(params: Record<PropertyKey, unknown>): Observable<{ items: T[] }>;
+import { ByQueryParams, ObjectParams } from './store.type';
 
-  abstract getById(id: { id: T['id'] }): Observable<{ item: T }>;
+export abstract class HttpServiceBase<T extends { id: PropertyKey }> {
+  abstract getByQuery(params: ByQueryParams): Observable<{ items: T[] } & ObjectParams>;
+
+  abstract getById(id: { id: T['id'] }): Observable<{ item: T } & ObjectParams>;
 
   abstract delete(id: { id: T['id'] }): Observable<void>;
 
-  abstract create(item: Omit<T, 'id'>): Observable<{ item: T }>;
+  abstract create(item: Omit<T, 'id'>): Observable<{ item: T } & ObjectParams>;
 
-  abstract update(params: { item: AtLeastDeep<T, 'id'> }): Observable<{ item: T }>;
+  abstract update(params: { item: AtLeastDeep<T, 'id'> }): Observable<{ item: T } & ObjectParams>;
 }
