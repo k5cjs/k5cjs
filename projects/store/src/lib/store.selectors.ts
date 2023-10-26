@@ -121,7 +121,7 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
       });
 
     this.queryOne = (queryId: string) =>
-      createSelector(this.query(queryId), entitiesFirstMemoized, (query, entities) => {
+      createSelector(this.query(queryId), this.entities, (query, entities) => {
         if (!query) return undefined;
 
         const {

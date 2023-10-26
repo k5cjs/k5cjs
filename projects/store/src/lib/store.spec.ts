@@ -511,4 +511,45 @@ describe('Store', () => {
       reloadSelectors: reloadSelectors + 2,
     });
   }));
+
+  it('get full item after the list was loaded', fakeAsync(() => {
+    spyOn(http, 'getByQuery').and.returnValue(
+      of({
+        items: [
+          { id: '1', name: 'first' },
+          { id: '2', name: 'second' },
+          { id: '3', name: 'third' },
+        ],
+        total: 3,
+      }),
+    );
+
+    let expected: { items: unknown[]; total: number };
+    service.getByQuery({}).subscribe((value) => (expected = value));
+
+    flush();
+
+    expect(expected!).toEqual({
+      items: [
+        { id: '1', name: 'first' },
+        { id: '2', name: 'second' },
+        { id: '3', name: 'third' },
+      ],
+      total: 3,
+    });
+
+    spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first', age: 18 } }));
+
+    type Full = FeatureStoreType & { age: number };
+    let expectedFull: { item: Full };
+
+    service
+      .getById({ id: '1' })
+      .pipe(first())
+      .subscribe((value) => (expectedFull = value as { item: Full }));
+
+    flush();
+
+    expect(expectedFull!).toEqual({ item: { id: '1', name: 'first', age: 18 } });
+  }));
 });

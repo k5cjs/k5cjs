@@ -60,7 +60,7 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
   ),
 
   on(actions.getByQuerySuccess, (state, { query, response: { items, ...rest }, options }) =>
-    adapter.addMany(items, {
+    adapter.upsertMany(items, {
       ...state,
       loadings: { ...state.loadings, [query]: false },
       queries: { ...state.queries, [query]: { ...rest, ids: items.map(({ id }) => id) } },
