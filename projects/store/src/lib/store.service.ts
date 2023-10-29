@@ -87,6 +87,22 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     );
   }
 
+  set(items: T[], options: ActionAllOptions['options'] = {}): Observable<{ items: T[] }> {
+    const query = this._query({ items });
+
+    return this._dispatch(
+      this._actions.set({
+        query,
+        params: { items },
+        options: { success: { resetQueries: true, reloadIdentifiers: true } },
+      }),
+      this._actions.setSuccess,
+    ).pipe(
+      switchMap(() => this._store.select(this._selectors.queryAll(query))),
+      filter(isNotUndefined),
+    );
+  }
+
   update(item: AtLeastDeep<T, 'id'>, options: ActionAllOptions['options'] = {}): Observable<{ item: T }> {
     const query = this._query(item);
 
