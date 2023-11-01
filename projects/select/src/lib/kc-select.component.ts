@@ -529,7 +529,12 @@ export class KcSelectComponent<V, K, L>
       return this._overlay.position().global().centerHorizontally().centerVertically();
     }
 
-    return this._overlay.position().flexibleConnectedTo(elementRef).withPositions(this.positions).withPush(false);
+    return this._overlay
+      .position()
+      .flexibleConnectedTo(elementRef)
+      .withViewportMargin(20)
+      .withPositions(this.positions)
+      .withPush(false);
   }
 
   private _closeDialog(): void {
