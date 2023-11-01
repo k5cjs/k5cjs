@@ -28,7 +28,7 @@ describe('KcCalWeekComponent', () => {
   });
 
   it('should create', () => {
-    component.week = { days: [{ date: new Date() }] };
+    component.week = { days: [{ date: new Date(), month: new Date() }] };
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });

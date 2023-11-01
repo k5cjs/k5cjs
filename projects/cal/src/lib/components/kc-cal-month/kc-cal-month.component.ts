@@ -39,7 +39,7 @@ export class KcCalMonthComponent implements OnInit {
   ) {
     this._weeks = Array.from(
       /**
-       * max weeks in one months
+       * max weeks in one month
        */
       { length: 6 },
       () => ({
@@ -48,7 +48,6 @@ export class KcCalMonthComponent implements OnInit {
            * number of days in one week
            */
           { length: 7 },
-          () => null,
         ),
       }),
     );
@@ -59,58 +58,47 @@ export class KcCalMonthComponent implements OnInit {
     this._renderWeeks();
   }
 
-  private _fillWeeks(date: Date): void {
-    const dateStart = new Date(date.getFullYear(), date.getMonth(), 1);
-    const dateEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    /**
-     * we have to skip the cells that are empty
-     * dayStart = 2;
-     * daysLength = 31;
-     *
-     *  0  1  2  3  4  5  6
-     *
-     *       01 02 03 04 05
-     * 06 07 08 09 10 11 12
-     * 13 14 15 16 17 18 19
-     * 20 21 22 23 24 25 26
-     * 27 28 29 30 31
-     *
-     */
+  private _fillWeeks(month: Date): void {
+    const dateStart = new Date(month.getFullYear(), month.getMonth(), 1);
+
     const localeDayStart = getLocaleFirstDayOfWeek(this._locale);
     const dayStart = dateStart.getDay();
-    const daysLength = dateEnd.getDate();
+    const daysLength = 42;
 
     for (let i = 0; i < daysLength; i++) {
       /**
-       * skip empty cell
-       * dayStart = 2
-       * localeDayStart = 1
-       * i = 0
-       * currentCell = 2 - 1 -> 01 date
+       * empty cells are filled with previous/next month days
+       *
+       *
+       *  0  1  2  3  4  5  6
+       *
+       * 29 30 01 02 03 04 05
+       * 06 07 08 09 10 11 12
+       * 13 14 15 16 17 18 19
+       * 20 21 22 23 24 25 26
+       * 27 28 29 30 31 01 02
+       *
        */
 
-      /**
-       *  if dayStart is 0, then we have to skip 6 cells
-       *  dayStart - localeDayStart < 1
-       *  0 - 1 < 1
-       *  -1
-       *  6 + 0
-       */
-      const diffToStart = dayStart - localeDayStart;
-      const currentCell = (diffToStart < 0 ? 6 : diffToStart) + i;
-
-      const y = Math.trunc(currentCell / 7);
-      const x = currentCell % 7;
+      const y = Math.trunc(i / 7);
+      const x = i % 7;
 
       this._weeks[y].days[x] = {
         date: new Date(
-          date.getFullYear(),
-          date.getMonth(),
+          month.getFullYear(),
+          month.getMonth(),
+
           /**
-           * `i` starts at zero, but the date starts at 1
+           * `i + 1` i starts at zero, but the date starts at 1
+           *
+           *  `- dayStart` shifts the calendar cells back to the correct day of the month
+           *
+           *  `- localeDayStart` is used to account for the locale-specific first day of the week
+           *
            */
-          i + 1,
+          i + 1 - dayStart - localeDayStart,
         ),
+        month,
       };
     }
   }

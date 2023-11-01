@@ -1,7 +1,7 @@
 <kc-cal>
   <kc-cal-month *kc-cal-month="let month" [month]="month">
     <kc-cal-week *kc-cal-week="let week" [week]="week">
-      <kc-cal-day *kc-cal-day="let day" [day]="day"></kc-cal-day>
+      <kc-cal-day *kc-cal-day="let day" [day]="day.date" [month]="day.month"></kc-cal-day>
     </kc-cal-week>
   </kc-cal-month>
 </kc-cal>
