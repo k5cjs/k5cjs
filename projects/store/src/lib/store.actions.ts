@@ -19,6 +19,9 @@ export class ActionsBase<T extends { id: PropertyKey }> {
   createSuccess: ActionCreatorType<{ response: { item: T } }>;
   createError: ActionCreatorType<{ error: string }>;
 
+  set: ActionCreatorType<{ params: { items: T[] } }>;
+  setSuccess: ActionCreatorType<{ response: { items: T[] } }>;
+
   update: ActionCreatorType<{ params: { item: AtLeastDeep<T, 'id'> } }>;
   updateSuccess: ActionCreatorType<{ response: { item: T } }>;
   updateError: ActionCreatorType<{ error: string }>;
@@ -45,6 +48,9 @@ export class ActionsBase<T extends { id: PropertyKey }> {
     this.create = createAction(this._type('create'), props<any>());
     this.createSuccess = createAction(this._type('create success'), props<any>());
     this.createError = createAction(this._type('create error'), props<any>());
+
+    this.set = createAction(this._type('set'), props<any>());
+    this.setSuccess = createAction(this._type('set success'), props<any>());
 
     this.update = createAction(this._type('update'), props<any>());
     this.updateSuccess = createAction(this._type('update success'), props<any>());

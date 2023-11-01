@@ -27,15 +27,16 @@ const simpleOptions = <V, K, L>(options: KcOption<V, K, L>[] | KcOption<V, K, L>
 
 const groupOptions = <V, K, L>(
   options: KcGroup<V, K, L>,
-  value: KcOptionGroupValue<V>,
+  values: KcOptionGroupValue<V>,
 ): [K | V, KcOption<V, K, L>][] => {
   return (
     Object.entries(options)
-      .filter(([key]) => value[key])
+      .filter(([key]) => values[key])
       .map(([key, { value }]) => {
         const allOptions = value as KcOption<V, K, L>[];
-        const selectedValues = value as KcOptionGroupValue<V>;
-        const selectedValue = selectedValues[key];
+        const selectedValues = values[key];
+        // TODO: check if is nested group
+        const selectedValue = selectedValues;
 
         const filter = allOptions.filter((option) => {
           if (Array.isArray(selectedValue))

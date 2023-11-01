@@ -98,6 +98,17 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     );
   });
 
+  set$ = createEffect(() => {
+    return this._actions$.pipe(
+      ofType(this._actions.set),
+      identified(this.identifiers),
+      concatMap(({ query, params: { items }, options }) => [
+        this._actions.setSuccess({ query, response: { items }, options }),
+        ...reloadIdentifiers(this.identifiers, this._actions.setSuccess, options),
+      ]),
+    );
+  });
+
   update$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.update),

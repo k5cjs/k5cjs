@@ -35,11 +35,19 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
   adapter: EntityAdapter<T>,
   actions: ActionsBase<T>,
 ): ReducerTypes<S, readonly ActionCreator[]>[] => [
-  on(actions.getByQuery, actions.getById, actions.create, actions.update, actions.delete, (state, { query }) => ({
-    ...state,
-    loadings: { ...state.loadings, [query]: true },
-    errors: { ...state.errors, [query]: undefined },
-  })),
+  on(
+    actions.getByQuery,
+    actions.getById,
+    actions.create,
+    actions.set,
+    actions.update,
+    actions.delete,
+    (state, { query }) => ({
+      ...state,
+      loadings: { ...state.loadings, [query]: true },
+      errors: { ...state.errors, [query]: undefined },
+    }),
+  ),
 
   on(actions.getByQueryIsLoaded, actions.getByIdIsLoaded, (state, { query }) => ({
     ...state,
@@ -84,6 +92,18 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
         loadings: { [query]: false },
         errors: { [query]: undefined },
         queries: { [query]: { ...rest, ids: [item.id] } },
+      }),
+      ...reloadSelectors(state, options),
+    }),
+  ),
+
+  on(actions.setSuccess, (state, { query, response: { items, ...rest }, options }) =>
+    adapter.upsertMany(items, {
+      ...state,
+      ...resetQueries(options, {
+        loadings: { [query]: false },
+        errors: { [query]: undefined },
+        queries: { [query]: { ...rest, ids: items.map(({ id }) => id) } },
       }),
       ...reloadSelectors(state, options),
     }),
