@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, concatMap, of, pipe, tap } from 'rxjs';
+import { ObservableInput, catchError, concatMap, first, map, of, tap } from 'rxjs';
 
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -8,55 +8,36 @@ import { Action, Store } from '@ngrx/store';
 import { ActionsBase } from './store.actions';
 import { HttpServiceBase } from './store.http.service';
 import { SelectorsBase } from './store.selectors';
-import { ActionAllOptions } from './store.type';
+import { ActionInit, ActionSuccess, Options, Params } from './store.type';
 
-const addActionReference = <T extends Action>(action: T, actionReference: Action): T => ({
-  ...action,
-  ref: actionReference.type,
-});
-
-const identified = <T extends Pick<ActionAllOptions, 'options'> & Action>(state: Record<PropertyKey, Action>) =>
-  pipe(
-    tap<T>((action) => {
-      const identified = action.options?.init?.identified;
-
-      if (identified) state[identified] = action;
-    }),
-  );
-
-const reloadIdentifiers = (
-  state: Record<PropertyKey, Action>,
-  refAction: Action,
-  options: ActionAllOptions['options'],
-) => {
-  if (options?.success?.reloadIdentifiers)
-    return Object.values(state).map((action) => addActionReference(action, refAction));
-
-  return [];
-};
+const createSuccesActionBody = <T extends Params = Params<string | number | boolean>>(
+  params: T,
+  { query, resetQueries, reloadSelectors }: ActionInit,
+): ActionSuccess<T> => ({ query, reloadSelectors, resetQueries, params });
 
 @Injectable()
 export class EffectsBase<T extends { id: PropertyKey }> {
   protected _actions$ = inject(Actions);
   protected _store = inject(Store);
 
-  protected identifiers: Record<PropertyKey, Action> = {};
+  protected identifiers: Record<PropertyKey, Options & Action> = {};
 
   getByQuery$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.getByQuery),
-      identified(this.identifiers),
+      this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
-      concatMap(([{ query, params, options }, queries]) =>
-        queries[query]
-          ? of(this._actions.getByQueryIsLoaded({ query }))
-          : this._http.getByQuery(params).pipe(
+      concatMap(([action, queries]) =>
+        queries[action.query]
+          ? of(this._actions.getByQueryIsLoaded(action))
+          : this._http.getByQuery(action).pipe(
+              this._callBefore(action),
               concatMap((response) => [
-                this._actions.getByQuerySuccess({ query, response, options }),
-                ...reloadIdentifiers(this.identifiers, this._actions.getByQuerySuccess, options),
+                this._actions.getByQuerySuccess(createSuccesActionBody(response, action)),
+                ...this._reloadIdentifiers(this._actions.getByQuerySuccess, action),
               ]),
               catchError(({ message }: HttpErrorResponse) =>
-                of(this._actions.getByQueryError({ query, error: message })),
+                of(this._actions.getByQueryError({ query: action.query, params: { error: message } })),
               ),
             ),
       ),
@@ -66,17 +47,20 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   getById$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.getById),
-      identified(this.identifiers),
+      this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
-      concatMap(([{ query, params, options }, queries]) =>
-        queries[query]
-          ? of(this._actions.getByIdIsLoaded({ query }))
-          : this._http.getById(params).pipe(
+      concatMap(([action, queries]) =>
+        queries[action.query]
+          ? of(this._actions.getByIdIsLoaded(action))
+          : this._http.getById(action).pipe(
+              this._callBefore(action),
               concatMap((response) => [
-                this._actions.getByIdSuccess({ query, response, options }),
-                ...reloadIdentifiers(this.identifiers, this._actions.getByIdSuccess, options),
+                this._actions.getByIdSuccess(createSuccesActionBody(response, action)),
+                ...this._reloadIdentifiers(this._actions.getByIdSuccess, action),
               ]),
-              catchError(({ message }: HttpErrorResponse) => of(this._actions.getByIdError({ query, error: message }))),
+              catchError(({ message }: HttpErrorResponse) =>
+                of(this._actions.getByIdError({ query: action.query, params: { error: message } })),
+              ),
             ),
       ),
     );
@@ -85,14 +69,17 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   create$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.create),
-      identified(this.identifiers),
-      concatMap(({ query, params: { item }, options }) =>
-        this._http.create(item).pipe(
+      this._setIdentified(),
+      concatMap((action) =>
+        this._http.create(action).pipe(
+          this._callBefore(action),
           concatMap((response) => [
-            this._actions.createSuccess({ query, response, options }),
-            ...reloadIdentifiers(this.identifiers, this._actions.createSuccess, options),
+            this._actions.createSuccess(createSuccesActionBody(response, action)),
+            ...this._reloadIdentifiers(this._actions.createSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) => of(this._actions.createError({ query, error: message }))),
+          catchError(({ message }: HttpErrorResponse) =>
+            of(this._actions.createError({ query: action.query, params: { error: message } })),
+          ),
         ),
       ),
     );
@@ -101,10 +88,9 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   set$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.set),
-      identified(this.identifiers),
-      concatMap(({ query, params: { items }, options }) => [
-        this._actions.setSuccess({ query, response: { items }, options }),
-        ...reloadIdentifiers(this.identifiers, this._actions.setSuccess, options),
+      concatMap(({ query, params, ...rest }) => [
+        this._actions.setSuccess({ ...rest, query, params }),
+        ...this._reloadIdentifiers(this._actions.setSuccess, rest),
       ]),
     );
   });
@@ -112,14 +98,17 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   update$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.update),
-      identified(this.identifiers),
-      concatMap(({ query, params, options }) =>
-        this._http.update(params).pipe(
-          concatMap((response) => [
-            this._actions.updateSuccess({ query, response, options }),
-            ...reloadIdentifiers(this.identifiers, this._actions.updateSuccess, options),
+      this._setIdentified(),
+      concatMap((action) =>
+        this._http.update(action).pipe(
+          this._callBefore(action),
+          concatMap((params) => [
+            this._actions.updateSuccess(createSuccesActionBody(params, action)),
+            ...this._reloadIdentifiers(this._actions.updateSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) => of(this._actions.updateError({ query, error: message }))),
+          catchError(({ message }: HttpErrorResponse) =>
+            of(this._actions.updateError({ query: action.query, params: { error: message } })),
+          ),
         ),
       ),
     );
@@ -128,14 +117,17 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   delete$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.delete),
-      identified(this.identifiers),
-      concatMap(({ query, params, options }) =>
-        this._http.delete(params).pipe(
-          concatMap(() => [
-            this._actions.deleteSuccess({ query, response: params, options }),
-            ...reloadIdentifiers(this.identifiers, this._actions.deleteSuccess, options),
+      this._setIdentified(),
+      concatMap((action) =>
+        this._http.delete(action).pipe(
+          this._callBefore(action),
+          concatMap((params) => [
+            this._actions.deleteSuccess(createSuccesActionBody(params, action)),
+            ...this._reloadIdentifiers(this._actions.deleteSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) => of(this._actions.deleteError({ query, error: message }))),
+          catchError(({ message }: HttpErrorResponse) =>
+            of(this._actions.deleteError({ query: action.query, params: { error: message } })),
+          ),
         ),
       ),
     );
@@ -146,4 +138,33 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     protected _selectors: SelectorsBase<T>,
     protected _http: HttpServiceBase<T>,
   ) {}
+
+  private _setIdentified<T extends Options & Action>() {
+    return tap<T>((action) => {
+      const identified = action.identified;
+
+      if (identified) this.identifiers[identified] = action;
+    });
+  }
+
+  private _reloadIdentifiers = <K extends Options>(refAction: Action, options: K) => {
+    if (options?.reloadIdentifiers)
+      return Object.values(this.identifiers).map((action) => ({
+        ...action,
+        ref: refAction,
+      }));
+
+    return [];
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private _callBefore = <T extends { before?: Params }>(action: ActionInit<any, any, T['before']>) =>
+    concatMap<T, ObservableInput<T>>((response) => {
+      if (!action.beforeSuccess) return of(response);
+
+      return action.beforeSuccess(response.before).pipe(
+        first(),
+        map(() => response),
+      );
+    });
 }

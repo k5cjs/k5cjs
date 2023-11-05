@@ -56,6 +56,14 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     (s1: Record<PropertyKey, string | undefined>) => string | undefined
   >;
 
+  loading: (
+    query: string,
+  ) => MemoizedSelector<
+    object,
+    boolean | undefined,
+    (s1: Record<PropertyKey, boolean | undefined>) => boolean | undefined
+  >;
+
   query: (
     query: string,
   ) => MemoizedSelector<
@@ -100,6 +108,7 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     this.loadings = createSelector(stateSelector, (state) => state.loadings);
 
     this.error = (queryId: string) => createSelector(this.errors, (queries) => queries[queryId]);
+    this.loading = (queryId: string) => createSelector(this.loadings, (queries) => queries[queryId]);
 
     this.query = (queryId: string) => createSelector(this.queries, (queries) => queries[queryId]);
 
@@ -128,8 +137,6 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
           ids: [id],
           ...rest
         } = query;
-
-        if (!entities[id]) return undefined;
 
         return {
           ...rest,
