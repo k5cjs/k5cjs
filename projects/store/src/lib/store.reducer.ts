@@ -2,13 +2,16 @@ import { EntityAdapter } from '@ngrx/entity';
 import { ActionCreator, ReducerTypes, on } from '@ngrx/store';
 
 import { ActionsBase } from './store.actions';
-import { ActionAllOptions, StateBase } from './store.type';
+import { StateBase } from './store.type';
 
-const resetQueries = <T extends { id: PropertyKey }>(
-  options: ActionAllOptions['options'],
-  values: Partial<Pick<StateBase<T>, 'loadings' | 'queries' | 'errors'>> = {},
+const resetQueries = <
+  T extends { id: PropertyKey },
+  K extends { resetQueries?: boolean; reloadIdentifiers?: boolean; reloadSelectors?: boolean },
+>(
+  options: K,
+  values: Partial<Pick<StateBase<T>, 'loadings' | 'queries' | 'errors'>>,
 ): Pick<StateBase<T>, 'loadings' | 'queries' | 'errors'> | object =>
-  options?.success?.resetQueries
+  options?.resetQueries
     ? {
         loadings: { ...values.loadings },
         errors: { ...values.errors },
@@ -16,11 +19,13 @@ const resetQueries = <T extends { id: PropertyKey }>(
       }
     : {};
 
-const reloadSelectors = <T extends { id: PropertyKey }>(
+const reloadSelectors = <
+  T extends { id: PropertyKey },
+  K extends { resetQueries?: boolean; reloadIdentifiers?: boolean; reloadSelectors?: boolean },
+>(
   state: StateBase<T>,
-  options: ActionAllOptions['options'],
-): Partial<StateBase<T>> | object =>
-  options?.success?.reloadSelectors ? { reloadSelectors: state.reloadSelectors + 1 } : {};
+  options: K,
+): Partial<StateBase<T>> | object => (options?.reloadSelectors ? { reloadSelectors: state.reloadSelectors + 1 } : {});
 
 export const stateBase = <T extends { id: PropertyKey }>(): StateBase<T> => ({
   entities: {},
@@ -60,72 +65,87 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
     actions.createError,
     actions.updateError,
     actions.deleteError,
-    (state, { query, error }) => ({
+    (state, { query, params: { error } }) => ({
       ...state,
       loadings: { ...state.loadings, [query]: false },
       errors: { ...state.errors, [query]: error },
     }),
   ),
 
-  on(actions.getByQuerySuccess, (state, { query, response: { items, ...rest }, options }) =>
+  on(actions.getByQuerySuccess, (state, { query, params: { items, config }, ...options }) =>
     adapter.upsertMany(items, {
       ...state,
       loadings: { ...state.loadings, [query]: false },
-      queries: { ...state.queries, [query]: { ...rest, ids: items.map(({ id }) => id) } },
+      errors: { ...state.errors, [query]: undefined },
+      queries: { ...state.queries, [query]: { ...config, ids: items.map(({ id }) => id) } },
       ...reloadSelectors(state, options),
     }),
   ),
 
-  on(actions.getByIdSuccess, (state, { query, response: { item, ...rest }, options }) =>
+  on(actions.getByIdSuccess, (state, { query, params: { item, config }, ...options }) =>
     adapter.upsertOne(item, {
       ...state,
       loadings: { ...state.loadings, [query]: false },
-      queries: { ...state.queries, [query]: { ...rest, ids: [item.id] } },
+      errors: { ...state.errors, [query]: undefined },
+      queries: { ...state.queries, [query]: { ...config, ids: [item.id] } },
       ...reloadSelectors(state, options),
     }),
   ),
 
-  on(actions.createSuccess, (state, { query, response: { item, ...rest }, options }) =>
+  on(actions.createSuccess, (state, { query, params: { item, config }, ...options }) =>
     adapter.addOne(item, {
       ...state,
+      loadings: { ...state.loadings, [query]: false },
+      errors: { ...state.errors, [query]: undefined },
+      queries: { ...state.queries, [query]: { ...config, ids: [item.id] } },
       ...resetQueries(options, {
         loadings: { [query]: false },
         errors: { [query]: undefined },
-        queries: { [query]: { ...rest, ids: [item.id] } },
+        queries: { [query]: { ...config, ids: [item.id] } },
       }),
       ...reloadSelectors(state, options),
     }),
   ),
 
-  on(actions.setSuccess, (state, { query, response: { items, ...rest }, options }) =>
+  on(actions.setSuccess, (state, { query, params: { items, config }, ...options }) =>
     adapter.upsertMany(items, {
       ...state,
+      loadings: { ...state.loadings, [query]: false },
+      errors: { ...state.errors, [query]: undefined },
+      queries: { ...state.queries, [query]: { ...config, ids: items.map(({ id }) => id) } },
       ...resetQueries(options, {
         loadings: { [query]: false },
         errors: { [query]: undefined },
-        queries: { [query]: { ...rest, ids: items.map(({ id }) => id) } },
+        queries: { [query]: { ...config, ids: items.map(({ id }) => id) } },
       }),
       ...reloadSelectors(state, options),
     }),
   ),
 
-  on(actions.updateSuccess, (state, { query, response: { item, ...rest }, options }) =>
+  on(actions.updateSuccess, (state, { query, params: { item, config }, ...options }) =>
     adapter.updateOne(
       { id: item.id as string, changes: item },
       {
         ...state,
         loadings: { ...state.loadings, [query]: false },
-        queries: { ...state.queries, [query]: { ...rest, ids: [item.id] } },
+        errors: { ...state.errors, [query]: undefined },
+        queries: { ...state.queries, [query]: { ...config, ids: [item.id] } },
         ...reloadSelectors(state, options),
       },
     ),
   ),
 
-  on(actions.deleteSuccess, (state, { query, response: { id }, options }) =>
-    adapter.removeOne(id as string, {
+  on(actions.deleteSuccess, (state, { query, params: { item, config }, ...options }) =>
+    adapter.removeOne(item.id as string, {
       ...state,
       loadings: { ...state.loadings, [query]: false },
-      ...resetQueries(options),
+      errors: { ...state.errors, [query]: undefined },
+      queries: { ...state.queries, [query]: { ...config, ids: [] } },
+      ...resetQueries(options, {
+        loadings: { [query]: false },
+        errors: { [query]: undefined },
+        queries: { [query]: { ...config, ids: [] } },
+      }),
       ...reloadSelectors(state, options),
     }),
   ),
