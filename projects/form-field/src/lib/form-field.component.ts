@@ -52,7 +52,12 @@ export class KcFormField implements OnInit, OnDestroy, KcControlType {
 
     this._stateChanges = new Subject();
 
-    this.stateChanges = this._stateChanges.asObservable().pipe(switchMap((value) => value));
+    this.stateChanges = this._stateChanges.asObservable().pipe(
+      /**
+       * wait stateChanges from control
+       */
+      switchMap((value) => value),
+    );
 
     this.stateChanges.pipe(takeUntil(this._destroyed)).subscribe(() => this._cdr.markForCheck());
   }

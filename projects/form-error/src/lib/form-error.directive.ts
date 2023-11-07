@@ -29,7 +29,7 @@ export class KcError<T = unknown> {
   constructor(private _vcr: ViewContainerRef, private _templateRef: TemplateRef<Context>) {}
 
   render(error: T) {
-    const context = this.context(error);
+    const context = this._context(error);
 
     const embeddedViewRef = this._templateRef.createEmbeddedView(context);
     this._vcr.insert(embeddedViewRef);
@@ -40,7 +40,7 @@ export class KcError<T = unknown> {
   update(error: T): void {
     if (!this._embeddedViewRef) return;
 
-    const context = this.context(error);
+    const context = this._context(error);
 
     this._embeddedViewRef.context = context;
   }
@@ -51,7 +51,7 @@ export class KcError<T = unknown> {
     this._embeddedViewRef.destroy();
   }
 
-  context(error: T): Context<T> {
+  private _context(error: T): Context<T> {
     const label: string = this._isLabelFn(this.label) ? this.label(error) : this.label || '';
 
     return {

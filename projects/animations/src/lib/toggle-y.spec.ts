@@ -1,8 +1,8 @@
 import { AnimationDriver } from '@angular/animations/browser';
 import { MockAnimationDriver, MockAnimationPlayer } from '@angular/animations/browser/testing';
 import { AfterContentChecked, ChangeDetectorRef, Component } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { toggleO } from './toggle-o';
 import { toggleY } from './toggle-y';
@@ -193,7 +193,7 @@ describe('Toggle y', () => {
 
     TestBed.configureTestingModule({
       declarations: [Dumpy2Component],
-      imports: [BrowserAnimationsModule],
+      imports: [NoopAnimationsModule],
       providers: [{ provide: AnimationDriver, useClass: MockAnimationDriver }],
       teardown: {
         destroyAfterEach: true,
@@ -205,6 +205,8 @@ describe('Toggle y', () => {
 
     component.state1 = true;
 
+    fixture.detectChanges();
+    flush();
     fixture.detectChanges();
 
     let player = getLog().pop()!;
@@ -225,9 +227,13 @@ describe('Toggle y', () => {
       ]),
     ]);
 
+    tick(100);
+
     component.state2 = true;
     component.message = 'Hello world 2 test test';
 
+    fixture.detectChanges();
+    flush();
     fixture.detectChanges();
 
     player = getLog().pop()!;

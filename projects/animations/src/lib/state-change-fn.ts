@@ -12,6 +12,29 @@ const hideStates = [DefaultState.Void, BooleanState.False];
 const showStates = [DefaultState.Null, BooleanState.True];
 const allStates = [...hideStates, ...showStates];
 
+export const stateChangeToFast =
+  (time: number) =>
+  (_from: string, _to: string, element: HTMLElement, params?: { time?: number }): boolean => {
+    const attr = 'toggle-y-time';
+    const now = Date.now();
+
+    const elementTime = element.getAttribute(attr);
+    element.setAttribute(attr, now.toString());
+
+    if (!elementTime) {
+      element.setAttribute(attr, now.toString());
+
+      return false;
+    }
+
+    const previousTime = Number(elementTime);
+    const durationBetweenStates = now - previousTime;
+
+    const animationTime = params?.time ?? time;
+
+    return durationBetweenStates < animationTime / 3;
+  };
+
 export const stateChangeEnter = (fromState: string, toState: string) => {
   const fromStateString = String(fromState) as DefaultState | BooleanState;
   const toStateString = String(toState) as DefaultState | BooleanState;

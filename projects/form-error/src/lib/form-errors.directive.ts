@@ -69,15 +69,9 @@ export class KcErrors implements OnDestroy, AfterContentInit {
   }
 
   private _removeErrors(): number {
-    const errors = this._formField.errors;
-
     let removed = 0;
 
-    for (const error of this._errors) {
-      if (this._hasError(errors, error.name)) continue;
-
-      removed += this._removeError(error);
-    }
+    for (const error of this._errors) removed += this._removeError(error);
 
     if (removed) {
       this.stagger += 1;
@@ -112,6 +106,9 @@ export class KcErrors implements OnDestroy, AfterContentInit {
 
   private _addError(error: KcError, errorContext: unknown): number {
     const parallelErrors = this.multiple ? this._errors.length : 1;
+    /**
+     * skip to add new error if multiple is false
+     */
     if (this._cache.size >= parallelErrors) return 0;
 
     if (!this._formField.invalid) return 0;
@@ -129,7 +126,16 @@ export class KcErrors implements OnDestroy, AfterContentInit {
   }
 
   private _removeError(error: KcError): number {
+    /**
+     * skip if error was not rendered
+     */
     if (!this._cache.has(error.name)) return 0;
+
+    const errors = this._formField.errors;
+    /**
+     * if error exist but control is valid, remove the error
+     */
+    if (this._hasError(errors, error.name) && this._formField.invalid) return 0;
 
     this._cache.get(error.name)!.destroy();
     this._cache.delete(error.name);
