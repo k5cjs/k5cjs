@@ -1,6 +1,6 @@
 import { animate, animateChild, group, query, state, style, transition, trigger } from '@angular/animations';
 
-import { stateChangeEnter, stateChangeLeave, stateChanged } from './state-change-fn';
+import { stateChangeEnter, stateChangeLeave, stateChangeToFast, stateChanged } from './state-change-fn';
 
 /**
  *
@@ -11,6 +11,8 @@ export const toggleY = (time = 100) =>
     state('void, false', style({ overflowY: 'hidden', height: 0, opacity: 0 })),
     state('*, true', style({ overflowY: '*', height: '*', opacity: '*' })),
 
+    transition(stateChangeToFast(time), [style({ overflowY: 'hidden', opacity: 0, height: 0 })]),
+
     transition(
       stateChangeEnter,
       [
@@ -19,6 +21,7 @@ export const toggleY = (time = 100) =>
       ],
       { params: { time } },
     ),
+
     transition(
       stateChangeLeave,
       [
@@ -28,6 +31,7 @@ export const toggleY = (time = 100) =>
       ],
       { params: { time } },
     ),
+
     transition(
       stateChanged,
       [

@@ -180,6 +180,7 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
      */
     return !!this._parent?.submitted;
   }
+
   get empty(): boolean {
     if (!this.ngControl) return true;
 

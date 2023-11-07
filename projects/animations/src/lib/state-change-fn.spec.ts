@@ -1,4 +1,6 @@
-import { stateChangeEnter, stateChangeLeave, stateChanged } from './state-change-fn';
+import { fakeAsync, tick } from '@angular/core/testing';
+
+import { stateChangeEnter, stateChangeLeave, stateChangeToFast, stateChanged } from './state-change-fn';
 
 describe('State change fn', () => {
   it('change from default state to false state', () => {
@@ -53,4 +55,15 @@ describe('State change fn', () => {
     void expect(stateChanged('unknown 1', 'unknown 2')).toBeTrue();
     void expect(stateChanged('unknown 1', 'unknown 1')).toBeFalse();
   });
+
+  it('the status has changed but remains visible', fakeAsync(() => {
+    const element = document.createElement('div');
+
+    void expect(stateChangeToFast(100)('void', 'void', element)).toBeFalse();
+    void expect(stateChangeToFast(100)('void', 'void', element)).toBeTrue();
+
+    tick(100 / 3 + 1);
+
+    void expect(stateChangeToFast(100)('void', 'void', element)).toBeFalse();
+  }));
 });
