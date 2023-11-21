@@ -69,7 +69,7 @@ export interface ActionError<T = Params> {
 type CheckType<T, K> = unknown extends T ? object : K;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Options<T extends Record<PropertyKey, unknown> = any, U = any, R = any> = ActionBase & {
+export type Options<T = any, U = any, R = any> = ActionBase & {
   /**
    * sugar syntax for first operator
    */
