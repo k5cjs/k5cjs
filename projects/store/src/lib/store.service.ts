@@ -32,7 +32,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     return options.first ? first() : identity;
   }
 
-  getByQuery(options: Options<Params>): Observable<{ items: T[] } & Record<PropertyKey, unknown>> {
+  getByQuery(options: Options<Params>): Observable<{ items: T[] } & Params> {
     const query = this._query({ params: options.params });
 
     return this._dispatch(
@@ -132,7 +132,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       this._actions.delete({
         query,
         resetQueries: true,
-        reloadSelectors: true,
+        reloadIdentifiers: true,
         ...options,
       }),
       this._actions.deleteSuccess,
