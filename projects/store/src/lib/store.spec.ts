@@ -451,7 +451,7 @@ describe('Store', () => {
       queries: {
         [service.query({ params: { item: { id: '1' } } })]: { ids: [] },
       },
-      reloadSelectors: reloadSelectors + 1,
+      reloadSelectors,
     });
   }));
 

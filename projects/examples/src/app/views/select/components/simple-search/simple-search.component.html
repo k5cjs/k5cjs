@@ -1,11 +1,13 @@
 <pre>{{ control.value | json }}</pre>
 
-<kc-select [formControl]="control" [options]="options">
-  <kc-value *kcValue></kc-value>
+<kc-select [formControl]="control" [options]="options" class="select">
+  <div class="modal">
+    <kc-value *kcValue></kc-value>
 
-  <input [formControl]="search" />
+    <input [formControl]="search" />
 
-  <kc-options *kcOptions="let options" [options]="options">
-    <kc-option *kcOption="let option" [option]="option"></kc-option>
-  </kc-options>
+    <kc-options *kcOptions="let options" [options]="options">
+      <kc-option *kcOption="let option" [option]="option"></kc-option>
+    </kc-options>
+  </div>
 </kc-select>

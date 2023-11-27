@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ContentChild,
-  HostListener,
-  Input,
-  ViewChild,
-  ViewContainerRef,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ContentChild, Input, ViewChild, ViewContainerRef } from '@angular/core';
 
 import { KcOptionDirective } from '../../directives';
 import { KcOption } from '../../types';
@@ -42,14 +34,5 @@ export class KcOptionsComponent<V, K, L> {
       const dialog = this.optionTemplate.template.createEmbeddedView({ $implicit: option });
       this._outlet.insert(dialog);
     });
-  }
-
-  @HostListener('mousedown', ['$event'])
-  protected _mousedown(event: MouseEvent): void {
-    /**
-     * Prevents the blur event from firing on the root element.
-     * also prevent to close the dropdown when clicking on the options.
-     */
-    event.preventDefault();
   }
 }

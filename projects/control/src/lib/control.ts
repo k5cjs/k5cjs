@@ -84,7 +84,17 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   protected _injector: Injector;
   protected _ngZone: NgZone;
 
-  private _destroy: Subject<void>;
+  protected _destroy: Subject<void>;
+
+  /**
+   * @deprecated until host is removed from DefaultValueAccessor decorator
+   * issue: https://github.com/angular/angular/issues/36563
+   */
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  override onTouched = () => {};
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onTochedNew = () => {};
 
   constructor() {
     const renderer = inject(Renderer2);
@@ -133,6 +143,10 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     this._destroy.complete();
 
     this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
+  }
+
+  override registerOnTouched(fn: () => void): void {
+    this.onTochedNew = fn;
   }
 
   get value(): T | null {
