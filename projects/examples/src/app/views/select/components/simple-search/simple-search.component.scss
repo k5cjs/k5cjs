@@ -1,0 +1,17 @@
+.select {
+  display: block;
+
+  &:focus {
+    border: 1px solid #0f0;
+  }
+}
+
+.modal {
+  padding: 10px;
+  color: #fff;
+  background-color: #0f0;
+
+  input {
+    color: #000;
+  }
+}

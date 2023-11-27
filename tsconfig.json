@@ -17,6 +17,9 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "paths": {
+      "@angular/*": ["node_modules/@angular/*"],
+      "rxjs/*": ["node_modules/rxjs/*"],
+      "rxjs": ["node_modules/rxjs"],
       "@k5cjs/rxjs": ["dist/rxjs"],
       "@k5cjs/forms": ["dist/forms"],
       "@k5cjs/tables": ["dist/tables"],
@@ -32,7 +35,7 @@
       "@k5cjs/animations": ["dist/animations"],
       "@k5cjs/form-error": ["dist/form-error"],
       "@k5cjs/store": ["dist/store"],
-      "@k5cjs/types": ["dist/types"],
+      "@k5cjs/types": ["dist/types"]
     },
     "target": "ES2022",
     "module": "es2020",

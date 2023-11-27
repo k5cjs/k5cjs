@@ -1,3 +1,4 @@
+import { ConfigurableFocusTrapFactory } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import {
   ConnectedPosition,
@@ -30,12 +31,11 @@ import {
   ViewContainerRef,
   forwardRef,
 } from '@angular/core';
-import { ControlValueAccessor, ValidationErrors } from '@angular/forms';
+import { ControlValueAccessor } from '@angular/forms';
 import {
   BehaviorSubject,
   Observable,
   ReplaySubject,
-  Subject,
   Subscription,
   first,
   isObservable,
@@ -45,7 +45,7 @@ import {
   tap,
 } from 'rxjs';
 
-import { KcControlType, kcControlProviders } from '@k5cjs/control';
+import { KcControl, KcControlType, kcControlProviders } from '@k5cjs/control';
 
 import { KcOptionComponent } from './components';
 import { DEFAULT_CONNECTED_POSITIONS } from './config';
@@ -79,6 +79,7 @@ import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue
   exportAs: 'kcSelect',
 })
 export class KcSelectComponent<V, K, L>
+  extends KcControl<KcOptionValue<V> | KcOptionGroupValue<V>>
   implements
     OnInit,
     AfterContentInit,
@@ -138,7 +139,7 @@ export class KcSelectComponent<V, K, L>
 
   @ViewChild('valueRef', { read: ViewContainerRef, static: true }) private _valueRef!: ViewContainerRef;
 
-  @ViewChild('templateRef') templateRef!: TemplateRef<unknown>;
+  @ViewChild('templateRef', { static: true }) templateRef!: TemplateRef<unknown>;
 
   @ContentChildren(KcOptionComponent, { descendants: true })
   optionComponents!: QueryList<KcOptionComponent<V, K, L>>;
@@ -152,11 +153,11 @@ export class KcSelectComponent<V, K, L>
   @ContentChildren(KcOptionsDirective, { descendants: true })
   private _optionsDirectives!: QueryList<KcOptionsDirective<V, K, L>>;
 
-  set value(val: KcOptionValue<V> | KcOptionGroupValue<V>) {
+  override set value(val: KcOptionValue<V> | KcOptionGroupValue<V>) {
     this._value = val;
     this._cdr.detectChanges();
   }
-  get value(): KcOptionValue<V> | KcOptionGroupValue<V> {
+  override get value(): KcOptionValue<V> | KcOptionGroupValue<V> {
     return this._value;
   }
   private _value!: KcOptionValue<V> | KcOptionGroupValue<V>;
@@ -170,37 +171,23 @@ export class KcSelectComponent<V, K, L>
   allSelected: boolean;
   allSelectedChanged: Observable<boolean>;
 
-  stateChanges: Observable<void>;
-  private _stateChanges: Subject<void>;
-
   private _allSelectedChanged: BehaviorSubject<boolean>;
 
   private _dialogOverlayRef: OverlayRef | undefined;
   private _optionsSubscription: Subscription | undefined;
 
-  private _focused: boolean;
-
   private _tabIndex: number;
 
   private _subscriptionChanges?: Subscription;
-
-  private _destroy: Subject<void>;
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private _onChange: (value: unknown) => void = () => {};
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private _onTouch: () => unknown = () => {};
 
   constructor(
     private _overlay: Overlay,
     private _viewContainerRef: ViewContainerRef,
     private _cdr: ChangeDetectorRef,
-    public elementRef: ElementRef<HTMLElement>,
+    private _trap: ConfigurableFocusTrapFactory,
     @Attribute('tabindex') tabIndex: string,
   ) {
-    this._destroy = new Subject<void>();
-
-    this._stateChanges = new Subject<void>();
-    this.stateChanges = this._stateChanges.asObservable();
+    super();
 
     this.closed = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
     this.submitted = new EventEmitter<KcOptionValue<V> | KcOptionGroupValue<V>>();
@@ -210,8 +197,6 @@ export class KcSelectComponent<V, K, L>
     this.allSelectedChanged = this._allSelectedChanged.asObservable();
     this.positions = DEFAULT_CONNECTED_POSITIONS;
 
-    this._focused = false;
-
     this._tabIndex = parseInt(tabIndex) || 0;
     this.cdkOverlayConfig = {
       hasBackdrop: true,
@@ -220,60 +205,18 @@ export class KcSelectComponent<V, K, L>
     };
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
+    super.ngOnInit();
+
     if (this.origin) {
-      this.origin.elementRef.nativeElement.addEventListener('click', (event) => {
+      // TODO: remove event listener on destroy
+      this.origin.elementRef.nativeElement.addEventListener('click', () => {
         if (this.selectionOpened) return;
 
         this.elementRef.nativeElement.focus();
-        this.click(event);
+        this.click();
       });
     }
-  }
-
-  get autofilled(): boolean {
-    // eslint-disable-next-line no-console
-    console.warn('autofilled method not implemented.');
-
-    return false;
-  }
-
-  get invalid(): boolean {
-    // eslint-disable-next-line no-console
-    console.warn('invalid method not implemented.');
-
-    return false;
-  }
-
-  get disabled(): boolean {
-    // eslint-disable-next-line no-console
-    console.warn('disabled method not implemented.');
-
-    return false;
-  }
-
-  disable(): void {
-    // eslint-disable-next-line no-console
-    console.warn('disable method not implemented.');
-  }
-
-  get empty(): boolean {
-    // eslint-disable-next-line no-console
-    console.warn('empty method not implemented.');
-
-    return false;
-  }
-
-  reset(): void {
-    // eslint-disable-next-line no-console
-    console.warn('reset method not implemented.');
-  }
-
-  get errors(): ValidationErrors | null {
-    // eslint-disable-next-line no-console
-    console.warn('reset method not implemented.');
-
-    return null;
   }
 
   ngAfterContentInit(): void {
@@ -285,7 +228,6 @@ export class KcSelectComponent<V, K, L>
 
     if (this._valueDirective) this._valueDirective.render(this._valueRef);
   }
-
   /**
    * allow element to be focusable
    */
@@ -293,65 +235,79 @@ export class KcSelectComponent<V, K, L>
     return this._tabIndex;
   }
 
-  get focused(): boolean {
-    return this._focused;
-  }
-
-  writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
+  override writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
     this.value = obj;
     this._updateSelectionModel();
   }
 
-  registerOnChange(fn: (value: unknown) => void): void {
-    this._onChange = fn;
-  }
-
-  registerOnTouched(fn: () => unknown): void {
-    this._onTouch = fn;
-  }
-
-  @HostListener('keydown', ['$event']) private _keydown(event: KeyboardEvent): void {
+  @HostListener('keydown', ['$event'])
+  protected _keydown(event: KeyboardEvent): void {
     /**
      * when user focus on element and press space, open selection
      */
-    if (event.key === ' ') this.open();
-    else if (event.key === 'Escape') this.close();
+    if (event.key === ' ') {
+      /**
+       * prevent scroll when user press space
+       */
+      event.preventDefault();
+      this.open();
+    } else if (event.key === 'Escape') this.close();
+    else if (event.key === 'Tab') {
+      if (this.selectionOpened) {
+        /**
+         * prevent to focus on next element when selection is opened
+         */
+        event.preventDefault();
+        this.close();
+      } else if (this.focused) {
+        this.focused = false;
+      }
+    }
   }
-
   /**
    * open selection when user click on element
    */
-  @HostListener('click', ['$event'])
-  click(event: MouseEvent): void {
-    if (this.selectionOpened) this.close(event);
-    else this.open(event);
+  @HostListener('click')
+  click(): void {
+    if (this.selectionOpened) this.close();
+    else this.open();
   }
   /**
    * focus on element when user press tab to focus on element
    * and don't open selection, to open selection user need to press space
    */
-  @HostListener('focus', ['$event'])
-  focus(): void {
-    this._focused = true;
+  @HostListener('focus')
+  override focus(): void {
+    this.focused = true;
+    this._stateChanges.next();
   }
 
   /**
    * close selection when user press tab to blur on element
    */
-  @HostListener('blur', ['$event'])
-  blur(event: FocusEvent): void {
-    this._focused = false;
-    this.close(event);
+  @HostListener('blur')
+  blur(): void {
+    if (this.selectionOpened) return;
+    /**
+     * blur element when user focused element but not open selection
+     * and focus on another element but not with tab key but with mouse click
+     */
+    this.focused = false;
+    this._stateChanges.next();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  open(event?: MouseEvent): void {
+  override focusChanged(): void {
+    // override focusChanged from KcControl to prevent unfocused
+    // is not necessary because is implemented above
+  }
+
+  open(): void {
     /**
      * skip to open if selection is already opened
      */
     if (this.selectionOpened) return;
 
-    this._openDialog();
+    this._openOverlay();
 
     this.selectionOpened = true;
 
@@ -367,23 +323,13 @@ export class KcSelectComponent<V, K, L>
     });
   }
 
-  close(event?: MouseEvent | FocusEvent): void {
+  close(): void {
     /**
      * skip to close if selection is already closed
      */
     if (!this.selectionOpened) return;
-    /**
-     * check if html element contains an attribute called 'prevent-close''
-     */
-    if (
-      this.selectionOpened &&
-      event &&
-      this._checkIsHtmlElement(event.target) &&
-      event.target.hasAttribute('prevent-close')
-    )
-      return;
 
-    this._closeDialog();
+    this._closeOverlay();
 
     this.selectionOpened = false;
 
@@ -398,6 +344,12 @@ export class KcSelectComponent<V, K, L>
     this._cdr.markForCheck();
 
     this.closed.emit(this.value);
+    /**
+     * stay focused until user click outside of select
+     */
+    this.elementRef.nativeElement.focus();
+
+    this.onTochedNew();
   }
 
   submit(): void {
@@ -501,25 +453,55 @@ export class KcSelectComponent<V, K, L>
     this._optionsCache.next(options);
   }
 
-  private _openDialog(): void {
+  private _openOverlay(): void {
     const elementRef: ElementRef<HTMLElement> = this.origin?.elementRef || this.elementRef;
     const minWidth: number = elementRef.nativeElement.offsetWidth;
 
     const overlayRef = this._overlay.create({
       scrollStrategy: this._overlay.scrollStrategies.reposition(),
       positionStrategy: this._getPositionStrategy(elementRef),
-      ...this.cdkOverlayConfig,
       minWidth,
+      ...this.cdkOverlayConfig,
     });
 
     const dialogPortal = new TemplatePortal(this.templateRef, this._viewContainerRef);
     overlayRef.attach(dialogPortal);
 
-    this._dialogOverlayRef = overlayRef;
     overlayRef
       .backdropClick()
       .pipe(takeUntil(this._destroy))
-      .subscribe((event) => this.close(event));
+      .subscribe(() => {
+        this.close();
+        this._stateChanges.next();
+      });
+
+    /**
+     * trap tab to be inside of modal
+     * for example search
+     */
+    const trap = this._trap.create(overlayRef.overlayElement);
+
+    void trap.focusInitialElementWhenReady().then((successfully) => {
+      if (successfully && trap.attachAnchors()) {
+        const elements = document.querySelectorAll('.cdk-focus-trap-anchor');
+        const first = elements[0];
+        const end = elements[elements.length - 1];
+
+        first.addEventListener('focus', () => {
+          trap.destroy();
+          this.elementRef.nativeElement.focus();
+          this.close();
+        });
+
+        end.addEventListener('focus', () => {
+          trap.destroy();
+          this.elementRef.nativeElement.focus();
+          this.close();
+        });
+      }
+    });
+
+    this._dialogOverlayRef = overlayRef;
   }
 
   private _getPositionStrategy(
@@ -529,15 +511,21 @@ export class KcSelectComponent<V, K, L>
       return this._overlay.position().global().centerHorizontally().centerVertically();
     }
 
+    const offsetMargin = Math.max(
+      ...this.positions
+        .flatMap(({ offsetX, offsetY }) => [offsetX || 0, offsetY || 0])
+        .map((offset) => Math.abs(offset)),
+    );
+
     return this._overlay
       .position()
       .flexibleConnectedTo(elementRef)
-      .withViewportMargin(20)
-      .withPositions(this.positions)
-      .withPush(false);
+      .withPush(false)
+      .withViewportMargin(20 + offsetMargin)
+      .withPositions(this.positions);
   }
 
-  private _closeDialog(): void {
+  private _closeOverlay(): void {
     this._dialogOverlayRef!.dispose();
     this._dialogOverlayRef = undefined;
   }
@@ -547,15 +535,11 @@ export class KcSelectComponent<V, K, L>
     const valueToEmit = getValues<V, K, L>(this.selection);
 
     this._value = valueToEmit!;
-    this._onChange(valueToEmit);
+    this.onChange(valueToEmit);
 
     this.allSelected = [...this.optionComponents].every((option) => option.selected);
     this._allSelectedChanged.next(this.allSelected);
 
     this._cdr.detectChanges();
-  }
-
-  private _checkIsHtmlElement(element: EventTarget | null): element is HTMLElement {
-    return element instanceof HTMLElement;
   }
 }
