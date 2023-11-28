@@ -1,4 +1,4 @@
-import { ContentChild, Directive, Input } from '@angular/core';
+import { ContentChild, Directive, Input, OnChanges } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 
 import { provideValueAccessor } from '@k5cjs/forms';
@@ -13,18 +13,24 @@ import { KcToggleItemDirective } from './toggle-item.directive';
   exportAs: 'toggleGroup',
   providers: [provideValueAccessor(KcToggleGroupDirective)],
 })
-export class KcToggleGroupDirective<T> implements ControlValueAccessor {
+export class KcToggleGroupDirective<T> implements OnChanges, ControlValueAccessor {
+  @Input() options: KcToggleOptions<T>[] = [];
+
+  @ContentChild(KcToggleItemDirective, { static: true }) toggleItem!: KcToggleItemDirective<T>;
+
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: T) => void = () => {};
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouch: () => void = () => {};
 
-  @Input() options: KcToggleOptions<T>[] = [];
+  private _value!: T;
 
-  @ContentChild(KcToggleItemDirective, { static: true })
-  toggleItem!: KcToggleItemDirective<T>;
+  ngOnChanges(): void {
+    this.select(this._value, false);
+  }
 
   writeValue = (obj: T) => {
+    this._value = obj;
     this.select(obj, false);
   };
 
@@ -36,17 +42,21 @@ export class KcToggleGroupDirective<T> implements ControlValueAccessor {
     this._onTouch = fn;
   };
 
-  select(value: T, emit = true) {
+  select(obj: T, emit = true) {
+    this._value = obj;
+
     this.toggleItem.viewContainerRef.clear();
-    this.options.forEach((option) => {
+
+    this.options.forEach((option) =>
       this.toggleItem.viewContainerRef.createEmbeddedView(this.toggleItem.templateRef, {
         $implicit: option,
-        selected: option.value === value,
-      });
-    });
-    if (emit) {
-      this._onChange(value);
-      this._onTouch();
-    }
+        selected: option.value === this._value,
+      }),
+    );
+
+    if (!emit) return;
+
+    this._onChange(obj);
+    this._onTouch();
   }
 }
