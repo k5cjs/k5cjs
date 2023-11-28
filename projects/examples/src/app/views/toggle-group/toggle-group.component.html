@@ -1,0 +1,10 @@
+<div toggleGroup #group="toggleGroup" [formControl]="control" [options]="options">
+  <button
+    (click)="group.select(value.value)"
+    *toggleItem="let value, selected as selected"
+    [value]="value"
+    [class.selected]="selected"
+  >
+    {{ value.label }}
+  </button>
+</div>

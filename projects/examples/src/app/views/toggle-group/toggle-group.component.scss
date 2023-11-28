@@ -1,0 +1,10 @@
+button {
+  @apply
+    p-10
+    bg-yellow-200;
+}
+
+.selected {
+  @apply
+    bg-yellow-500;
+}
