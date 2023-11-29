@@ -1,6 +1,7 @@
 import { AutofillMonitor } from '@angular/cdk/text-field';
 import {
   AfterViewInit,
+  DestroyRef,
   Directive,
   ElementRef,
   HostListener,
@@ -15,6 +16,7 @@ import {
   forwardRef,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   AbstractControlDirective,
@@ -26,7 +28,7 @@ import {
   NgForm,
   ValidationErrors,
 } from '@angular/forms';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, asapScheduler, observeOn } from 'rxjs';
 
 import { KcControlType } from './control.type';
 
@@ -76,15 +78,14 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     return !!this.ngControl?.disabled;
   }
 
-  protected _stateChanges: Subject<void>;
+  protected _autofillMonitor = inject(AutofillMonitor);
+  protected _parentForm = inject(NgForm, { optional: true });
+  protected _parentFormGroup = inject(FormGroupDirective, { optional: true });
+  protected _injector = inject(Injector);
+  protected _ngZone = inject(NgZone);
+  protected _destroy = inject(DestroyRef);
 
-  protected _autofillMonitor: AutofillMonitor;
-  protected _parentForm: NgForm | null;
-  protected _parentFormGroup: FormGroupDirective | null;
-  protected _injector: Injector;
-  protected _ngZone: NgZone;
-
-  protected _destroy: Subject<void>;
+  protected _stateChanges = new Subject<void>();
 
   /**
    * @deprecated until host is removed from DefaultValueAccessor decorator
@@ -105,15 +106,6 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
 
     this.elementRef = elementRef;
 
-    this._autofillMonitor = inject(AutofillMonitor);
-    this._parentForm = inject(NgForm, { optional: true });
-    this._parentFormGroup = inject(FormGroupDirective, { optional: true });
-    this._injector = inject(Injector);
-    this._ngZone = inject(NgZone);
-
-    this._destroy = new Subject();
-    this._stateChanges = new Subject<void>();
-
     this.stateChanges = this._stateChanges.asObservable();
   }
 
@@ -123,24 +115,34 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     if (this.ngControl && this.ngControl.control) {
       this._interceptMarkAsTouched(this.ngControl.control);
 
-      this.ngControl.control.statusChanges.pipe(takeUntil(this._destroy)).subscribe(() => this._stateChanges.next());
+      this.ngControl.control.statusChanges
+        .pipe(
+          /**
+           * wait for the next tick to emit the state change
+           * because for example formGroupDirective.submitted is updated
+           * after the statusChanges is emitted
+           */
+          observeOn(asapScheduler),
+          takeUntilDestroyed(this._destroy),
+        )
+        .subscribe(() => this._stateChanges.next());
     }
 
-    if (this._parent) this._interceptNgSubmit(this._parent);
+    if (this._parent) this._interceptParentProperties(this._parent);
   }
 
   ngAfterViewInit(): void {
-    this._autofillMonitor.monitor(this.elementRef.nativeElement).subscribe(({ isAutofilled }) => {
-      this.autofilled = isAutofilled;
-      this._stateChanges.next();
-    });
+    this._autofillMonitor
+      .monitor(this.elementRef.nativeElement)
+      .pipe(takeUntilDestroyed(this._destroy))
+      .subscribe(({ isAutofilled }) => {
+        this.autofilled = isAutofilled;
+        this._stateChanges.next();
+      });
   }
 
   ngOnDestroy(): void {
     this._stateChanges.complete();
-
-    this._destroy.next();
-    this._destroy.complete();
 
     this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
   }
@@ -219,7 +221,7 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
    * intercepts the ngSubmit method of the form
    * to emit a state change when the form is submitted
    */
-  private _interceptNgSubmit(form: FormGroupDirective | NgForm): void {
+  private _interceptParentProperties(form: FormGroupDirective | NgForm): void {
     const onSubmit = form.onSubmit.bind(form);
 
     form.onSubmit = (...args) => {

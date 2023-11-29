@@ -3,15 +3,15 @@ import {
   AfterContentInit,
   ChangeDetectorRef,
   ContentChildren,
+  DestroyRef,
   Directive,
-  Inject,
   Input,
-  OnDestroy,
   QueryList,
+  inject,
 } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { KC_FORM_FIELD, KcFormField } from '@k5cjs/form-field';
+import { KC_FORM_FIELD } from '@k5cjs/form-field';
 
 import { KcError } from './form-error.directive';
 
@@ -22,43 +22,37 @@ import { KcError } from './form-error.directive';
   exportAs: 'kcErrors',
 })
 // eslint-disable-next-line @angular-eslint/directive-class-suffix
-export class KcErrors implements OnDestroy, AfterContentInit {
+export class KcErrors implements AfterContentInit {
   // prettier-ignore
   @Input()
   set multiple(value: boolean | string) { this._multiple = coerceBooleanProperty(value); }
   // prettier-ignore
   get multiple(): boolean | string { return this._multiple; }
-  private _multiple: boolean;
+  private _multiple = false;
 
   // prettier-ignore
   @Input()
   set staggerTime(value: number | string) { this._staggerTime = coerceNumberProperty(value); }
   // prettier-ignore
   get staggerTime(): number { return this._staggerTime; }
-  private _staggerTime: number;
+  private _staggerTime = 0;
 
   @ContentChildren(KcError, { descendants: true }) private _errors!: QueryList<KcError>;
 
-  stagger: number;
+  stagger = 0;
 
   private _cache: Map<string, KcError> = new Map();
-  private _destroy: Subject<void> = new Subject();
 
-  constructor(@Inject(KC_FORM_FIELD) private _formField: KcFormField, private _cdr: ChangeDetectorRef) {
-    this._multiple = false;
-    this._staggerTime = 0;
-    this.stagger = 0;
+  private _formField = inject(KC_FORM_FIELD);
+  protected _cdr = inject(ChangeDetectorRef);
+  protected _destroy = inject(DestroyRef);
 
-    this._formField.stateChanges.pipe(takeUntil(this._destroy)).subscribe(() => this._render());
+  constructor() {
+    this._formField.stateChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe(() => this._render());
   }
 
   ngAfterContentInit(): void {
     this._render();
-  }
-
-  ngOnDestroy(): void {
-    this._destroy.next();
-    this._destroy.complete();
   }
 
   private _render(): void {

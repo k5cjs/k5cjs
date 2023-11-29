@@ -31,6 +31,7 @@ import {
   ViewContainerRef,
   forwardRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor } from '@angular/forms';
 import {
   BehaviorSubject,
@@ -41,7 +42,6 @@ import {
   isObservable,
   map,
   switchMap,
-  takeUntil,
   tap,
 } from 'rxjs';
 
@@ -313,7 +313,7 @@ export class KcSelectComponent<V, K, L>
 
     this._removeOptionsSubscription();
 
-    this._optionsSubscription = this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
+    this._optionsSubscription = this.options.pipe(takeUntilDestroyed(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length)
         this._groupDirectives.forEach((group) => group.render(options as KcGroup<V, K, L>));
       else if (this._optionsDirectives.length)
@@ -397,7 +397,7 @@ export class KcSelectComponent<V, K, L>
       .pipe(
         tap((options) => options && this.selection.set(options, { emitEvent: false })),
         switchMap(() => this.selection.changed),
-        takeUntil(this._destroy),
+        takeUntilDestroyed(this._destroy),
       )
       .subscribe(() => {
         /**
@@ -469,7 +469,7 @@ export class KcSelectComponent<V, K, L>
 
     overlayRef
       .backdropClick()
-      .pipe(takeUntil(this._destroy))
+      .pipe(takeUntilDestroyed(this._destroy))
       .subscribe(() => {
         this.close();
         this._stateChanges.next();
