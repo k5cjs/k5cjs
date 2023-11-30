@@ -90,12 +90,14 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   /**
    * @deprecated until host is removed from DefaultValueAccessor decorator
    * issue: https://github.com/angular/angular/issues/36563
+   *
+   * on touch is called from host decorator
    */
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   override onTouched = () => {};
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  onTochedNew = () => {};
+  onTouchedNew = () => {};
 
   constructor() {
     const renderer = inject(Renderer2);
@@ -148,7 +150,7 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   }
 
   override registerOnTouched(fn: () => void): void {
-    this.onTochedNew = fn;
+    this.onTouchedNew = fn;
   }
 
   get value(): T | null {

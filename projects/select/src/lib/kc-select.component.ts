@@ -41,6 +41,7 @@ import {
   first,
   isObservable,
   map,
+  skip,
   switchMap,
   tap,
 } from 'rxjs';
@@ -208,6 +209,10 @@ export class KcSelectComponent<V, K, L>
   override ngOnInit(): void {
     super.ngOnInit();
 
+    this.selection = new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
+
+    this._subscriptionChanges = this._initSelectionModel();
+
     if (this.origin) {
       // TODO: remove event listener on destroy
       this.origin.elementRef.nativeElement.addEventListener('click', () => {
@@ -220,24 +225,18 @@ export class KcSelectComponent<V, K, L>
   }
 
   ngAfterContentInit(): void {
-    /**
-     * init selection after writeValue is called
-     * ngOnInit -> writeValue -> ngAfterContentInit
-     */
-    this._subscriptionChanges = this._initSelectionModel();
-
     if (this._valueDirective) this._valueDirective.render(this._valueRef);
+  }
+
+  override writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
+    this.value = obj;
+    this._updateSelectionModel();
   }
   /**
    * allow element to be focusable
    */
   @HostBinding('attr.tabindex') get tabindex(): number {
     return this._tabIndex;
-  }
-
-  override writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
-    this.value = obj;
-    this._updateSelectionModel();
   }
 
   @HostListener('keydown', ['$event'])
@@ -349,7 +348,7 @@ export class KcSelectComponent<V, K, L>
      */
     this.elementRef.nativeElement.focus();
 
-    this.onTochedNew();
+    this.onTouchedNew();
   }
 
   submit(): void {
@@ -391,12 +390,14 @@ export class KcSelectComponent<V, K, L>
   }
 
   private _initSelectionModel(): Subscription {
-    this.selection ??= new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
-
     return this._getSelectedOptions
       .pipe(
-        tap((options) => options && this.selection.set(options, { emitEvent: false })),
+        tap((options) => options && this.selection.set(options)),
         switchMap(() => this.selection.changed),
+        /**
+         * skip first value because the selectionModel is initialized
+         */
+        skip(1),
         takeUntilDestroyed(this._destroy),
       )
       .subscribe(() => {
