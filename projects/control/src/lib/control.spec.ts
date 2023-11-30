@@ -1,4 +1,13 @@
-import { Component, Directive, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  Component,
+  Directive,
+  ElementRef,
+  Injector,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+  runInInjectionContext,
+} from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { take } from 'rxjs';
@@ -32,7 +41,10 @@ class DumpyComponent {
 
   @ViewChild('submit') submit!: ElementRef<HTMLButtonElement>;
 
-  control = new FormControl('', { validators: Validators.required.bind(Validators), nonNullable: true });
+  control = new FormControl<string | string[] | Record<PropertyKey, unknown>>('', {
+    validators: Validators.required.bind(Validators),
+    nonNullable: true,
+  });
 
   form = new FormGroup({
     control: new FormControl('', { validators: Validators.required.bind(Validators), nonNullable: true }),
@@ -46,6 +58,7 @@ class DumpyComponent {
 describe('InputDirective', () => {
   let component: DumpyComponent;
   let fixture: ComponentFixture<DumpyComponent>;
+  let injector: Injector;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -57,6 +70,7 @@ describe('InputDirective', () => {
     });
     fixture = TestBed.createComponent(DumpyComponent);
     component = fixture.componentInstance;
+    injector = fixture.componentRef.injector;
   });
 
   it('should create an instance', () => {
@@ -231,5 +245,42 @@ describe('InputDirective', () => {
     fixture.detectChanges();
 
     expect(component.controls.length).toEqual(3);
+  });
+
+  it('check is empty', () => {
+    fixture.detectChanges();
+
+    expect(component.dir1.empty).toBeTrue();
+  });
+
+  it('check is empty array', () => {
+    fixture.detectChanges();
+
+    component.control.setValue([]);
+
+    expect(component.dir1.empty).toBeTrue();
+  });
+
+  it('check is empty object', () => {
+    fixture.detectChanges();
+
+    component.control.setValue({});
+
+    expect(component.dir1.empty).toBeTrue();
+  });
+
+  it('check is empty control', () => {
+    fixture.detectChanges();
+
+    expect(component.dir2.empty).toBeTrue();
+  });
+
+  it('check default functions for onTouched and onTouchedNew', () => {
+    runInInjectionContext(injector, () => {
+      const control = new DumpyDirective();
+
+      expect(control.onTouched()).toEqual(undefined);
+      expect(control.onTouchedNew()).toEqual(undefined);
+    });
   });
 });

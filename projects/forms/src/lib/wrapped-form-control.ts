@@ -89,4 +89,8 @@ export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValu
   registerOnTouched(fn: () => void): void {
     this.valueAccessor.registerOnTouched(fn);
   }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.valueAccessor.setDisabledState?.(isDisabled);
+  }
 }

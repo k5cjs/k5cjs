@@ -31,6 +31,7 @@ import {
   ViewContainerRef,
   forwardRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ControlValueAccessor } from '@angular/forms';
 import {
   BehaviorSubject,
@@ -40,8 +41,8 @@ import {
   first,
   isObservable,
   map,
+  skip,
   switchMap,
-  takeUntil,
   tap,
 } from 'rxjs';
 
@@ -208,6 +209,10 @@ export class KcSelectComponent<V, K, L>
   override ngOnInit(): void {
     super.ngOnInit();
 
+    this.selection = new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
+
+    this._subscriptionChanges = this._initSelectionModel();
+
     if (this.origin) {
       // TODO: remove event listener on destroy
       this.origin.elementRef.nativeElement.addEventListener('click', () => {
@@ -220,24 +225,18 @@ export class KcSelectComponent<V, K, L>
   }
 
   ngAfterContentInit(): void {
-    /**
-     * init selection after writeValue is called
-     * ngOnInit -> writeValue -> ngAfterContentInit
-     */
-    this._subscriptionChanges = this._initSelectionModel();
-
     if (this._valueDirective) this._valueDirective.render(this._valueRef);
+  }
+
+  override writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
+    this.value = obj;
+    this._updateSelectionModel();
   }
   /**
    * allow element to be focusable
    */
   @HostBinding('attr.tabindex') get tabindex(): number {
     return this._tabIndex;
-  }
-
-  override writeValue(obj: KcOptionValue<V> | KcOptionGroupValue<V>): void {
-    this.value = obj;
-    this._updateSelectionModel();
   }
 
   @HostListener('keydown', ['$event'])
@@ -313,7 +312,7 @@ export class KcSelectComponent<V, K, L>
 
     this._removeOptionsSubscription();
 
-    this._optionsSubscription = this.options.pipe(takeUntil(this._destroy)).subscribe((options) => {
+    this._optionsSubscription = this.options.pipe(takeUntilDestroyed(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length)
         this._groupDirectives.forEach((group) => group.render(options as KcGroup<V, K, L>));
       else if (this._optionsDirectives.length)
@@ -349,7 +348,7 @@ export class KcSelectComponent<V, K, L>
      */
     this.elementRef.nativeElement.focus();
 
-    this.onTochedNew();
+    this.onTouchedNew();
   }
 
   submit(): void {
@@ -391,13 +390,15 @@ export class KcSelectComponent<V, K, L>
   }
 
   private _initSelectionModel(): Subscription {
-    this.selection ??= new MapEmitSelect<KcOption<V, K, L> | KcOptionSelection<V, K, L>, K | V, boolean>(this.multiple);
-
     return this._getSelectedOptions
       .pipe(
-        tap((options) => options && this.selection.set(options, { emitEvent: false })),
+        tap((options) => options && this.selection.set(options)),
         switchMap(() => this.selection.changed),
-        takeUntil(this._destroy),
+        /**
+         * skip first value because the selectionModel is initialized
+         */
+        skip(1),
+        takeUntilDestroyed(this._destroy),
       )
       .subscribe(() => {
         /**
@@ -469,7 +470,7 @@ export class KcSelectComponent<V, K, L>
 
     overlayRef
       .backdropClick()
-      .pipe(takeUntil(this._destroy))
+      .pipe(takeUntilDestroyed(this._destroy))
       .subscribe(() => {
         this.close();
         this._stateChanges.next();
