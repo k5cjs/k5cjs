@@ -210,20 +210,6 @@ describe('KcFormField', () => {
     expect(component.formField.value).toEqual('test');
   });
 
-  it('tests unimplemented functions', () => {
-    fixture.detectChanges();
-
-    let expectError: unknown = null;
-
-    try {
-      component.formField.disable();
-    } catch (error) {
-      expectError = error;
-    }
-
-    expect(expectError).toEqual(new Error('Method not implemented.'));
-  });
-
   it('provider', () => {
     fixture.detectChanges();
 

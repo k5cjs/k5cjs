@@ -41,7 +41,6 @@ import {
   first,
   isObservable,
   map,
-  skip,
   switchMap,
   tap,
 } from 'rxjs';
@@ -99,6 +98,7 @@ export class KcSelectComponent<V, K, L>
       | KcOption<V, K, L>[][]
       | KcGroup<V, K, L>,
   ) {
+    // TODO: check to implement shareReplay
     if (isObservable(options)) this._options = options;
     else this._createObservableOptions(options);
   }
@@ -175,10 +175,10 @@ export class KcSelectComponent<V, K, L>
   private _allSelectedChanged: BehaviorSubject<boolean>;
 
   private _dialogOverlayRef: OverlayRef | undefined;
-  private _optionsSubscription: Subscription | undefined;
 
   private _tabIndex: number;
 
+  private _subscriptionOptions?: Subscription;
   private _subscriptionChanges?: Subscription;
 
   constructor(
@@ -276,7 +276,7 @@ export class KcSelectComponent<V, K, L>
    * and don't open selection, to open selection user need to press space
    */
   @HostListener('focus')
-  override focus(): void {
+  override _focus(): void {
     this.focused = true;
     this._stateChanges.next();
   }
@@ -285,7 +285,7 @@ export class KcSelectComponent<V, K, L>
    * close selection when user press tab to blur on element
    */
   @HostListener('blur')
-  blur(): void {
+  override _blur(): void {
     if (this.selectionOpened) return;
     /**
      * blur element when user focused element but not open selection
@@ -293,11 +293,6 @@ export class KcSelectComponent<V, K, L>
      */
     this.focused = false;
     this._stateChanges.next();
-  }
-
-  override focusChanged(): void {
-    // override focusChanged from KcControl to prevent unfocused
-    // is not necessary because is implemented above
   }
 
   open(): void {
@@ -312,7 +307,7 @@ export class KcSelectComponent<V, K, L>
 
     this._removeOptionsSubscription();
 
-    this._optionsSubscription = this.options.pipe(takeUntilDestroyed(this._destroy)).subscribe((options) => {
+    this._subscriptionOptions = this.options.pipe(takeUntilDestroyed(this._destroy)).subscribe((options) => {
       if (this._groupDirectives.length)
         this._groupDirectives.forEach((group) => group.render(options as KcGroup<V, K, L>));
       else if (this._optionsDirectives.length)
@@ -337,6 +332,8 @@ export class KcSelectComponent<V, K, L>
     if (this._groupDirectives.length) this._groupDirectives.forEach((group) => group.clear());
     else if (this._optionsDirectives.length)
       this._optionsDirectives.forEach((optionDirective) => optionDirective.clear());
+
+    this.onTouchedNew();
     /**
      * mark for check when user try to close from KcSelect token
      */
@@ -347,8 +344,6 @@ export class KcSelectComponent<V, K, L>
      * stay focused until user click outside of select
      */
     this.elementRef.nativeElement.focus();
-
-    this.onTouchedNew();
   }
 
   submit(): void {
@@ -383,10 +378,10 @@ export class KcSelectComponent<V, K, L>
   }
 
   private _removeOptionsSubscription(): void {
-    if (!this._optionsSubscription) return;
+    if (!this._subscriptionOptions) return;
 
-    this._optionsSubscription.unsubscribe();
-    this._optionsSubscription = undefined;
+    this._subscriptionOptions.unsubscribe();
+    this._subscriptionOptions = undefined;
   }
 
   private _initSelectionModel(): Subscription {
@@ -394,10 +389,6 @@ export class KcSelectComponent<V, K, L>
       .pipe(
         tap((options) => options && this.selection.set(options)),
         switchMap(() => this.selection.changed),
-        /**
-         * skip first value because the selectionModel is initialized
-         */
-        skip(1),
         takeUntilDestroyed(this._destroy),
       )
       .subscribe(() => {
@@ -540,6 +531,8 @@ export class KcSelectComponent<V, K, L>
 
     this.allSelected = [...this.optionComponents].every((option) => option.selected);
     this._allSelectedChanged.next(this.allSelected);
+
+    this._stateChanges.next();
 
     this._cdr.detectChanges();
   }
