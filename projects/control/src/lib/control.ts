@@ -159,8 +159,12 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     return null;
   }
 
+  enable(): void {
+    this.setDisabledState(false);
+  }
+
   disable(): void {
-    throw new Error('Method not implemented.');
+    this.setDisabledState(true);
   }
 
   focus(): void {
@@ -175,12 +179,22 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     return this.ngControl?.errors || null;
   }
 
-  @HostListener('focus', ['true'])
-  @HostListener('blur', ['false'])
-  focusChanged(focused: boolean): void {
-    if (focused === this.focused) return;
+  @HostListener('focus')
+  protected _focus(): void {
+    if (this.focused) return;
 
-    this.focused = focused;
+    this.focused = true;
+    this._stateChanges.next();
+  }
+
+  @HostListener('blur')
+  protected _blur(): void {
+    this.focused = false;
+    /**
+     * when control is blurred, we mark it as touched
+     */
+    this.onTouchedNew();
+
     this._stateChanges.next();
   }
 

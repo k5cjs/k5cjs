@@ -211,20 +211,6 @@ describe('InputDirective', () => {
     expect(component.dir1.autofilled).toBeTrue();
   });
 
-  it('tests unimplemented functions', () => {
-    fixture.detectChanges();
-
-    let expectError: unknown = null;
-
-    try {
-      component.dir2.disable();
-    } catch (error) {
-      expectError = error;
-    }
-
-    expect(expectError).toEqual(new Error('Method not implemented.'));
-  });
-
   it('skip emit one more event if input is focused', () => {
     fixture.detectChanges();
 
