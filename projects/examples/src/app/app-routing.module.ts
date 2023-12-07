@@ -26,6 +26,10 @@ const routes: Routes = [
     path: 'form-field',
     loadChildren: () => import('./views/form-field'),
   },
+  {
+    path: 'toggle-group',
+    loadChildren: () => import('./views/toggle-group'),
+  },
 ];
 
 @NgModule({
