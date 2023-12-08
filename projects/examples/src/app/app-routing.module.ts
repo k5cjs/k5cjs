@@ -30,6 +30,11 @@ const routes: Routes = [
     path: 'toggle-group',
     loadChildren: () => import('./views/toggle-group'),
   },
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'home',
+  },
 ];
 
 @NgModule({
