@@ -9,4 +9,4 @@ const externalComponents = [KcToggleGroupDirective, KcToggleItemDirective];
   imports: [],
   exports: [...externalComponents],
 })
-export class KcToggleGroupModule {}
+export class KcToggleModule {}

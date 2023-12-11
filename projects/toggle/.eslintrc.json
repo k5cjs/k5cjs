@@ -10,7 +10,7 @@
       ],
       "parserOptions": {
         "project": [
-          "projects/toggle-group/tsconfig.(lib|spec).json"
+          "projects/toggle/tsconfig.(lib|spec).json"
         ]
       },
       "rules": {

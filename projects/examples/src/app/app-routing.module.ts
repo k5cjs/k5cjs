@@ -27,8 +27,8 @@ const routes: Routes = [
     loadChildren: () => import('./views/form-field'),
   },
   {
-    path: 'toggle-group',
-    loadChildren: () => import('./views/toggle-group'),
+    path: 'toggle',
+    loadChildren: () => import('./views/toggle'),
   },
   {
     path: '',

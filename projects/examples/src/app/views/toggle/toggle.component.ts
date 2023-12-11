@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
-  selector: 'app-toggle-group',
-  templateUrl: './toggle-group.component.html',
-  styleUrls: ['./toggle-group.component.scss'],
+  selector: 'app-toggle',
+  templateUrl: './toggle.component.html',
+  styleUrls: ['./toggle.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ToggleGroupComponent {
+export class ToggleComponent {
   control = new FormControl('a');
   multiple = new FormControl(['a', 'c']);
 
