@@ -1,0 +1,21 @@
+<div toggleGroup #simpleGroup="toggleGroup" [formControl]="control" [options]="options">
+  <button
+    *toggleItem="let value, selected as selected"
+    [value]="value"
+    [class.selected]="selected"
+    (click)="simpleGroup.select(value.value)"
+  >
+    {{ value.label }}
+  </button>
+</div>
+
+<div toggleGroup #multipleGroup="toggleGroup" [formControl]="multiple" multiple [options]="options">
+  <button
+    *toggleItem="let value, selected as selected"
+    [value]="value"
+    [class.selected]="selected"
+    (click)="multipleGroup.select(value.value)"
+  >
+    {{ value.label }}
+  </button>
+</div>

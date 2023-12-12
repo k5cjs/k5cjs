@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": ["../../dev-mode-types"]
   },
   "files": ["src/public-api.ts", "../../cypress.config.ts"]
 }

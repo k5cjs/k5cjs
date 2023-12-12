@@ -135,6 +135,7 @@ export class MapEmit<K, V, T extends boolean = false> {
   /**
    * Toggles a value between selected and deselected.
    */
+  // TODO: implement to toggle multiple values
   toggle(key: K, value: V, options?: Options): void {
     this.has(key) ? this.delete(key, options) : this.set(key, value, options);
   }

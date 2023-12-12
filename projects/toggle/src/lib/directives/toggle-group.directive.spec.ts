@@ -1,8 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
-import { KcToggleGroupModule } from '../toggle-group.module';
+import { KcToggleModule } from '../toggle.module';
 
 import { KcToggleGroupDirective } from './toggle-group.directive';
 
@@ -34,27 +34,46 @@ class DummyComponent {
 
 describe('KcToggleGroupDirective', () => {
   let directive: DummyComponent;
+  let fixture: ComponentFixture<DummyComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [DummyComponent],
-      imports: [KcToggleGroupModule, ReactiveFormsModule],
+      imports: [KcToggleModule, ReactiveFormsModule],
       teardown: {
         destroyAfterEach: true,
       },
     });
 
-    const fixture = TestBed.createComponent(DummyComponent);
+    fixture = TestBed.createComponent(DummyComponent);
     directive = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should write value on writeValue', () => {
-    const selectSpy = spyOn(directive.toggleGroup, 'select');
+  it('should set a single value', () => {
+    const _values = spyOn(directive.toggleGroup['_values'], 'set');
+    const value = 'test-value';
+    directive.toggleGroup.writeValue(value);
 
-    directive.toggleGroup.writeValue('a');
+    expect(_values).toHaveBeenCalledWith([[value, value]]);
+  });
 
-    expect(selectSpy).toHaveBeenCalledWith('a', false);
+  it('should set multiple values when the `multiple` input is true', () => {
+    const _values = spyOn(directive.toggleGroup['_values'], 'set');
+    directive.toggleGroup.multiple = true;
+    const values = ['test-value1', 'test-value2'];
+    directive.toggleGroup.writeValue(values);
+
+    expect(_values).toHaveBeenCalledWith(values.map((value) => [value, value]));
+  });
+
+  it('should throw an error when setting multiple values when the `multiple` input is false', () => {
+    const _values = spyOn(directive.toggleGroup['_values'], 'set');
+    const values = ['test-value1', 'test-value2'];
+    expect(() => directive.toggleGroup.writeValue(values)).toThrowError(
+      'Cannot set multiple values to a single toggle group.',
+    );
+    expect(_values).not.toHaveBeenCalled();
   });
 
   it('should register onChange on registerOnChange', () => {

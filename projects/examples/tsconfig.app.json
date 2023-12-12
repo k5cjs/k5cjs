@@ -3,7 +3,7 @@
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/app",
-    "types": []
+    "types": ["../../dev-mode-types"]
   },
   "files": ["src/main.ts"]
 }
