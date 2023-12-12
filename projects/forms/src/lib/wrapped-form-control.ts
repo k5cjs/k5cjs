@@ -78,7 +78,10 @@ export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValu
             }
       `);
 
-    this.valueAccessor.writeValue(obj);
+    void Promise.resolve(null).then(() => {
+      this.valueAccessor.writeValue(obj);
+      this._cdr.markForCheck();
+    });
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types

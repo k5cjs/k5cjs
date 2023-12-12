@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ChangeDetectionStrategy, Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import {
   ControlValueAccessor,
   FormsModule,
@@ -135,31 +135,37 @@ describe('WrappedFormControl', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ParentComponent);
-    fixture.detectChanges();
-
     component = fixture.componentInstance;
-
-    input = fixture.debugElement.query(By.directive(InputComponent))!;
-    inputNative = input.nativeElement as HTMLElement;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('default value', () => {
+  it('default value', fakeAsync(() => {
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    input = fixture.debugElement.query(By.directive(InputComponent))!;
+    inputNative = input.nativeElement as HTMLElement;
     const span = inputNative.querySelector('span');
-    expect(span?.textContent).toContain('default');
-  });
 
-  it('patch value', () => {
+    expect(span?.textContent).toContain('default');
+  }));
+
+  it('patch value', fakeAsync(() => {
     component.form.patchValue({ input: 'test' });
     fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+    input = fixture.debugElement.query(By.directive(InputComponent))!;
+    inputNative = input.nativeElement as HTMLElement;
     const span = inputNative.querySelector('span');
     expect(span?.textContent).toContain('test');
-  });
+  }));
 
   it('error without component control', () => {
+    fixture.detectChanges();
     const test = TestBed.createComponent(ErrorParentComponent);
     test.destroy = () => {};
 
@@ -167,6 +173,7 @@ describe('WrappedFormControl', () => {
   });
 
   it('error without component control and show the class name for the component', () => {
+    fixture.detectChanges();
     const test = TestBed.createComponent(ErrorParentComponent);
     test.destroy = () => {};
 
