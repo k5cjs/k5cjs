@@ -2,28 +2,22 @@
   @apply
     w-full
     mx-0
-    my-10
-    px-1;
-}
-
-.label {
-  @apply
-    text-gray-950
-    dark:text-gray-100;
+  py-10
+  px-1;
 }
 
 input {
   @apply
     w-full
     m-0
-    p-0
-    text-inherit
-    border-none
-    box-border
-    bg-transparent
-    outline-none
-    placeholder-slate-400
-    truncate;
+  p-0
+  text-inherit
+  border-none
+  box-border
+  bg-transparent
+  outline-none
+  placeholder-slate-400
+  truncate;
 
   font-size: inherit;
   line-height: inherit;
@@ -39,10 +33,10 @@ input {
     @apply
       [background:transparent]
       bg-white
-      shadow-inner
-      shadow-transparent
-      transition-colors
-      duration-[5000s];
+    shadow-inner
+    shadow-transparent
+    transition-colors
+    duration-[5000s];
   }
 
   &:disabled {
@@ -51,20 +45,4 @@ input {
      */
     @apply opacity-100;
   }
-}
-
-.test {
-  @apply
-    flex
-    flex-col;
-}
-
-.button {
-  @apply
-    w-48
-    p-1
-    m-3
-    rounded-lg
-    text-white
-    bg-blue-500;
 }

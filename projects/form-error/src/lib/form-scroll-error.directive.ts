@@ -21,12 +21,11 @@ export class KcScrollError {
       const errorElements = Array.from(errorElementsNodeList);
 
       const errorElement = errorElements.find((element) => element.hasAttribute('formcontrolname'));
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth' });
 
-      if (!errorElement) return false;
-
-      errorElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-
-      if (this.focus) errorElement.focus();
+        if (this.focus) errorElement.focus();
+      }
 
       return onSubmit(...args);
     };

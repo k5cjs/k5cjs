@@ -18,3 +18,17 @@
     <span *kcError="'email'">Please enter a valid email address</span>
   </div>
 </kc-form-field>
+
+<form [formGroup]="form" scrollToError>
+  <app-input formControlName="control1"></app-input>
+  <app-input formControlName="control2"></app-input>
+  <app-input formControlName="control3"></app-input>
+  <app-input formControlName="control4"></app-input>
+  <app-input formControlName="control5"></app-input>
+  <app-input formControlName="control6"></app-input>
+  <app-input formControlName="control7"></app-input>
+  <app-input formControlName="control8"></app-input>
+  <app-input formControlName="control9"></app-input>
+  <app-input formControlName="control10"></app-input>
+  <button type="submit" class="button">Submit</button>
+</form>

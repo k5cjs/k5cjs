@@ -92,7 +92,7 @@ describe('KcScrollError', () => {
       fixture.detectChanges();
     }
 
-    expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth', block: 'end' });
+    expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
   }));
 
   it('should not focus when [focus] is false', fakeAsync(() => {
