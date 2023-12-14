@@ -11,24 +11,22 @@ import { FormGroupDirective } from '@angular/forms';
 export class KcScrollError {
   @Input({ transform: coerceBooleanProperty }) focus = false;
 
-  constructor(private _elementRef: ElementRef, private _form: FormGroupDirective) {
+  constructor(private _elementRef: ElementRef<HTMLElement>, private _form: FormGroupDirective) {
     const onSubmit = this._form.onSubmit.bind(this._form);
 
     this._form.onSubmit = (...args) => {
-      const form = this._elementRef.nativeElement as HTMLElement;
+      const form = this._elementRef.nativeElement;
 
-      if (form instanceof HTMLElement) {
-        const errorElementsNodeList = form.querySelectorAll('.ng-invalid');
-        const errorElements = Array.from(errorElementsNodeList) as HTMLElement[];
+      const errorElementsNodeList = form.querySelectorAll<HTMLElement>('.ng-invalid');
+      const errorElements = Array.from(errorElementsNodeList);
 
-        const errorElement = errorElements.find((element) => element.hasAttribute('formcontrolname'));
+      const errorElement = errorElements.find((element) => element.hasAttribute('formcontrolname'));
 
-        if (errorElement) {
-          errorElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      if (!errorElement) return false;
 
-          if (this.focus) errorElement.focus();
-        }
-      }
+      errorElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+
+      if (this.focus) errorElement.focus();
 
       return onSubmit(...args);
     };
