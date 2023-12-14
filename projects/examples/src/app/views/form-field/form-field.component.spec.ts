@@ -5,6 +5,7 @@ import { KcError, KcErrors } from '@k5cjs/form-error';
 import { KcFormField } from '@k5cjs/form-field';
 import { KcInput } from '@k5cjs/input';
 
+import { InputComponent } from './components';
 import { FormFieldComponent } from './form-field.component';
 
 describe('FormFieldComponent', () => {
@@ -13,7 +14,7 @@ describe('FormFieldComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FormFieldComponent],
+      declarations: [FormFieldComponent, InputComponent],
       imports: [FormsModule, ReactiveFormsModule, KcFormField, KcInput, KcErrors, KcError],
     }).compileComponents();
 
