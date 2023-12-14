@@ -43,11 +43,10 @@ const libs = [
   Libs.Animations,
   Libs.Store,
   Libs.Types,
+  Libs.Toggle,
 ];
 
-const apps = [
-  Apps.Examples,
-];
+const apps = [Apps.Examples];
 
 const lints = [...apps, ...libs];
 

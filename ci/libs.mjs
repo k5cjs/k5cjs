@@ -15,4 +15,5 @@ export const Libs = {
   Animations: 'animations',
   Store: 'store',
   Types: 'types',
+  Toggle: 'toggle',
 };

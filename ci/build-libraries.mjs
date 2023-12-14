@@ -37,10 +37,9 @@ const commands = [
     { name: Libs.FormField, needs: [Libs.Control] },
     { name: Libs.Input, needs: [Libs.Control] },
     { name: Libs.Textarea, needs: [Libs.Control] },
+    { name: Libs.Toggle, needs: [Libs.Forms, Libs.SelectionModel] },
   ],
-  [
-    { name: Libs.FormError, needs: [Libs.FormField] },
-  ]
+  [{ name: Libs.FormError, needs: [Libs.FormField] }],
 ];
 
 const libHash = (name) => $`git rev-parse --verify --quiet HEAD:projects/${name}/`;
