@@ -3,11 +3,10 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 
+import { KcError, KcErrors } from '@k5cjs/form-error';
 import { KcFormField } from '@k5cjs/form-field';
 import { KcInput } from '@k5cjs/input';
 
-import { KcError } from './form-error.directive';
-import { KcErrors } from './form-errors.directive';
 import { KcScrollError } from './form-scroll-error.directive';
 @Component({
   template: `
@@ -72,6 +71,9 @@ describe('KcScrollError', () => {
     const formElement = form.nativeElement as HTMLElement;
     const submitButton = formElement.querySelector('button');
 
+    const directiveInstance = form.injector.get(KcScrollError);
+    directiveInstance.focus = true;
+
     testComponent.form.get('control1')?.setErrors({ required: true });
     fixture.detectChanges();
 
@@ -82,8 +84,10 @@ describe('KcScrollError', () => {
     }
 
     const invalidElement = form.query(By.css('.ng-invalid'));
+
     expect(invalidElement).toBeTruthy();
 
+    const focusSpy = spyOn(invalidElement.nativeElement, 'focus');
     const scrollIntoViewSpy = spyOn(invalidElement.nativeElement, 'scrollIntoView');
 
     if (submitButton) {
@@ -92,6 +96,9 @@ describe('KcScrollError', () => {
       fixture.detectChanges();
     }
 
+    tick();
+
+    expect(focusSpy).toHaveBeenCalled();
     expect(scrollIntoViewSpy).toHaveBeenCalledWith({ behavior: 'smooth' });
   }));
 

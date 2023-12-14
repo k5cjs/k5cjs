@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { KcError, KcErrors , KcScrollError } from '@k5cjs/form-error';
+import { KcError, KcErrors } from '@k5cjs/form-error';
 import { KcFormField } from '@k5cjs/form-field';
+import { KcScrollError } from '@k5cjs/forms';
 import { KcInput } from '@k5cjs/input';
-
 
 import { ExtendsComponent, ExtendsFormFieldComponent } from './components';
 import { InputComponent } from './components/input/input.component';
