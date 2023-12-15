@@ -185,16 +185,22 @@ describe('Store', () => {
       ),
     );
 
-    let expected: { items: unknown[]; total: number };
-    service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
-
+    let expected: unknown;
     let expectedError: unknown;
-    service.error({ params: {} }).subscribe((value) => (expectedError = value));
+
+    service.getByQuery({ params: {} }).subscribe({
+      next: () => (expected = 'next'),
+      error: (error: unknown) => (expectedError = error),
+    });
+
+    let expectedErrorFromError: unknown;
+    service.error({ params: {} }).subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
-    expect(expected!).toBeUndefined();
+    expect(expected).toBeUndefined();
     expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
   it('getById success', fakeAsync(() => {
@@ -250,16 +256,22 @@ describe('Store', () => {
       ),
     );
 
-    let expected: { item: FeatureStoreType };
-    service.getById({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
-
+    let expected: unknown;
     let expectedError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedError = value));
+
+    service.getById({ params: { item: { id: '1' } } }).subscribe({
+      next: () => (expected = 'next'),
+      error: (error: unknown) => (expectedError = error),
+    });
+
+    let expectedErrorFromError: unknown;
+    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
-    expect(expected!).toBeUndefined();
+    expect(expected).toBeUndefined();
     expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
   it('create success', fakeAsync(() => {
@@ -336,18 +348,24 @@ describe('Store', () => {
       ),
     );
 
-    let expected: { item: FeatureStoreType };
-    service.create({ params: { item: { name: 'test update' } } }).subscribe((value) => (expected = value));
+    let expected: unknown;
+    let expectedError: unknown;
+
+    service.create({ params: { item: { name: 'test update' } } }).subscribe({
+      next: () => (expected = 'next'),
+      error: (error: unknown) => (expectedError = error),
+    });
 
     flush();
 
-    let expectedError: unknown;
-    service.error({ params: { item: { name: 'test update' } } }).subscribe((value) => (expectedError = value));
+    let expectedErrorFromError: unknown;
+    service.error({ params: { item: { name: 'test update' } } }).subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
     expect(expected!).toBeUndefined();
     expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
   it('update success', fakeAsync(() => {
@@ -398,16 +416,24 @@ describe('Store', () => {
       ),
     );
 
-    let expected: { item: FeatureStoreType };
-    service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe((value) => (expected = value));
-
+    let expected: unknown;
     let expectedError: unknown;
-    service.error({ params: { item: { id: '1', name: 'test update' } } }).subscribe((value) => (expectedError = value));
+
+    service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe({
+      next: () => (expected = 'next'),
+      error: (error: unknown) => (expectedError = error),
+    });
+
+    let expectedErrorFromError: unknown;
+    service
+      .error({ params: { item: { id: '1', name: 'test update' } } })
+      .subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
-    expect(expected!).toBeUndefined();
+    expect(expected).toBeUndefined();
     expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
   it('delete success', fakeAsync(() => {
@@ -427,7 +453,7 @@ describe('Store', () => {
 
     spyOn(http, 'delete').and.returnValue(of({ item: { id: '1' } }));
 
-    let expected: boolean;
+    let expected: boolean | undefined = true;
     service.delete({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
 
     flush();
@@ -438,7 +464,7 @@ describe('Store', () => {
       .pipe(first())
       .subscribe((value) => (expectedState = value));
 
-    expect(expected!).toBeTrue();
+    expect(expected).toBeUndefined();
     expect(expectedState!).toEqual({
       ids: [],
       entities: {},
@@ -478,13 +504,18 @@ describe('Store', () => {
       ),
     );
 
-    let expected: boolean;
-    service.delete({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+    let expected: unknown;
+    let expectedError: unknown;
+
+    service.delete({ params: { item: { id: '1' } } }).subscribe({
+      next: () => (expected = 'next'),
+      error: (error: unknown) => (expectedError = error),
+    });
 
     flush();
 
-    let expectedError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedError = value));
+    let expectedErrorFromError: unknown;
+    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
@@ -494,8 +525,10 @@ describe('Store', () => {
       .pipe(first())
       .subscribe((value) => (expectedState = value));
 
-    expect(expected!).toBeFalse();
+    expect(expected).toBeUndefined();
     expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(expectedErrorFromError!);
+
     expect(expectedState!).toEqual({
       ids: ['1'],
       entities: {

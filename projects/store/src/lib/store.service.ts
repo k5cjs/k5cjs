@@ -1,5 +1,15 @@
 import { inject } from '@angular/core';
-import { MonoTypeOperatorFunction, Observable, filter, first, identity, map, switchMap } from 'rxjs';
+import {
+  MonoTypeOperatorFunction,
+  Observable,
+  catchError,
+  filter,
+  first,
+  identity,
+  map,
+  switchMap,
+  throwError,
+} from 'rxjs';
 
 import { AtLeastDeep, isNotUndefined } from '@k5cjs/types';
 import { Actions, ofType } from '@ngrx/effects';
@@ -46,6 +56,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       this._actions.getByQueryIsLoaded,
       this._actions.getByQueryError,
     ).pipe(
+      catchError(() => this._throwError(query)),
       switchMap(() => this._store.select(this._selectors.queryAll(query))),
       filter(isNotUndefined),
       StoreServiceBase.First(options),
@@ -64,6 +75,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       this._actions.getByIdIsLoaded,
       this._actions.getByIdError,
     ).pipe(
+      catchError(() => this._throwError(query)),
       switchMap(() => this._store.select(this._selectors.queryOne(query))),
       filter(isNotUndefined),
       StoreServiceBase.First(options),
@@ -83,6 +95,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       this._actions.createSuccess,
       this._actions.createError,
     ).pipe(
+      catchError(() => this._throwError(query)),
       switchMap(() => this._store.select(this._selectors.queryOne(query))),
       filter(isNotUndefined),
       StoreServiceBase.First(options),
@@ -100,6 +113,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
         ...options,
       }),
       this._actions.setSuccess,
+      [],
     ).pipe(
       switchMap(() => this._store.select(this._selectors.queryAll(query))),
       filter(isNotUndefined),
@@ -119,13 +133,14 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       this._actions.updateSuccess,
       this._actions.updateError,
     ).pipe(
+      catchError(() => this._throwError(query)),
       switchMap(() => this._store.select(this._selectors.queryOne(query))),
       filter(isNotUndefined),
       StoreServiceBase.First(options),
     );
   }
 
-  delete(options: Options<{ item: Pick<T, 'id'> } & Params>): Observable<boolean> {
+  delete(options: Options<{ item: Pick<T, 'id'> } & Params>): Observable<undefined> {
     const query = this._query({ params: options.params });
 
     return this._dispatch(
@@ -137,7 +152,11 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
       }),
       this._actions.deleteSuccess,
       this._actions.deleteError,
-    ).pipe(StoreServiceBase.First(options));
+    ).pipe(
+      catchError(() => this._throwError(query)),
+      map(() => undefined),
+      StoreServiceBase.First(options),
+    );
   }
 
   byQuery(params: Params): Observable<{ items: T[] } & object> {
@@ -159,17 +178,47 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   error(params: Params): Observable<string | undefined> {
     const query = this._query(params);
 
-    return this._store.select(this._selectors.error(query));
+    return this._errorByQuery(query);
   }
 
+  protected _throwError(query: string): Observable<never> {
+    return this._errorByQuery(query).pipe(switchMap((error) => throwError(() => error)));
+  }
+
+  protected _errorByQuery(query: string): Observable<string | undefined> {
+    return this._store.select(this._selectors.error(query));
+  }
+  /**
+   * if you have finished actions and do not have an error finished action, then call function like this:
+   * this._dispatch(action, successAction, [])
+   */
+  protected _dispatch(
+    action: Action,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...finishedActions: [...ActionCreatorType<any>[], ActionCreatorType<any>[]]
+  ): Observable<string>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected _dispatch(action: Action, ...finishedActions: ActionCreatorType<any>[]): Observable<boolean> {
+  protected _dispatch(action: Action, ...finishedActions: ActionCreatorType<any>[]): Observable<string>;
+  protected _dispatch(
+    action: Action,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...finishedActions: [...ActionCreatorType<any>[], ActionCreatorType<any>[]] | ActionCreatorType<any>[]
+  ): Observable<string> {
     setTimeout(() => this._store.dispatch(action));
 
+    const errorsActions = finishedActions[finishedActions.length - 1];
+    const errors = Array.isArray(errorsActions) ? errorsActions : [errorsActions];
+
     return this._actions$.pipe(
-      ofType(...finishedActions),
-      // check is success action
-      map(({ type }) => type === finishedActions[0].type),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ofType<ActionCreatorType<any>>(...finishedActions.flat()),
+      map(({ type }) => {
+        if (errors.some((error) => error.type === type)) {
+          throw new Error(type);
+        }
+
+        return type;
+      }),
       first(),
     );
   }
