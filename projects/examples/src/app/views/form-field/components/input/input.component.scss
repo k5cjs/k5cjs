@@ -2,14 +2,8 @@
   @apply
     w-full
     mx-0
-    my-10
+    py-10
     px-1;
-}
-
-.label {
-  @apply
-    text-gray-950
-    dark:text-gray-100;
 }
 
 input {
@@ -51,20 +45,4 @@ input {
      */
     @apply opacity-100;
   }
-}
-
-.test {
-  @apply
-    flex
-    flex-col;
-}
-
-.button {
-  @apply
-    w-48
-    p-2
-    m-3
-    rounded-lg
-    text-white
-    bg-blue-500;
 }
