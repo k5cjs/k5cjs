@@ -1,3 +1,4 @@
+export * from './lib/form-scroll-error.directive';
 /*
  * Public API Surface of forms
  */

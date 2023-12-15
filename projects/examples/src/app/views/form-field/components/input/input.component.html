@@ -1,0 +1,7 @@
+<kc-form-field class="field">
+  <input control kc-input placeholder="Test" />
+  <div error kcErrors>
+    <span *kcError="'required'; label: 'required'; let value">{{ value }}</span>
+    <span *kcError="'email'">Please enter a valid email address</span>
+  </div>
+</kc-form-field>
