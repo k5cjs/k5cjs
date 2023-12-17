@@ -23,7 +23,7 @@ export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
   @ContentChild(KcToggleItemDirective, { static: true }) toggleItem!: KcToggleItemDirective<T>;
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  private _onChange: (value: T) => void = () => {};
+  private _onChange: (value: T | T[]) => void = () => {};
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouch: () => void = () => {};
 
@@ -58,7 +58,7 @@ export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
     this._values.set(values);
   };
 
-  registerOnChange = (fn: (value: T) => void) => {
+  registerOnChange = (fn: (value: T | T[]) => void) => {
     this._onChange = fn;
   };
 
@@ -69,7 +69,7 @@ export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
   select(obj: T) {
     this._values.toggle(obj, obj);
 
-    this._onChange(obj);
+    this._onChange(this._values.selected!);
     this._onTouch();
   }
 }

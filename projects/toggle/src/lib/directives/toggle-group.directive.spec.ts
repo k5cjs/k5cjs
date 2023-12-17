@@ -99,9 +99,9 @@ describe('KcToggleGroupDirective', () => {
     const onTouched = jasmine.createSpy();
     directive.toggleGroup['_onTouch'] = onTouched;
 
-    directive.toggleGroup.select('a');
+    directive.toggleGroup.select('b');
 
-    expect(onChange).toHaveBeenCalledWith('a');
+    expect(onChange).toHaveBeenCalledWith('b');
     expect(onTouched).toHaveBeenCalled();
   });
 });
