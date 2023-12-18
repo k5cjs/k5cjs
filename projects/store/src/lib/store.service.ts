@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import {
   MonoTypeOperatorFunction,
@@ -25,7 +26,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   loadings: Observable<Record<PropertyKey, boolean | undefined>>;
   entities: Observable<Record<T['id'], T | undefined>>;
   queries: Observable<Record<PropertyKey, { ids: T['id'][] } | undefined>>;
-  errors: Observable<Record<PropertyKey, string | undefined>>;
+  errors: Observable<Record<PropertyKey, HttpErrorResponse | undefined>>;
 
   protected _store = inject(Store<T>);
   protected _actions$ = inject(Actions);
@@ -175,7 +176,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     return this._store.select(this._selectors.entity(id));
   }
 
-  error(params: Params): Observable<string | undefined> {
+  error(params: Params): Observable<HttpErrorResponse | undefined> {
     const query = this._query(params);
 
     return this._errorByQuery(query);
@@ -185,7 +186,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     return this._errorByQuery(query).pipe(switchMap((error) => throwError(() => error)));
   }
 
-  protected _errorByQuery(query: string): Observable<string | undefined> {
+  protected _errorByQuery(query: string): Observable<HttpErrorResponse | undefined> {
     return this._store.select(this._selectors.error(query));
   }
   /**

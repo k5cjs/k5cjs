@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { EntityState } from '@ngrx/entity';
@@ -7,7 +8,7 @@ export type Params<T = unknown> = Record<PropertyKey, T>;
 export type HttpParams = Params<string | number | boolean>;
 
 export interface StateBase<T extends { id: PropertyKey }> extends EntityState<T> {
-  errors: Params<string | undefined>;
+  errors: Params<HttpErrorResponse | undefined>;
   loadings: Params<boolean | undefined>;
   queries: Params<({ ids: T['id'][] } & Params) | undefined>;
   reloadSelectors: number;

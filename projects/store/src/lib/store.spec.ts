@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { Observable, first, map, of } from 'rxjs';
@@ -180,7 +181,7 @@ describe('Store', () => {
     spyOn(http, 'getByQuery').and.returnValue(
       of({ items: [{ id: '1', name: 'first' }], total: 1 }).pipe(
         map(() => {
-          throw { message: 'error message' };
+          throw new HttpErrorResponse({ error: 'error message' });
         }),
       ),
     );
@@ -199,7 +200,7 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
     expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
@@ -251,7 +252,7 @@ describe('Store', () => {
     spyOn(http, 'getById').and.returnValue(
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
-          throw { message: 'error message' };
+          throw new HttpErrorResponse({ error: 'error message' });
         }),
       ),
     );
@@ -270,7 +271,7 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
     expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
@@ -343,7 +344,7 @@ describe('Store', () => {
     spyOn(http, 'create').and.returnValue(
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
-          throw { message: 'error message' };
+          throw new HttpErrorResponse({ error: 'error message' });
         }),
       ),
     );
@@ -364,7 +365,7 @@ describe('Store', () => {
     flush();
 
     expect(expected!).toBeUndefined();
-    expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
     expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
@@ -411,7 +412,7 @@ describe('Store', () => {
     spyOn(http, 'update').and.returnValue(
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
-          throw { message: 'error message' };
+          throw new HttpErrorResponse({ error: 'error message' });
         }),
       ),
     );
@@ -432,7 +433,7 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
     expect(expectedError!).toEqual(expectedErrorFromError!);
   }));
 
@@ -499,7 +500,7 @@ describe('Store', () => {
     spyOn(http, 'delete').and.returnValue(
       of(undefined).pipe(
         map(() => {
-          throw { message: 'error message' };
+          throw new HttpErrorResponse({ error: 'error message' });
         }),
       ),
     );
@@ -526,7 +527,7 @@ describe('Store', () => {
       .subscribe((value) => (expectedState = value));
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual('error message');
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
     expect(expectedError!).toEqual(expectedErrorFromError!);
 
     expect(expectedState!).toEqual({
@@ -535,7 +536,7 @@ describe('Store', () => {
         '1': { id: '1', name: 'first' },
       },
       errors: {
-        [service.query({ params: { item: { id: '1' } } })]: 'error message',
+        [service.query({ params: { item: { id: '1' } } })]: new HttpErrorResponse({ error: 'error message' }),
       },
       loadings: {
         [service.query({ params: { item: { id: '1' } } })]: false,

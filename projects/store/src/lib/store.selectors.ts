@@ -1,3 +1,5 @@
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { EntityAdapter, EntityState } from '@ngrx/entity';
 import {
   MemoizedSelector,
@@ -38,8 +40,8 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
 
   errors: MemoizedSelector<
     object,
-    Record<PropertyKey, string | undefined>,
-    (s1: StateBase<T>) => Record<PropertyKey, string | undefined>
+    Record<PropertyKey, HttpErrorResponse | undefined>,
+    (s1: StateBase<T>) => Record<PropertyKey, HttpErrorResponse | undefined>
   >;
 
   loadings: MemoizedSelector<
@@ -52,8 +54,8 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     query: string,
   ) => MemoizedSelector<
     object,
-    string | undefined,
-    (s1: Record<PropertyKey, string | undefined>) => string | undefined
+    HttpErrorResponse | undefined,
+    (s1: Record<PropertyKey, HttpErrorResponse | undefined>) => HttpErrorResponse | undefined
   >;
 
   loading: (
