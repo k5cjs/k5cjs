@@ -36,8 +36,8 @@ export class EffectsBase<T extends { id: PropertyKey }> {
                 this._actions.getByQuerySuccess(createSuccesActionBody(response, action)),
                 ...this._reloadIdentifiers(this._actions.getByQuerySuccess, action),
               ]),
-              catchError(({ message }: HttpErrorResponse) =>
-                of(this._actions.getByQueryError({ query: action.query, params: { error: message } })),
+              catchError((error: HttpErrorResponse) =>
+                of(this._actions.getByQueryError({ query: action.query, params: { error } })),
               ),
             ),
       ),
@@ -58,8 +58,8 @@ export class EffectsBase<T extends { id: PropertyKey }> {
                 this._actions.getByIdSuccess(createSuccesActionBody(response, action)),
                 ...this._reloadIdentifiers(this._actions.getByIdSuccess, action),
               ]),
-              catchError(({ message }: HttpErrorResponse) =>
-                of(this._actions.getByIdError({ query: action.query, params: { error: message } })),
+              catchError((error: HttpErrorResponse) =>
+                of(this._actions.getByIdError({ query: action.query, params: { error } })),
               ),
             ),
       ),
@@ -77,8 +77,8 @@ export class EffectsBase<T extends { id: PropertyKey }> {
             this._actions.createSuccess(createSuccesActionBody(response, action)),
             ...this._reloadIdentifiers(this._actions.createSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) =>
-            of(this._actions.createError({ query: action.query, params: { error: message } })),
+          catchError((error: HttpErrorResponse) =>
+            of(this._actions.createError({ query: action.query, params: { error } })),
           ),
         ),
       ),
@@ -106,8 +106,8 @@ export class EffectsBase<T extends { id: PropertyKey }> {
             this._actions.updateSuccess(createSuccesActionBody(params, action)),
             ...this._reloadIdentifiers(this._actions.updateSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) =>
-            of(this._actions.updateError({ query: action.query, params: { error: message } })),
+          catchError((error: HttpErrorResponse) =>
+            of(this._actions.updateError({ query: action.query, params: { error } })),
           ),
         ),
       ),
@@ -125,8 +125,8 @@ export class EffectsBase<T extends { id: PropertyKey }> {
             this._actions.deleteSuccess(createSuccesActionBody(params, action)),
             ...this._reloadIdentifiers(this._actions.deleteSuccess, action),
           ]),
-          catchError(({ message }: HttpErrorResponse) =>
-            of(this._actions.deleteError({ query: action.query, params: { error: message } })),
+          catchError((error: HttpErrorResponse) =>
+            of(this._actions.deleteError({ query: action.query, params: { error } })),
           ),
         ),
       ),
