@@ -40,6 +40,10 @@ describe('CalDay', () => {
   });
 
   it('should create', () => {
+    const date = new Date();
+    component.day = date;
+    component.month = date;
+
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
@@ -47,6 +51,7 @@ describe('CalDay', () => {
   it('check input date', () => {
     const date = new Date();
     component.day = date;
+    component.month = date;
 
     fixture.detectChanges();
 
@@ -58,6 +63,7 @@ describe('CalDay', () => {
   it('check if day is selected', () => {
     const date = new Date();
     component.day = date;
+    component.month = date;
     spyOn(selector, 'isSelected').and.returnValue(true);
 
     fixture.detectChanges();
@@ -71,6 +77,7 @@ describe('CalDay', () => {
     const currentDate = new Date();
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1);
     component.day = date;
+    component.month = date;
 
     fixture.detectChanges();
 
@@ -80,7 +87,9 @@ describe('CalDay', () => {
   });
 
   it('check if current day has border', () => {
-    component.day = new Date();
+    const date = new Date();
+    component.day = date;
+    component.month = date;
 
     fixture.detectChanges();
 
@@ -92,6 +101,7 @@ describe('CalDay', () => {
   it('check if current day has border and is selected', () => {
     const date = removeTime(new Date());
     component.day = date;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(date);
 
@@ -110,6 +120,7 @@ describe('CalDay', () => {
     const to = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     component.day = from;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(from);
     spyOnProperty(selector, 'to').and.returnValue(to);
@@ -128,6 +139,7 @@ describe('CalDay', () => {
     const to = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     component.day = to;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(from);
     spyOnProperty(selector, 'to').and.returnValue(to);
@@ -147,6 +159,7 @@ describe('CalDay', () => {
     const to = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     component.day = middle;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(from);
     spyOnProperty(selector, 'to').and.returnValue(to);
@@ -162,6 +175,7 @@ describe('CalDay', () => {
     const date = new Date();
 
     component.day = date;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(date);
     spyOnProperty(selector, 'to').and.returnValue(date);
@@ -177,6 +191,7 @@ describe('CalDay', () => {
     const date = removeTime(new Date());
 
     component.day = date;
+    component.month = date;
 
     spyOnProperty(selector, 'from').and.returnValue(date);
 
@@ -192,6 +207,7 @@ describe('CalDay', () => {
     const date = removeTime(new Date());
 
     component.day = date;
+    component.month = date;
 
     spyOnProperty(selector, 'to').and.returnValue(date);
 
@@ -202,8 +218,12 @@ describe('CalDay', () => {
     expect(window.getComputedStyle(compiled).borderRadius).toEqual('4px');
   });
 
-  it('check click on empty day', () => {
-    component.day = null;
+  it('check click on offset day', () => {
+    const month = new Date();
+    const prevMonthDay = new Date(month.getFullYear(), month.getMonth() - 1, 1);
+
+    component.day = prevMonthDay;
+    component.month = month;
     fixture.detectChanges();
 
     expect(fixture.componentInstance.select()).toEqual(undefined);
@@ -212,13 +232,17 @@ describe('CalDay', () => {
   it('check click on disabled', () => {
     const date = new Date();
     component.day = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+    component.month = date;
     fixture.detectChanges();
 
     expect(fixture.componentInstance.select()).toEqual(undefined);
   });
 
   it('check click', () => {
-    component.day = new Date();
+    const date = new Date();
+    component.day = date;
+    component.month = date;
+
     spyOn(selector, 'select');
 
     fixture.detectChanges();
@@ -230,6 +254,10 @@ describe('CalDay', () => {
   });
 
   it('detect changes', () => {
+    const date = new Date();
+    component.day = date;
+    component.month = date;
+
     // This is a unique instance here, brand new
     const changeDetectorRef = fixture.debugElement.injector.get(ChangeDetectorRef);
 
@@ -245,6 +273,10 @@ describe('CalDay', () => {
   });
 
   it('detect changes do not call', () => {
+    const date = new Date();
+    component.day = date;
+    component.month = date;
+
     // This is a unique instance here, brand new
     const changeDetectorRef = fixture.debugElement.injector.get(ChangeDetectorRef);
 

@@ -34,11 +34,12 @@ export class KcCalWeekComponent implements OnInit {
     week.days.forEach((day) => this.container.insert(this._createViewRef(day)));
   }
 
-  private _createViewRef(day: KcCalDayData | null): ViewRef {
-    if (this.day) return this.day.template.createEmbeddedView({ $implicit: day?.date || null });
+  private _createViewRef(day: KcCalDayData): ViewRef {
+    if (this.day) return this.day.template.createEmbeddedView({ $implicit: day });
 
     const dayComponentRef = this.container.createComponent(KcCalDayComponent);
-    dayComponentRef.instance.day = day?.date || null;
+    dayComponentRef.setInput('day', day.date);
+    dayComponentRef.setInput('month', day.month);
     return dayComponentRef.hostView;
   }
 }
