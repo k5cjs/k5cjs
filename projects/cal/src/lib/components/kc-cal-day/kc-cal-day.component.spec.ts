@@ -172,7 +172,7 @@ describe('CalDay', () => {
   });
 
   it('check if is only one', () => {
-    const date = new Date();
+    const date = removeTime(new Date());
 
     component.day = date;
     component.month = date;
@@ -287,5 +287,193 @@ describe('CalDay', () => {
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(markForCheckSpy).not.toHaveBeenCalled();
+  });
+
+  it('should have offset day selected', () => {
+    const date = new Date();
+    const prevMonthDay = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+
+    component.day = prevMonthDay;
+    component.month = date;
+
+    spyOnProperty(selector, 'from').and.returnValue(prevMonthDay);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.classList).toContain('kc-cal-day--selected-other');
+    expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(252, 211, 77)');
+  });
+
+  describe('when hovering over day', () => {
+    it('should show hover on single day', () => {
+      const date = new Date();
+      component.day = date;
+      component.month = date;
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      compiled.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      fixture.detectChanges();
+
+      expect(compiled.classList).toContain('kc-cal-day--hovered');
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover over offset day', () => {
+      const date = new Date();
+
+      component.day = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+      component.month = date;
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      compiled.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      fixture.detectChanges();
+
+      expect(compiled.classList).toContain('kc-cal-day--hovered-other');
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(238, 242, 255)');
+    });
+
+    it('should not show hover on selected', () => {
+      const date = new Date();
+      component.day = date;
+      component.month = date;
+
+      spyOnProperty(selector, 'from').and.returnValue(date);
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      compiled.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      fixture.detectChanges();
+
+      expect(compiled.classList).toContain('kc-cal-day--selected');
+      expect(compiled.classList).not.toContain('kc-cal-day--hovered');
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(255, 158, 27)');
+    });
+
+    it('should show hover between from & hovered', () => {
+      const date = new Date();
+
+      const from = new Date(date.getFullYear(), date.getMonth(), 1);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 5);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'from').and.returnValue(from);
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover between hovered & from', () => {
+      const date = new Date();
+
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
+      const from = new Date(date.getFullYear(), date.getMonth(), 5);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+      spyOnProperty(selector, 'from').and.returnValue(from);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover between hovered & to', () => {
+      const date = new Date();
+
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
+      const to = new Date(date.getFullYear(), date.getMonth(), 5);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+      spyOnProperty(selector, 'to').and.returnValue(to);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover between to & hovered', () => {
+      const date = new Date();
+
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 5);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
+      const to = new Date(date.getFullYear(), date.getMonth(), 1);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'to').and.returnValue(to);
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover between hovered & selected from', () => {
+      const date = new Date();
+
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 2);
+      const from = new Date(date.getFullYear(), date.getMonth(), 5);
+      const to = new Date(date.getFullYear(), date.getMonth(), 9);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+      spyOnProperty(selector, 'from').and.returnValue(from);
+      spyOnProperty(selector, 'to').and.returnValue(to);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
+
+    it('should show hover between selected to & hovered', () => {
+      const date = new Date();
+
+      const from = new Date(date.getFullYear(), date.getMonth(), 1);
+      const to = new Date(date.getFullYear(), date.getMonth(), 5);
+      const middle = new Date(date.getFullYear(), date.getMonth(), 7);
+      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 9);
+
+      component.day = middle;
+      component.month = date;
+
+      spyOnProperty(selector, 'from').and.returnValue(from);
+      spyOnProperty(selector, 'to').and.returnValue(to);
+      spyOnProperty(selector, 'hovered').and.returnValue(hoveredDate);
+
+      fixture.detectChanges();
+
+      const compiled = fixture.nativeElement as HTMLElement;
+
+      expect(window.getComputedStyle(compiled).backgroundColor).toEqual('rgb(224, 231, 255)');
+    });
   });
 });

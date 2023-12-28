@@ -53,4 +53,21 @@
       rounded
       border-rose-600;
   }
+
+  &--hovered {
+    @apply
+      bg-indigo-100;
+  }
+
+  &--hovered-other {
+    @apply
+      bg-indigo-50;
+  }
+
+  &--selected-other {
+    @apply
+      bg-amber-300;
+
+    color: #fff;
+  }
 }
