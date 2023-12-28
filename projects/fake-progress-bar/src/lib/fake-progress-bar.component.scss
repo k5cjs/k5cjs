@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+}
+
+.bar-container {
+  flex: 1 1 0%;
+  height: 0.125rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 0.125rem;
+  background-color: #fa0000;
+  transform: scaleX(0);
+  transform-origin: left;
+}

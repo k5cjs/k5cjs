@@ -19,6 +19,7 @@ mv coverage/animations/coverage-final.json reports/animations.json
 mv coverage/store/coverage-final.json reports/store.json
 mv coverage/types/coverage-final.json reports/types.json
 mv coverage/toggle/coverage-final.json reports/toggle.json
+mv coverage/fake-progress-bar/coverage-final.json reports/toggle.json
 
 mkdir -p .nyc_output
 

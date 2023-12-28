@@ -38,6 +38,7 @@ const commands = [
     { name: Libs.Input, needs: [Libs.Control] },
     { name: Libs.Textarea, needs: [Libs.Control] },
     { name: Libs.Toggle, needs: [Libs.Forms, Libs.SelectionModel] },
+    { name: Libs.FakeProgressBar, needs: [Libs.Animations] },
   ],
   [{ name: Libs.FormError, needs: [Libs.FormField] }],
 ];

@@ -1,0 +1,3 @@
+<div @toggleO *ngIf="width$ | async as scale" class="bar-container">
+  <div [style.transform]="'scaleX(' + scale + ')'" class="progress-bar"></div>
+</div>
