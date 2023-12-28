@@ -16,4 +16,5 @@ export const Libs = {
   Store: 'store',
   Types: 'types',
   Toggle: 'toggle',
+  FakeProgressBar: 'fake-progress-bar',
 };

@@ -31,6 +31,10 @@ const routes: Routes = [
     loadChildren: () => import('./views/toggle'),
   },
   {
+    path: 'fake-progress-bar',
+    loadChildren: () => import('./views/fake-progress-bar'),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'home',

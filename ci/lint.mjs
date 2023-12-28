@@ -44,6 +44,7 @@ const libs = [
   Libs.Store,
   Libs.Types,
   Libs.Toggle,
+  Libs.FakeProgressBar,
 ];
 
 const apps = [Apps.Examples];
