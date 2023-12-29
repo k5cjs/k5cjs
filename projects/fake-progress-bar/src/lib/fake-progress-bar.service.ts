@@ -59,7 +59,7 @@ export class K5cFakeProgressBarService {
           return { ...value, time, progress };
         }
 
-        return { ...value, bp: progress };
+        return { ...value, progress };
       }),
       switchMap((event) => {
         if (event.type === FakeProgressBarEventType.Start)
@@ -107,6 +107,7 @@ export class K5cFakeProgressBarService {
 
   end(): void {
     if (this._progress > 0) this._progress -= 1;
-    this._trigger.next({ type: FakeProgressBarEventType.End });
+
+    setTimeout(() => this._trigger.next({ type: FakeProgressBarEventType.End }), 50);
   }
 }
