@@ -17,4 +17,6 @@ export interface KcCalBaseSelector<T> {
   from: Date | null;
   to: Date | null;
   hovered: Date | null;
+  hoveredChanged: Observable<Date | null>;
+  changeHovered(date: Date): void;
 }

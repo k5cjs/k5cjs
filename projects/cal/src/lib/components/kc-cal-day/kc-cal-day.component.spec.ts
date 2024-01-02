@@ -355,9 +355,9 @@ describe('CalDay', () => {
     it('should show hover between from & hovered', () => {
       const date = new Date();
 
-      const from = new Date(date.getFullYear(), date.getMonth(), 1);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 5);
+      const from = new Date(date.getFullYear() - 1, date.getMonth(), 1);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 3);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 5);
 
       component.day = middle;
       component.month = date;
@@ -375,9 +375,9 @@ describe('CalDay', () => {
     it('should show hover between hovered & from', () => {
       const date = new Date();
 
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
-      const from = new Date(date.getFullYear(), date.getMonth(), 5);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 1);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 3);
+      const from = new Date(date.getFullYear() - 1, date.getMonth(), 5);
 
       component.day = middle;
       component.month = date;
@@ -395,9 +395,9 @@ describe('CalDay', () => {
     it('should show hover between hovered & to', () => {
       const date = new Date();
 
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
-      const to = new Date(date.getFullYear(), date.getMonth(), 5);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 1);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 3);
+      const to = new Date(date.getFullYear() - 1, date.getMonth(), 5);
 
       component.day = middle;
       component.month = date;
@@ -415,9 +415,9 @@ describe('CalDay', () => {
     it('should show hover between to & hovered', () => {
       const date = new Date();
 
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 5);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 3);
-      const to = new Date(date.getFullYear(), date.getMonth(), 1);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 5);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 3);
+      const to = new Date(date.getFullYear() - 1, date.getMonth(), 1);
 
       component.day = middle;
       component.month = date;
@@ -435,10 +435,10 @@ describe('CalDay', () => {
     it('should show hover between hovered & selected from', () => {
       const date = new Date();
 
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 1);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 2);
-      const from = new Date(date.getFullYear(), date.getMonth(), 5);
-      const to = new Date(date.getFullYear(), date.getMonth(), 9);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 1);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 2);
+      const from = new Date(date.getFullYear() - 1, date.getMonth(), 5);
+      const to = new Date(date.getFullYear() - 1, date.getMonth(), 9);
 
       component.day = middle;
       component.month = date;
@@ -457,10 +457,10 @@ describe('CalDay', () => {
     it('should show hover between selected to & hovered', () => {
       const date = new Date();
 
-      const from = new Date(date.getFullYear(), date.getMonth(), 1);
-      const to = new Date(date.getFullYear(), date.getMonth(), 5);
-      const middle = new Date(date.getFullYear(), date.getMonth(), 7);
-      const hoveredDate = new Date(date.getFullYear(), date.getMonth(), 9);
+      const from = new Date(date.getFullYear() - 1, date.getMonth(), 1);
+      const to = new Date(date.getFullYear() - 1, date.getMonth(), 5);
+      const middle = new Date(date.getFullYear() - 1, date.getMonth(), 7);
+      const hoveredDate = new Date(date.getFullYear() - 1, date.getMonth(), 9);
 
       component.day = middle;
       component.month = date;
