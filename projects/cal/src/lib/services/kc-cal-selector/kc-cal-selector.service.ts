@@ -11,6 +11,7 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
   protected _to: Date | null;
   protected _range: Subject<KcCalBaseRange>;
   protected _rangeSelector: BehaviorSubject<Selector>;
+  protected _hovered: Date | null;
 
   constructor(protected _kcCal: KcCal) {
     this._selector = Selector.From;
@@ -18,6 +19,7 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     this._to = null;
     this._range = new Subject();
     this._rangeSelector = new BehaviorSubject<Selector>(this._selector);
+    this._hovered = null;
   }
 
   get from(): Date | null {
@@ -38,6 +40,10 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
 
   get stateChanged(): Observable<Selector> {
     return this._rangeSelector.asObservable();
+  }
+
+  get hovered(): Date | null {
+    return this._hovered;
   }
 
   select(
@@ -102,6 +108,10 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     this._rangeSelector.next(this._selector);
 
     if (options?.goMonth && this.to) this._kcCal.goMonth(this.to, 'to');
+  }
+
+  changeHovered(date: Date) {
+    this._hovered = date;
   }
 
   protected _selectFrom(from: Date | null, options?: { goMonth?: boolean }): void {
