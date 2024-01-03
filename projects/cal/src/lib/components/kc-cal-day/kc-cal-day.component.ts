@@ -48,6 +48,10 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
     this._selector.changed.pipe(takeUntil(this._destroy)).subscribe(() => {
       this._cdr.markForCheck();
     });
+
+    this._selector.hoveredChanged.pipe(takeUntil(this._destroy)).subscribe(() => {
+      this._cdr.markForCheck();
+    });
   }
 
   @HostBinding('class.kc-cal-day') class = true;
