@@ -32,6 +32,10 @@ export class ActionsBase<T extends { id: PropertyKey }> {
   updateSuccess: Success<{ item: T; config?: Params; before?: Params }>;
   updateError: Error<{ error: HttpErrorResponse }>;
 
+  updateAll: Init<{ items: AtLeastDeep<T, 'id'>[] }>;
+  updateAllSuccess: Success<{ items: T[]; config?: Params; before?: Params }>;
+  updateAllError: Error<{ error: HttpErrorResponse }>;
+
   delete: Init<{ item: Pick<T, 'id'> }>;
   deleteSuccess: Success<{ item: Pick<T, 'id'>; config?: Params; before?: Params }>;
   deleteError: Error<{ error: HttpErrorResponse }>;
@@ -76,6 +80,20 @@ export class ActionsBase<T extends { id: PropertyKey }> {
       props<ActionSuccess<{ item: T; config?: Params; before?: Params }>>(),
     );
     this.updateError = createAction(this._type('update error'), props<ActionError<{ error: HttpErrorResponse }>>());
+
+    this.updateAll = createAction(this._type('update all'), props<ActionInit<{ items: AtLeastDeep<T, 'id'>[] }>>());
+    this.updateAllSuccess = createAction(
+      this._type('update all success'),
+      props<ActionSuccess<{ items: T[]; config?: Params; before?: Params }>>(),
+    );
+    this.updateAllError = createAction(
+      this._type('update all error'),
+      props<
+        ActionError<{
+          error: HttpErrorResponse;
+        }>
+      >(),
+    );
 
     this.delete = createAction(this._type('delete'), props<ActionInit<{ item: Pick<T, 'id'> }>>());
     this.deleteSuccess = createAction(
