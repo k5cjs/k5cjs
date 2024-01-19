@@ -141,6 +141,25 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     );
   }
 
+  updateAll(options: Options<{ items: AtLeastDeep<T, 'id'>[] } & Params>): Observable<{ items: T[] }> {
+    const query = this._query({ params: options.params });
+
+    return this._dispatch(
+      this._actions.updateAll({
+        query,
+        reloadSelectors: true,
+        ...options,
+      }),
+      this._actions.updateAllSuccess,
+      this._actions.updateAllError,
+    ).pipe(
+      catchError(() => this._throwError(query)),
+      switchMap(() => this._store.select(this._selectors.queryAll(query))),
+      filter(isNotUndefined),
+      StoreServiceBase.First(options),
+    );
+  }
+
   delete(options: Options<{ item: Pick<T, 'id'> } & Params>): Observable<undefined> {
     const query = this._query({ params: options.params });
 

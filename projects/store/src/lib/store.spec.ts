@@ -86,6 +86,13 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
   update(_options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
     throw new Error('Method not implemented.');
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  updateAll(_options: ActionInit<{ items: AtLeastDeep<FeatureStoreType, 'id'>[] }>): Observable<{
+    items: FeatureStoreType[];
+  }> {
+    throw new Error('Method not implemented.');
+  }
 }
 
 @Injectable()
@@ -428,6 +435,118 @@ describe('Store', () => {
     let expectedErrorFromError: unknown;
     service
       .error({ params: { item: { id: '1', name: 'test update' } } })
+      .subscribe((value) => (expectedErrorFromError = value));
+
+    flush();
+
+    expect(expected).toBeUndefined();
+    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError!).toEqual(expectedErrorFromError!);
+  }));
+
+  it('update all success', fakeAsync(() => {
+    store.dispatch({
+      type: 'set',
+      payload: {
+        ids: ['1', '2'],
+        entities: {
+          '1': { id: '1', name: 'first' },
+          '2': { id: '2', name: 'second' },
+        },
+        errors: {},
+        loadings: {},
+        queries: {},
+        reloadSelectors,
+      },
+    });
+
+    spyOn(http, 'updateAll').and.returnValue(
+      of({
+        items: [
+          { id: '1', name: 'first item test update all' },
+          { id: '2', name: 'second item test update all' },
+        ],
+      }),
+    );
+
+    let expected: { items: FeatureStoreType[] };
+    service
+      .updateAll({
+        params: {
+          items: [
+            { id: '1', name: 'first item test update all' },
+            { id: '2', name: 'second item test update all' },
+          ],
+        },
+      })
+      .subscribe((value) => (expected = value));
+
+    flush();
+
+    expect(expected!).toEqual({
+      items: [
+        { id: '1', name: 'first item test update all' },
+        { id: '2', name: 'second item test update all' },
+      ],
+    });
+  }));
+
+  it('update all error', fakeAsync(() => {
+    store.dispatch({
+      type: 'set',
+      payload: {
+        ids: ['1', '2'],
+        entities: {
+          '1': { id: '1', name: 'first' },
+          '2': { id: '2', name: 'second' },
+        },
+        errors: {},
+        loadings: {},
+        queries: {},
+        reloadSelectors,
+      },
+    });
+
+    spyOn(http, 'updateAll').and.returnValues(
+      of({
+        items: [
+          { id: '1', name: 'first' },
+          { id: '2', name: 'second' },
+        ],
+      }).pipe(
+        map(() => {
+          throw new HttpErrorResponse({ error: 'error message' });
+        }),
+      ),
+    );
+
+    let expected: unknown;
+    let expectedError: unknown;
+
+    service
+      .updateAll({
+        params: {
+          items: [
+            { id: '1', name: 'first item test update all' },
+            { id: '2', name: 'second item test update all' },
+          ],
+        },
+      })
+      .subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
+
+    let expectedErrorFromError: unknown;
+    service
+      .error({
+        params: {
+          items: [
+            { id: '1', name: 'first item test update all' },
+            { id: '2', name: 'second item test update all' },
+          ],
+        },
+      })
       .subscribe((value) => (expectedErrorFromError = value));
 
     flush();

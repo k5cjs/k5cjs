@@ -114,6 +114,25 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     );
   });
 
+  updateAll$ = createEffect(() => {
+    return this._actions$.pipe(
+      ofType(this._actions.updateAll),
+      this._setIdentified(),
+      concatMap((action) =>
+        this._http.updateAll(action).pipe(
+          this._callBefore(action),
+          concatMap((response) => [
+            this._actions.updateAllSuccess(createSuccesActionBody(response, action)),
+            ...this._reloadIdentifiers(this._actions.updateAllSuccess, action),
+          ]),
+          catchError((error: HttpErrorResponse) =>
+            of(this._actions.updateAllError({ query: action.query, params: { error } })),
+          ),
+        ),
+      ),
+    );
+  });
+
   delete$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.delete),
