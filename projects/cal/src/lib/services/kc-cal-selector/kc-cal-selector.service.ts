@@ -114,7 +114,7 @@ export class KcCalSelector implements KcCalBaseSelector<KcCalBaseRange> {
     if (options?.goMonth && this.to) this._kcCal.goMonth(this.to, 'to');
   }
 
-  changeHovered(date: Date) {
+  changeHovered(date: Date | null) {
     this._hovered.next(date);
   }
 
