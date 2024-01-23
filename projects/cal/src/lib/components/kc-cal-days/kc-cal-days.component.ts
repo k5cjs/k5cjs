@@ -16,7 +16,7 @@ export class KcCalDaysComponent {
     private _locale: string = 'en-US',
   ) {
     this.days = [];
-    const localeStartDay = getLocaleFirstDayOfWeek(this._locale);
+    const localeStartDay: number = getLocaleFirstDayOfWeek(this._locale);
 
     for (let i = localeStartDay; i < 7 + localeStartDay; i++) this.days.push(new Date(0, 0, i));
   }
