@@ -971,862 +971,875 @@ describe('Store', () => {
 
     expect(expected!).toBeTrue();
   }));
-});
 
-describe('Store with select id', () => {
-  let service: StoreService;
-  let http: HttpService;
-  let store: Store<{ [key]: StateBase<FeatureStoreType> }>;
-
-  const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        StoreModule.forRoot({ [key]: reducer(selectId) }),
-        EffectsModule.forRoot([Effects]),
-        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
-      ],
-      teardown: {
-        destroyAfterEach: false,
-      },
-      providers: [
-        {
-          provide: SELECT_ID_TOKEN,
-          useValue: selectId,
-        },
-      ],
-    });
-
-    service = TestBed.inject(StoreService);
-    http = TestBed.inject(HttpService);
-    store = TestBed.inject(Store) as Store<{ [key]: StateBase<FeatureStoreType> }>;
-
-    store.dispatch({ type: 'reset' });
-  });
-
-  it('getByQuery success', fakeAsync(() => {
-    spyOn(http, 'getByQuery').and.returnValue(of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }));
-
-    let expected: { items: unknown[]; total: number };
-    service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+  it('check queryOne in selector', fakeAsync(() => {
+    let expected: undefined | { item: FeatureStoreType };
+    store.select(selectors(null).queryOne('undefined')).subscribe((value) => (expected = value));
 
     flush();
 
-    expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+    expect(expected).toEqual(undefined);
   }));
 
-  it('getByQuery is loaded', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+  describe('Store with select id', () => {
+    const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
+
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+
+      TestBed.configureTestingModule({
+        imports: [
+          StoreModule.forRoot({ [key]: reducer(selectId) }),
+          EffectsModule.forRoot([Effects]),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+        ],
+        teardown: {
+          destroyAfterEach: false,
         },
-        errors: {},
-        loadings: {},
-        queries: {
-          [service.query({ params: {} })]: {
-            ids: [selectId({ id: '1', name: 'first' })],
-            total: 1,
+        providers: [
+          {
+            provide: SELECT_ID_TOKEN,
+            useValue: selectId,
           },
-        },
-        reloadSelectors,
-      },
+        ],
+      });
+
+      service = TestBed.inject(StoreService);
+      http = TestBed.inject(HttpService);
+      store = TestBed.inject(Store) as Store<{ [key]: StateBase<FeatureStoreType> }>;
+
+      store.dispatch({ type: 'reset' });
     });
 
-    let expected: { items: unknown[]; total: number };
+    it('getByQuery success', fakeAsync(() => {
+      spyOn(http, 'getByQuery').and.returnValue(of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }));
 
-    service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+      let expected: { items: unknown[]; total: number };
+      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
 
-    flush();
+      flush();
 
-    expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
-  }));
+      expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+    }));
 
-  it('getByQuery error', fakeAsync(() => {
-    spyOn(http, 'getByQuery').and.returnValue(
-      of({ items: [{ id: '1', name: 'first' }], total: 1 }).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
-    );
-
-    let expected: unknown;
-    let expectedError: unknown;
-
-    service.getByQuery({ params: {} }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
-
-    let expectedErrorFromError: unknown;
-    service.error({ params: {} }).subscribe((value) => (expectedErrorFromError = value));
-
-    flush();
-
-    expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-  }));
-
-  it('getById success', fakeAsync(() => {
-    spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first' } }));
-
-    let expected: { item: FeatureStoreType };
-    service
-      .getById({ params: { item: { id: '1' } } })
-      .pipe(first())
-      .subscribe((value) => (expected = value));
-
-    flush();
-
-    expect(expected!).toEqual({ item: { id: '1', name: 'first' } });
-  }));
-
-  it('getById is loaded', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {
-          [service.query({ params: { item: { id: '1' } } })]: {
-            ids: [selectId({ id: '1', name: 'first' })],
+    it('getByQuery is loaded', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
           },
+          errors: {},
+          loadings: {},
+          queries: {
+            [service.query({ params: {} })]: {
+              ids: [selectId({ id: '1', name: 'first' })],
+              total: 1,
+            },
+          },
+          reloadSelectors,
         },
-        reloadSelectors,
-      },
-    });
+      });
 
-    flush();
+      let expected: { items: unknown[]; total: number };
 
-    let expected: { item: FeatureStoreType };
+      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
 
-    service.getById({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+      flush();
 
-    flush();
+      expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+    }));
 
-    expect(expected!).toEqual({ item: { id: '1', name: 'first' } });
-  }));
+    it('getByQuery error', fakeAsync(() => {
+      spyOn(http, 'getByQuery').and.returnValue(
+        of({ items: [{ id: '1', name: 'first' }], total: 1 }).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
 
-  it('getById error', fakeAsync(() => {
-    spyOn(http, 'getById').and.returnValue(
-      of({ item: { id: '1', name: 'first' } }).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
-    );
+      let expected: unknown;
+      let expectedError: unknown;
 
-    let expected: unknown;
-    let expectedError: unknown;
+      service.getByQuery({ params: {} }).subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
 
-    service.getById({ params: { item: { id: '1' } } }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
+      let expectedErrorFromError: unknown;
+      service.error({ params: {} }).subscribe((value) => (expectedErrorFromError = value));
 
-    let expectedErrorFromError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+      flush();
 
-    flush();
+      expect(expected).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+    }));
 
-    expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-  }));
+    it('getById success', fakeAsync(() => {
+      spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first' } }));
 
-  it('create success', fakeAsync(() => {
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '1', name: 'created' } }));
+      let expected: { item: FeatureStoreType };
+      service
+        .getById({ params: { item: { id: '1' } } })
+        .pipe(first())
+        .subscribe((value) => (expected = value));
 
-    let expected: { item: FeatureStoreType };
-    service.create({ params: { item: { name: 'test create' } }, first: true }).subscribe((value) => (expected = value));
+      flush();
 
-    flush();
+      expect(expected!).toEqual({ item: { id: '1', name: 'first' } });
+    }));
 
-    expect(expected!).toEqual({ item: { id: '1', name: 'created' } });
-  }));
+    it('getById is loaded', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {
+            [service.query({ params: { item: { id: '1' } } })]: {
+              ids: [selectId({ id: '1', name: 'first' })],
+            },
+          },
+          reloadSelectors,
+        },
+      });
 
-  it('create success (skip reset)', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
+      flush();
+
+      let expected: { item: FeatureStoreType };
+
+      service.getById({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({ item: { id: '1', name: 'first' } });
+    }));
+
+    it('getById error', fakeAsync(() => {
+      spyOn(http, 'getById').and.returnValue(
+        of({ item: { id: '1', name: 'first' } }).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
+
+      let expected: unknown;
+      let expectedError: unknown;
+
+      service.getById({ params: { item: { id: '1' } } }).subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
+
+      let expectedErrorFromError: unknown;
+      service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+
+      flush();
+
+      expect(expected).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+    }));
+
+    it('create success', fakeAsync(() => {
+      spyOn(http, 'create').and.returnValue(of({ item: { id: '1', name: 'created' } }));
+
+      let expected: { item: FeatureStoreType };
+      service
+        .create({ params: { item: { name: 'test create' } }, first: true })
+        .subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({ item: { id: '1', name: 'created' } });
+    }));
+
+    it('create success (skip reset)', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {
+            [service.query({ params: { item: { name: 'first' } } })]: { ids: [selectId({ id: '1', name: 'first' })] },
+          },
+          reloadSelectors,
+        },
+      });
+
+      spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'created' } }));
+
+      let expected: { item: FeatureStoreType };
+      service
+        .create({ params: { item: { name: 'created' } }, resetQueries: false, first: true })
+        .subscribe((value) => (expected = value));
+
+      flush();
+
+      let expectedState: State;
+      store
+        .select(key)
+        .pipe(first())
+        .subscribe((value) => (expectedState = value));
+
+      expect(expected!).toEqual({ item: { id: '2', name: 'created' } });
+
+      expect(expectedState!).toEqual({
+        ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'created' })],
         entities: {
           [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          [selectId({ id: '2', name: 'created' })]: { id: '2', name: 'created' },
         },
-        errors: {},
-        loadings: {},
+        errors: {
+          [service.query({ params: { item: { name: 'created' } } })]: undefined,
+        },
+        loadings: {
+          [service.query({ params: { item: { name: 'created' } } })]: false,
+        },
         queries: {
           [service.query({ params: { item: { name: 'first' } } })]: { ids: [selectId({ id: '1', name: 'first' })] },
+          [service.query({ params: { item: { name: 'created' } } })]: { ids: [selectId({ id: '2', name: 'created' })] },
         },
         reloadSelectors,
-      },
-    });
+      });
+    }));
 
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'created' } }));
+    it('create error', fakeAsync(() => {
+      spyOn(http, 'create').and.returnValue(
+        of({ item: { id: '1', name: 'first' } }).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
 
-    let expected: { item: FeatureStoreType };
-    service
-      .create({ params: { item: { name: 'created' } }, resetQueries: false, first: true })
-      .subscribe((value) => (expected = value));
+      let expected: unknown;
+      let expectedError: unknown;
 
-    flush();
+      service.create({ params: { item: { name: 'test update' } } }).subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
 
-    let expectedState: State;
-    store
-      .select(key)
-      .pipe(first())
-      .subscribe((value) => (expectedState = value));
+      flush();
 
-    expect(expected!).toEqual({ item: { id: '2', name: 'created' } });
+      let expectedErrorFromError: unknown;
+      service
+        .error({ params: { item: { name: 'test update' } } })
+        .subscribe((value) => (expectedErrorFromError = value));
 
-    expect(expectedState!).toEqual({
-      ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'created' })],
-      entities: {
-        [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        [selectId({ id: '2', name: 'created' })]: { id: '2', name: 'created' },
-      },
-      errors: {
-        [service.query({ params: { item: { name: 'created' } } })]: undefined,
-      },
-      loadings: {
-        [service.query({ params: { item: { name: 'created' } } })]: false,
-      },
-      queries: {
-        [service.query({ params: { item: { name: 'first' } } })]: { ids: [selectId({ id: '1', name: 'first' })] },
-        [service.query({ params: { item: { name: 'created' } } })]: { ids: [selectId({ id: '2', name: 'created' })] },
-      },
-      reloadSelectors,
-    });
-  }));
+      flush();
 
-  it('create error', fakeAsync(() => {
-    spyOn(http, 'create').and.returnValue(
-      of({ item: { id: '1', name: 'first' } }).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
-    );
+      expect(expected!).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+    }));
 
-    let expected: unknown;
-    let expectedError: unknown;
-
-    service.create({ params: { item: { name: 'test update' } } }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
-
-    flush();
-
-    let expectedErrorFromError: unknown;
-    service.error({ params: { item: { name: 'test update' } } }).subscribe((value) => (expectedErrorFromError = value));
-
-    flush();
-
-    expect(expected!).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-  }));
-
-  it('update success', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 18 },
+    it('update success', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 18 },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
+      });
 
-    spyOn(http, 'update').and.returnValue(of({ item: { id: '1', name: 'first', age: 30 } }));
+      spyOn(http, 'update').and.returnValue(of({ item: { id: '1', name: 'first', age: 30 } }));
 
-    let expected: { item: FeatureStoreType };
+      let expected: { item: FeatureStoreType };
 
-    service.update({ params: { item: { id: '1', name: 'first', age: 30 } } }).subscribe((value) => (expected = value));
+      service
+        .update({ params: { item: { id: '1', name: 'first', age: 30 } } })
+        .subscribe((value) => (expected = value));
 
-    flush();
+      flush();
 
-    expect(expected!).toEqual({ item: { id: '1', name: 'first', age: 30 } });
-  }));
+      expect(expected!).toEqual({ item: { id: '1', name: 'first', age: 30 } });
+    }));
 
-  it('update error', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+    it('update error', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
+      });
 
-    spyOn(http, 'update').and.returnValue(
-      of({ item: { id: '1', name: 'first' } }).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
-    );
+      spyOn(http, 'update').and.returnValue(
+        of({ item: { id: '1', name: 'first' } }).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
 
-    let expected: unknown;
-    let expectedError: unknown;
+      let expected: unknown;
+      let expectedError: unknown;
 
-    service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
+      service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
 
-    let expectedErrorFromError: unknown;
-    service
-      .error({ params: { item: { id: '1', name: 'test update' } } })
-      .subscribe((value) => (expectedErrorFromError = value));
+      let expectedErrorFromError: unknown;
+      service
+        .error({ params: { item: { id: '1', name: 'test update' } } })
+        .subscribe((value) => (expectedErrorFromError = value));
 
-    flush();
+      flush();
 
-    expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-  }));
+      expect(expected).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+    }));
 
-  it('update all success', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [
-          selectId({ id: '2', name: 'second' }),
-          selectId({ id: '1', name: 'third' }),
-          selectId({ id: '1', name: 'first' }),
-        ],
-        entities: {
-          [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second', age: 13 },
-          [selectId({ id: '1', name: 'third' })]: { id: '1', name: 'third', age: 13 },
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 12 },
+    it('update all success', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [
+            selectId({ id: '2', name: 'second' }),
+            selectId({ id: '1', name: 'third' }),
+            selectId({ id: '1', name: 'first' }),
+          ],
+          entities: {
+            [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second', age: 13 },
+            [selectId({ id: '1', name: 'third' })]: { id: '1', name: 'third', age: 13 },
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 12 },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
+      });
 
-    spyOn(http, 'updateAll').and.returnValue(
-      of({
-        items: [
-          { id: '1', name: 'first', age: 20 },
-          { id: '2', name: 'second', age: 24 },
-          { id: '1', name: 'third', age: 70 },
-        ],
-      }),
-    );
-
-    let expected: { items: FeatureStoreType[] };
-    service
-      .updateAll({
-        params: {
+      spyOn(http, 'updateAll').and.returnValue(
+        of({
           items: [
             { id: '1', name: 'first', age: 20 },
             { id: '2', name: 'second', age: 24 },
             { id: '1', name: 'third', age: 70 },
           ],
+        }),
+      );
+
+      let expected: { items: FeatureStoreType[] };
+      service
+        .updateAll({
+          params: {
+            items: [
+              { id: '1', name: 'first', age: 20 },
+              { id: '2', name: 'second', age: 24 },
+              { id: '1', name: 'third', age: 70 },
+            ],
+          },
+        })
+        .subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({
+        items: [
+          { id: '1', name: 'first', age: 20 },
+          { id: '2', name: 'second', age: 24 },
+          { id: '1', name: 'third', age: 70 },
+        ],
+      });
+    }));
+
+    it('update all error', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+            [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-      })
-      .subscribe((value) => (expected = value));
+      });
 
-    flush();
+      spyOn(http, 'updateAll').and.returnValues(
+        of({
+          items: [
+            { id: '1', name: 'first' },
+            { id: '2', name: 'second' },
+          ],
+        }).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
 
-    expect(expected!).toEqual({
-      items: [
-        { id: '1', name: 'first', age: 20 },
-        { id: '2', name: 'second', age: 24 },
-        { id: '1', name: 'third', age: 70 },
-      ],
-    });
-  }));
+      let expected: unknown;
+      let expectedError: unknown;
 
-  it('update all error', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
+      service
+        .updateAll({
+          params: {
+            items: [
+              { id: '1', name: 'first item test update all' },
+              { id: '2', name: 'second item test update all' },
+            ],
+          },
+        })
+        .subscribe({
+          next: () => (expected = 'next'),
+          error: (error: unknown) => (expectedError = error),
+        });
+
+      let expectedErrorFromError: unknown;
+      service
+        .error({
+          params: {
+            items: [
+              { id: '1', name: 'first item test update all' },
+              { id: '2', name: 'second item test update all' },
+            ],
+          },
+        })
+        .subscribe((value) => (expectedErrorFromError = value));
+
+      flush();
+
+      expect(expected).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+    }));
+
+    it('delete success', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
+        },
+      });
+
+      spyOn(http, 'delete').and.returnValue(of({ item: { id: selectId({ id: '1', name: 'first' }) } }));
+
+      let expected: boolean | undefined = true;
+      service
+        .delete({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })
+        .subscribe((value) => (expected = value));
+
+      flush();
+
+      let expectedState: State;
+      store
+        .select(key)
+        .pipe(first())
+        .subscribe((value) => {
+          return (expectedState = value);
+        });
+
+      expect(expected).toBeUndefined();
+      expect(expectedState!).toEqual({
+        ids: [],
+        entities: {},
+        errors: {
+          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
+        },
+        loadings: {
+          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: false,
+        },
+        queries: {
+          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: { ids: [] },
+        },
+        reloadSelectors,
+      });
+    }));
+
+    it('delete error', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
+        },
+      });
+
+      spyOn(http, 'delete').and.returnValue(
+        of(undefined).pipe(
+          map(() => {
+            throw new HttpErrorResponse({ error: 'error message' });
+          }),
+        ),
+      );
+
+      let expected: unknown;
+      let expectedError: unknown;
+
+      service.delete({ params: { item: { id: '1' } } }).subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
+
+      flush();
+
+      let expectedErrorFromError: unknown;
+      service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+
+      flush();
+
+      let expectedState: State;
+      store
+        .select(key)
+        .pipe(first())
+        .subscribe((value) => (expectedState = value));
+
+      expect(expected).toBeUndefined();
+      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError!).toEqual(expectedErrorFromError!);
+
+      expect(expectedState!).toEqual({
+        ids: [selectId({ id: '1', name: 'first' })],
+        entities: {
+          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+        },
+        errors: {
+          [service.query({ params: { item: { id: '1' } } })]: new HttpErrorResponse({ error: 'error message' }),
+        },
+        loadings: {
+          [service.query({ params: { item: { id: '1' } } })]: false,
+        },
+        queries: {},
+        reloadSelectors,
+      });
+    }));
+
+    it('reload identifier', fakeAsync(() => {
+      spyOn(http, 'getByQuery').and.returnValues(
+        of({
+          items: [{ id: '1', name: 'first' }],
+          config: { total: 1 },
+        }),
+        of({
+          items: [
+            { id: '1', name: 'first' },
+            { id: '2', name: 'second' },
+          ],
+          config: { total: 2 },
+        }),
+      );
+
+      let expected: { items: FeatureStoreType[]; total: number };
+      service.getByQuery({ params: { limit: 10 } }).subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({
+        items: [{ id: '1', name: 'first' }],
+        total: 1,
+      });
+
+      spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'second' } }));
+
+      service.create({ params: { item: { name: 'test create' }, age: 10 } }).subscribe();
+
+      flush();
+
+      let expectedState: StateBase<FeatureStoreType>;
+      store
+        .select(key)
+        .pipe(first())
+        .subscribe((value) => (expectedState = value));
+
+      expect(expectedState!).toEqual({
         ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
         entities: {
           [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
           [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second' },
         },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
-
-    spyOn(http, 'updateAll').and.returnValues(
-      of({
-        items: [
-          { id: '1', name: 'first' },
-          { id: '2', name: 'second' },
-        ],
-      }).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
-    );
-
-    let expected: unknown;
-    let expectedError: unknown;
-
-    service
-      .updateAll({
-        params: {
-          items: [
-            { id: '1', name: 'first item test update all' },
-            { id: '2', name: 'second item test update all' },
-          ],
+        errors: {
+          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: undefined,
+          [service.query({ params: { limit: 10 } })]: undefined,
         },
-      })
-      .subscribe({
-        next: () => (expected = 'next'),
-        error: (error: unknown) => (expectedError = error),
+        loadings: {
+          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: false,
+          [service.query({ params: { limit: 10 } })]: false,
+        },
+        queries: {
+          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: {
+            ids: [selectId({ id: '2', name: 'second' })],
+          },
+          [service.query({ params: { limit: 10 } })]: {
+            ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+            total: 2,
+          },
+        },
+        reloadSelectors: reloadSelectors + 2,
       });
+    }));
 
-    let expectedErrorFromError: unknown;
-    service
-      .error({
-        params: {
+    it('get full item after the list was loaded', fakeAsync(() => {
+      spyOn(http, 'getByQuery').and.returnValue(
+        of({
           items: [
-            { id: '1', name: 'first item test update all' },
-            { id: '2', name: 'second item test update all' },
+            { id: '1', name: 'first' },
+            { id: '2', name: 'second' },
+            { id: '3', name: 'third' },
           ],
-        },
-      })
-      .subscribe((value) => (expectedErrorFromError = value));
-
-    flush();
-
-    expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-  }));
-
-  it('delete success', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
-
-    spyOn(http, 'delete').and.returnValue(of({ item: { id: selectId({ id: '1', name: 'first' }) } }));
-
-    let expected: boolean | undefined = true;
-    service
-      .delete({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })
-      .subscribe((value) => (expected = value));
-
-    flush();
-
-    let expectedState: State;
-    store
-      .select(key)
-      .pipe(first())
-      .subscribe((value) => {
-        return (expectedState = value);
-      });
-
-    expect(expected).toBeUndefined();
-    expect(expectedState!).toEqual({
-      ids: [],
-      entities: {},
-      errors: {
-        [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
-      },
-      loadings: {
-        [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: false,
-      },
-      queries: {
-        [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: { ids: [] },
-      },
-      reloadSelectors,
-    });
-  }));
-
-  it('delete error', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
-
-    spyOn(http, 'delete').and.returnValue(
-      of(undefined).pipe(
-        map(() => {
-          throw new HttpErrorResponse({ error: 'error message' });
+          config: {
+            total: 3,
+          },
         }),
-      ),
-    );
+      );
 
-    let expected: unknown;
-    let expectedError: unknown;
+      let expected: { items: unknown[]; total: number };
+      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
 
-    service.delete({ params: { item: { id: '1' } } }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
+      flush();
 
-    flush();
-
-    let expectedErrorFromError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
-
-    flush();
-
-    let expectedState: State;
-    store
-      .select(key)
-      .pipe(first())
-      .subscribe((value) => (expectedState = value));
-
-    expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
-
-    expect(expectedState!).toEqual({
-      ids: [selectId({ id: '1', name: 'first' })],
-      entities: {
-        [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-      },
-      errors: {
-        [service.query({ params: { item: { id: '1' } } })]: new HttpErrorResponse({ error: 'error message' }),
-      },
-      loadings: {
-        [service.query({ params: { item: { id: '1' } } })]: false,
-      },
-      queries: {},
-      reloadSelectors,
-    });
-  }));
-
-  it('reload identifier', fakeAsync(() => {
-    spyOn(http, 'getByQuery').and.returnValues(
-      of({
-        items: [{ id: '1', name: 'first' }],
-        config: { total: 1 },
-      }),
-      of({
-        items: [
-          { id: '1', name: 'first' },
-          { id: '2', name: 'second' },
-        ],
-        config: { total: 2 },
-      }),
-    );
-
-    let expected: { items: FeatureStoreType[]; total: number };
-    service.getByQuery({ params: { limit: 10 } }).subscribe((value) => (expected = value));
-
-    flush();
-
-    expect(expected!).toEqual({
-      items: [{ id: '1', name: 'first' }],
-      total: 1,
-    });
-
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'second' } }));
-
-    service.create({ params: { item: { name: 'test create' }, age: 10 } }).subscribe();
-
-    flush();
-
-    let expectedState: StateBase<FeatureStoreType>;
-    store
-      .select(key)
-      .pipe(first())
-      .subscribe((value) => (expectedState = value));
-
-    expect(expectedState!).toEqual({
-      ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
-      entities: {
-        [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second' },
-      },
-      errors: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: undefined,
-        [service.query({ params: { limit: 10 } })]: undefined,
-      },
-      loadings: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: false,
-        [service.query({ params: { limit: 10 } })]: false,
-      },
-      queries: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: {
-          ids: [selectId({ id: '2', name: 'second' })],
-        },
-        [service.query({ params: { limit: 10 } })]: {
-          ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
-          total: 2,
-        },
-      },
-      reloadSelectors: reloadSelectors + 2,
-    });
-  }));
-
-  it('get full item after the list was loaded', fakeAsync(() => {
-    spyOn(http, 'getByQuery').and.returnValue(
-      of({
+      expect(expected!).toEqual({
         items: [
           { id: '1', name: 'first' },
           { id: '2', name: 'second' },
           { id: '3', name: 'third' },
         ],
-        config: {
-          total: 3,
-        },
-      }),
-    );
+        total: 3,
+      });
 
-    let expected: { items: unknown[]; total: number };
-    service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+      spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first', age: 18 } }));
 
-    flush();
+      type Full = FeatureStoreType & { age: number };
+      let expectedFull: { item: Full };
 
-    expect(expected!).toEqual({
-      items: [
-        { id: '1', name: 'first' },
-        { id: '2', name: 'second' },
-        { id: '3', name: 'third' },
-      ],
-      total: 3,
-    });
+      service
+        .getById({ params: { item: { id: '1' } } })
+        .pipe(first())
+        .subscribe((value) => (expectedFull = value as { item: Full }));
 
-    spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first', age: 18 } }));
+      flush();
 
-    type Full = FeatureStoreType & { age: number };
-    let expectedFull: { item: Full };
+      expect(expectedFull!).toEqual({ item: { id: '1', name: 'first', age: 18 } });
+    }));
 
-    service
-      .getById({ params: { item: { id: '1' } } })
-      .pipe(first())
-      .subscribe((value) => (expectedFull = value as { item: Full }));
-
-    flush();
-
-    expect(expectedFull!).toEqual({ item: { id: '1', name: 'first', age: 18 } });
-  }));
-
-  it('call before', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {
-          [service.query({ params: { id: '1' } })]: {
-            ids: [selectId({ id: '1', name: 'first' })],
-            total: 1,
+    it('call before', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
           },
+          errors: {},
+          loadings: {},
+          queries: {
+            [service.query({ params: { id: '1' } })]: {
+              ids: [selectId({ id: '1', name: 'first' })],
+              total: 1,
+            },
+          },
+          reloadSelectors,
         },
-        reloadSelectors,
-      },
-    });
+      });
 
-    spyOn(http, 'getByQuery').and.returnValue(
-      of({
+      spyOn(http, 'getByQuery').and.returnValue(
+        of({
+          items: [
+            { id: '2', name: 'User' },
+            { id: '3', name: 'Name' },
+          ],
+          config: {
+            total: 2,
+          },
+          before: {
+            name: 'Cristian',
+            age: 18,
+          },
+        }),
+      );
+
+      let expected: { items: unknown[]; total: number };
+      let user: { name: string; age: number };
+
+      service
+        .getByQuery({
+          params: {},
+          beforeSuccess: (body) => {
+            user = body;
+
+            return of(user);
+          },
+        })
+        .subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({
         items: [
           { id: '2', name: 'User' },
           { id: '3', name: 'Name' },
         ],
-        config: {
-          total: 2,
-        },
-        before: {
-          name: 'Cristian',
-          age: 18,
-        },
-      }),
-    );
+        total: 2,
+      });
 
-    let expected: { items: unknown[]; total: number };
-    let user: { name: string; age: number };
+      expect(user!).toEqual({ name: 'Cristian', age: 18 });
+    }));
 
-    service
-      .getByQuery({
-        params: {},
-        beforeSuccess: (body) => {
-          user = body;
-
-          return of(user);
-        },
-      })
-      .subscribe((value) => (expected = value));
-
-    flush();
-
-    expect(expected!).toEqual({
-      items: [
-        { id: '2', name: 'User' },
-        { id: '3', name: 'Name' },
-      ],
-      total: 2,
-    });
-
-    expect(user!).toEqual({ name: 'Cristian', age: 18 });
-  }));
-
-  it('set', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
-
-    let expected: { items: FeatureStoreType[] };
-    service
-      .set({
-        params: {
-          items: [
-            { id: '1', name: 'test update' },
-            { id: '2', name: 'test update' },
-          ],
-        },
-      })
-      .subscribe((value) => (expected = value));
-
-    flush();
-
-    expect(expected!).toEqual({
-      items: [
-        { id: '1', name: 'test update' },
-        { id: '2', name: 'test update' },
-      ],
-    });
-  }));
-
-  it('by id', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {},
-        reloadSelectors,
-      },
-    });
-
-    let expected: FeatureStoreType | undefined;
-
-    service.byId(selectId({ id: '1', name: 'first' })).subscribe((value) => (expected = value));
-
-    flush();
-
-    expect(expected!).toEqual({ id: '1', name: 'first' });
-  }));
-
-  it('by query', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-          [selectId({ id: '1', name: 'second' })]: { id: '2', name: 'second' },
-        },
-        errors: {},
-        loadings: {},
-        queries: {
-          [service.query({ params: { limit: 100 } })]: {
-            ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '1', name: 'second' })],
+    it('set', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
           },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-        reloadSelectors,
-      },
-    });
+      });
 
-    let expected: { items: FeatureStoreType[] };
+      let expected: { items: FeatureStoreType[] };
+      service
+        .set({
+          params: {
+            items: [
+              { id: '1', name: 'test update' },
+              { id: '2', name: 'test update' },
+            ],
+          },
+        })
+        .subscribe((value) => (expected = value));
 
-    service.byQuery({ limit: 100 }).subscribe((value) => (expected = value));
+      flush();
 
-    flush();
+      expect(expected!).toEqual({
+        items: [
+          { id: '1', name: 'test update' },
+          { id: '2', name: 'test update' },
+        ],
+      });
+    }));
 
-    expect(expected!).toEqual({
-      items: [
-        { id: '1', name: 'first' },
-        { id: '2', name: 'second' },
-      ],
-    });
-  }));
-
-  it('loading', fakeAsync(() => {
-    store.dispatch({
-      type: 'set',
-      payload: {
-        ids: [selectId({ id: '1', name: 'first' })],
-        entities: {
-          [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+    it('by id', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {},
+          reloadSelectors,
         },
-        errors: {},
-        loadings: {
-          [service.query({ params: { limit: 100 } })]: true,
+      });
+
+      let expected: FeatureStoreType | undefined;
+
+      service.byId({ id: '1', name: 'first' }).subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toEqual({ id: '1', name: 'first' });
+    }));
+
+    it('by query', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+            [selectId({ id: '1', name: 'second' })]: { id: '2', name: 'second' },
+          },
+          errors: {},
+          loadings: {},
+          queries: {
+            [service.query({ params: { limit: 100 } })]: {
+              ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '1', name: 'second' })],
+            },
+          },
+          reloadSelectors,
         },
-        queries: {},
-        reloadSelectors,
-      },
-    });
+      });
 
-    let expected: boolean | undefined;
+      let expected: { items: FeatureStoreType[] };
 
-    service.loading({ limit: 100 }).subscribe((value) => (expected = value));
+      service.byQuery({ limit: 100 }).subscribe((value) => (expected = value));
 
-    flush();
+      flush();
 
-    expect(expected!).toBeTrue();
-  }));
+      expect(expected!).toEqual({
+        items: [
+          { id: '1', name: 'first' },
+          { id: '2', name: 'second' },
+        ],
+      });
+    }));
+
+    it('loading', fakeAsync(() => {
+      store.dispatch({
+        type: 'set',
+        payload: {
+          ids: [selectId({ id: '1', name: 'first' })],
+          entities: {
+            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
+          },
+          errors: {},
+          loadings: {
+            [service.query({ params: { limit: 100 } })]: true,
+          },
+          queries: {},
+          reloadSelectors,
+        },
+      });
+
+      let expected: boolean | undefined;
+
+      service.loading({ limit: 100 }).subscribe((value) => (expected = value));
+
+      flush();
+
+      expect(expected!).toBeTrue();
+    }));
+  });
 });

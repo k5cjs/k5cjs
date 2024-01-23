@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EntityAdapter, EntityState } from '@ngrx/entity';
+import { EntityAdapter, EntityState, IdSelector } from '@ngrx/entity';
 import {
   MemoizedSelector,
   createFeatureSelector,
@@ -24,18 +24,18 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
 
   entities: MemoizedSelector<
     object,
-    Record<T['id'], T | undefined>,
-    (s1: StateBase<T>) => Record<T['id'], T | undefined>
+    Record<ReturnType<IdSelector<T>>, T | undefined>,
+    (s1: StateBase<T>) => Record<ReturnType<IdSelector<T>>, T | undefined>
   >;
 
   entity: (
-    id: T['id'],
-  ) => MemoizedSelector<object, T | undefined, (s1: Record<T['id'], T | undefined>) => T | undefined>;
+    item: Partial<T>,
+  ) => MemoizedSelector<object, T | undefined, (s1: Record<ReturnType<IdSelector<T>>, T | undefined>) => T | undefined>;
 
   queries: MemoizedSelector<
     object,
-    Record<PropertyKey, { ids: T['id'][] & object } | undefined>,
-    (s1: StateBase<T>) => Record<PropertyKey, { ids: T['id'][] & object } | undefined>
+    Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>,
+    (s1: StateBase<T>) => Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>
   >;
 
   errors: MemoizedSelector<
@@ -70,8 +70,10 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     query: string,
   ) => MemoizedSelector<
     object,
-    { ids: T['id'][] & object } | undefined,
-    (s1: Record<PropertyKey, { ids: T['id'][] & object } | undefined>) => { ids: T['id'][] & object } | undefined
+    { ids: ReturnType<IdSelector<T>>[] & object } | undefined,
+    (
+      s1: Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>,
+    ) => { ids: ReturnType<IdSelector<T>>[] & object } | undefined
   >;
 
   queryAll: (query: string) => MemoizedSelector<
@@ -79,8 +81,8 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     { items: T[] } | undefined,
     (
       //
-      s1: { ids: T['id'][] & object },
-      s2: Record<T['id'], T | undefined>,
+      s1: { ids: ReturnType<IdSelector<T>>[] & object },
+      s2: Record<ReturnType<IdSelector<T>>, T | undefined>,
     ) => { items: T[] } | undefined
   >;
 
@@ -89,8 +91,8 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     { item: T } | undefined,
     (
       //
-      s1: { ids: T['id'][] & object },
-      s2: Record<T['id'], T | undefined>,
+      s1: { ids: ReturnType<IdSelector<T>>[] & object },
+      s2: Record<ReturnType<IdSelector<T>>, T | undefined>,
     ) => { item: T } | undefined
   >;
 
@@ -102,9 +104,10 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     this.all = createSelector(stateSelector, selectAll);
     this.entities = createSelector(
       stateSelector,
-      selectEntities as (state: EntityState<T>) => Record<T['id'], T | undefined>,
+      selectEntities as (state: EntityState<T>) => Record<ReturnType<IdSelector<T>>, T | undefined>,
     );
-    this.entity = (id: T['id']) => createSelector(this.entities, (entities) => entities?.[id]);
+    this.entity = (item: Partial<T>) =>
+      createSelector(this.entities, (entities) => entities?.[adapter.selectId(item as T)]);
     this.queries = createSelector(stateSelector, (state) => state.queries);
     this.errors = createSelector(stateSelector, (state) => state.errors);
     this.loadings = createSelector(stateSelector, (state) => state.loadings);
@@ -114,10 +117,7 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
 
     this.query = (queryId: string) => createSelector(this.queries, (queries) => queries[queryId]);
 
-    const entitiesFirstMemoized = createSelectorFirstMemoized(
-      stateSelector,
-      (state) => state.entities as Record<T['id'], T | undefined>,
-    );
+    const entitiesFirstMemoized = createSelectorFirstMemoized(stateSelector, (state) => state.entities);
 
     this.queryAll = (queryId: string) =>
       createSelector(this.query(queryId), entitiesFirstMemoized, (query, entities) => {
@@ -127,7 +127,7 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
 
         return {
           ...rest,
-          items: ids.map((id) => entities[id]).filter((item): item is T => !!item),
+          items: ids.map((selectId) => entities[selectId]).filter((item): item is T => !!item),
         };
       });
 
@@ -136,13 +136,13 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
         if (!query) return undefined;
 
         const {
-          ids: [id],
+          ids: [selectId],
           ...rest
         } = query;
 
         return {
           ...rest,
-          item: entities[id]!,
+          item: entities[selectId]!,
         };
       });
   }

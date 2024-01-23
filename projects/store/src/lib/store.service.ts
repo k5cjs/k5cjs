@@ -14,6 +14,7 @@ import {
 
 import { AtLeastDeep, isNotUndefined } from '@k5cjs/types';
 import { Actions, ofType } from '@ngrx/effects';
+import { IdSelector } from '@ngrx/entity';
 import { Action, Store } from '@ngrx/store';
 import { sha1 } from 'object-hash';
 
@@ -24,8 +25,8 @@ import { ActionCreatorType, Options, Params } from './store.type';
 export class StoreServiceBase<T extends { id: PropertyKey }> {
   all: Observable<T[]>;
   loadings: Observable<Record<PropertyKey, boolean | undefined>>;
-  entities: Observable<Record<T['id'], T | undefined>>;
-  queries: Observable<Record<PropertyKey, { ids: T['id'][] } | undefined>>;
+  entities: Observable<Record<ReturnType<IdSelector<T>>, T | undefined>>;
+  queries: Observable<Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] } | undefined>>;
   errors: Observable<Record<PropertyKey, HttpErrorResponse | undefined>>;
 
   protected _store = inject(Store<T>);
@@ -191,8 +192,18 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     return this._store.select(this._selectors.loading(query));
   }
 
-  byId(id: T['id']): Observable<T | undefined> {
-    return this._store.select(this._selectors.entity(id));
+  byId(item: Partial<T>): Observable<T | undefined>;
+  /**
+   * @deprecated use with item
+   */
+  byId(id: T['id']): Observable<T | undefined>;
+  byId(item: T['id'] | Partial<T>): Observable<T | undefined> {
+    /**
+     * remove this in next major version
+     */
+    const options: Partial<T> = this._isPartialT(item) ? item : ({ id: item } as Partial<T>);
+
+    return this._store.select(this._selectors.entity(options));
   }
 
   error(params: Params): Observable<HttpErrorResponse | undefined> {
@@ -245,5 +256,9 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
 
   protected _query(param: Record<PropertyKey, unknown>): string {
     return sha1(param);
+  }
+
+  private _isPartialT(item: unknown): item is Partial<T> {
+    return item instanceof Object;
   }
 }
