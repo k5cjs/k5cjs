@@ -104,8 +104,8 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     );
   }
 
-  set(options: Options<{ items: T[] } & Params>): Observable<{ items: T[] }> {
-    const query = this._query({ params: options.params });
+  set(options: Options<{ items: T[] } & { query?: Params } & Params>): Observable<{ items: T[] }> {
+    const query = this._query({ params: options.params.query || options.params });
 
     return this._dispatch(
       this._actions.set({

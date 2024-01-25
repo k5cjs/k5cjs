@@ -890,6 +890,87 @@ describe('Store', () => {
     });
   }));
 
+  it('set with query', fakeAsync(() => {
+    store.dispatch({
+      type: 'set',
+      payload: {
+        ids: ['1'],
+        entities: {
+          '1': { id: '1', name: 'first' },
+        },
+        errors: {},
+        loadings: {},
+        queries: {},
+        reloadSelectors,
+      },
+    });
+
+    let expected: { items: FeatureStoreType[] };
+    service
+      .set({
+        params: {
+          items: [
+            { id: '1', name: 'test update' },
+            { id: '2', name: 'test update' },
+          ],
+          query: { siteId: 10 },
+        },
+      })
+      .subscribe((value) => (expected = value));
+
+    flush();
+
+    let expectedQuery: { items: FeatureStoreType[] };
+    service.byQuery({ siteId: 10 }).subscribe((value) => (expectedQuery = value));
+
+    expect(expected!).toEqual({
+      items: [
+        { id: '1', name: 'test update' },
+        { id: '2', name: 'test update' },
+      ],
+    });
+
+    expect(expectedQuery!).toEqual({
+      items: [
+        { id: '1', name: 'test update' },
+        { id: '2', name: 'test update' },
+      ],
+    });
+
+    let expectedExactQuery: { items: FeatureStoreType[] };
+    service
+      .set({
+        params: {
+          items: [
+            { id: '3', name: 'test update' },
+            { id: '4', name: 'test update' },
+          ],
+          query: { siteId: 10 },
+        },
+        reloadSelectors: true,
+      })
+      .subscribe((value) => (expectedExactQuery = value));
+
+    flush();
+
+    let expectedQueryExactQuery: { items: FeatureStoreType[] };
+    service.byQuery({ siteId: 10 }).subscribe((value) => (expectedQueryExactQuery = value));
+
+    expect(expectedExactQuery!).toEqual({
+      items: [
+        { id: '3', name: 'test update' },
+        { id: '4', name: 'test update' },
+      ],
+    });
+
+    expect(expectedQueryExactQuery!).toEqual({
+      items: [
+        { id: '3', name: 'test update' },
+        { id: '4', name: 'test update' },
+      ],
+    });
+  }));
+
   it('by id', fakeAsync(() => {
     store.dispatch({
       type: 'set',
