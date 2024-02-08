@@ -15,3 +15,12 @@
     <span (click)="click(3)">Item 3</span>
   </div>
 </kc-dropdown>
+
+<kc-dropdown (dialogClosed)="dialogClosed()">
+  <button icon>Options (dialogClosed)</button>
+  <div class="modal">
+    <span (click)="click(1)">Item 1</span>
+    <span (click)="click(2)">Item 2</span>
+    <span (click)="click(3)">Item 3</span>
+  </div>
+</kc-dropdown>

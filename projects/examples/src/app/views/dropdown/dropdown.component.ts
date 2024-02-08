@@ -10,4 +10,8 @@ export class DropdownComponent {
   click(v: number): void {
     alert(v);
   }
+
+  dialogClosed(): void {
+    alert('dialogClosed');
+  }
 }

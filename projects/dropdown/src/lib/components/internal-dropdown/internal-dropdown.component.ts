@@ -5,7 +5,9 @@ import {
   Component,
   ContentChild,
   ElementRef,
+  EventEmitter,
   OnDestroy,
+  Output,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -31,6 +33,8 @@ export class KcInternalDropdownComponent implements OnDestroy {
     disposeOnNavigation: true,
     backdropClass: 'cdk-overlay-transparent-backdrop',
   };
+
+  @Output() dialogClosed = new EventEmitter<void>();
 
   constructor(private _overlay: Overlay) {}
 
@@ -66,6 +70,8 @@ export class KcInternalDropdownComponent implements OnDestroy {
   }
 
   private _closeDialog(): void {
+    this.dialogClosed.emit();
+
     this._dialogOverlayRef?.dispose();
     this._dialogOverlayRef = undefined;
   }
