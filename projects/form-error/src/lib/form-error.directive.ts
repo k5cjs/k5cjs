@@ -9,7 +9,6 @@ interface Context<T = unknown> {
 }
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[kcError]',
   standalone: true,
 })

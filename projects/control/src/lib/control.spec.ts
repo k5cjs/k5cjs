@@ -15,18 +15,18 @@ import { take } from 'rxjs';
 import { KcControl, kcControlProviders } from './control';
 
 @Directive({
-  selector: '[libControl]',
+  selector: '[kcControl]',
   providers: kcControlProviders(DumpyDirective),
 })
 class DumpyDirective extends KcControl {}
 
 @Component({
   template: `
-    <input #dir1 [formControl]="control" libControl />
-    <input #dir2 libControl />
+    <input #dir1 [formControl]="control" kcControl />
+    <input #dir2 kcControl />
 
     <form [formGroup]="form" (ngSubmit)="ngSubmit()">
-      <input #dir3 formControlName="control" libControl />
+      <input #dir3 formControlName="control" kcControl />
 
       <button #submit type="submit">Submit</button>
     </form>

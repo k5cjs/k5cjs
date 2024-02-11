@@ -15,7 +15,7 @@ import { provideValueAccessor } from './provide-value-accessor';
 import { WrappedFormControl } from './wrapped-form-control';
 
 @Component({
-  selector: 'lib-input',
+  selector: 'kc-input',
   template: `
     <input [(ngModel)]="value" />
     <span>{{ value }}</span>
@@ -47,9 +47,9 @@ class InputComponent implements ControlValueAccessor {
 }
 
 @Component({
-  selector: 'lib-child',
+  selector: 'kc-child',
   template: `
-    <lib-input></lib-input>
+    <kc-input></kc-input>
   `,
   providers: [provideValueAccessor(ChildComponent)],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,10 +57,10 @@ class InputComponent implements ControlValueAccessor {
 class ChildComponent extends WrappedFormControl {}
 
 @Component({
-  selector: 'lib-parent',
+  selector: 'kc-parent',
   template: `
     <form [formGroup]="form">
-      <lib-child formControlName="input"></lib-child>
+      <kc-child formControlName="input"></kc-child>
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -76,7 +76,7 @@ class ParentComponent {
 }
 
 @Component({
-  selector: 'lib-error-child',
+  selector: 'kc-error-child',
   template: `
     <span></span>
   `,
@@ -86,10 +86,10 @@ class ParentComponent {
 class ErrorChildComponent extends WrappedFormControl {}
 
 @Component({
-  selector: 'lib-error-parent',
+  selector: 'kc-error-parent',
   template: `
     <form [formGroup]="form">
-      <lib-error-child formControlName="input"></lib-error-child>
+      <kc-error-child formControlName="input"></kc-error-child>
     </form>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

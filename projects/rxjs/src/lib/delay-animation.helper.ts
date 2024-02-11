@@ -1,5 +1,5 @@
 import {
-  MonoTypeOperatorFunction,
+  type MonoTypeOperatorFunction,
   Observable,
   debounce,
   delayWhen,

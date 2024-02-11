@@ -7,7 +7,7 @@ import { ControlValueAccessor, FormsModule, ReactiveFormsModule } from '@angular
 import { provideValueAccessor } from './provide-value-accessor';
 
 @Component({
-  selector: 'lib-input',
+  selector: 'kc-input',
   template: `
     <input [(ngModel)]="value" />
     <span>{{ value }}</span>

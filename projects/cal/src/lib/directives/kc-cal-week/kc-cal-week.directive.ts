@@ -4,7 +4,7 @@ export interface CalWeekDef<T> {
   template: TemplateRef<T>;
 }
 
-@Directive({ selector: '[kc-cal-week]' })
+@Directive({ selector: '[kcCalWeek], [kc-cal-week]' })
 export class KcCalWeekDirective<T = unknown> implements CalWeekDef<T> {
   constructor(public template: TemplateRef<T>) {}
 }

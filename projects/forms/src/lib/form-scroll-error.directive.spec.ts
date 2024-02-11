@@ -25,7 +25,7 @@ import { KcScrollError } from './form-scroll-error.directive';
           <span *kcError="'email'">Please enter a valid email address</span>
         </div>
       </kc-form-field>
-      <button type="submit"></button>
+      <button type="submit">Submit</button>
     </form>
   `,
 })

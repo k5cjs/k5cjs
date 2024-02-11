@@ -1,26 +1,26 @@
 <kc-dropdown>
   <button icon>Options</button>
   <div class="modal">
-    <span (click)="click(1)">Item 1</span>
-    <span (click)="click(2)">Item 2</span>
-    <span (click)="click(3)">Item 3</span>
+    <button (click)="click(1)">Item 1</button>
+    <button (click)="click(2)">Item 2</button>
+    <button (click)="click(3)">Item 3</button>
   </div>
 </kc-dropdown>
 
 <kc-dropdown preventClose>
   <button icon>Options (preventClose=false)</button>
   <div class="modal">
-    <span (click)="click(1)">Item 1</span>
-    <span (click)="click(2)">Item 2</span>
-    <span (click)="click(3)">Item 3</span>
+    <button (click)="click(1)">Item 1</button>
+    <button (click)="click(2)">Item 2</button>
+    <button (click)="click(3)">Item 3</button>
   </div>
 </kc-dropdown>
 
 <kc-dropdown (dialogClosed)="dialogClosed()">
   <button icon>Options (dialogClosed)</button>
   <div class="modal">
-    <span (click)="click(1)">Item 1</span>
-    <span (click)="click(2)">Item 2</span>
-    <span (click)="click(3)">Item 3</span>
+    <button (click)="click(1)">Item 1</button>
+    <button (click)="click(2)">Item 2</button>
+    <button (click)="click(3)">Item 3</button>
   </div>
 </kc-dropdown>

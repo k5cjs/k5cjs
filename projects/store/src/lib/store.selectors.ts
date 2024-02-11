@@ -15,6 +15,7 @@ export const isEqualCheck = <T extends { id: PropertyKey }>(a: StateBase<T>, b: 
   return a.reloadSelectors === b.reloadSelectors;
 };
 
+// eslint-disable-next-line @ngrx/prefix-selectors-with-select
 export const createSelectorFirstMemoized = createSelectorFactory((memoize) =>
   defaultMemoize(memoize, isEqualCheck),
 ) as typeof createSelector;
@@ -97,27 +98,27 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
   >;
 
   constructor(key: string, adapter: EntityAdapter<T>) {
-    const stateSelector = createFeatureSelector<StateBase<T>>(key);
+    const selectState = createFeatureSelector<StateBase<T>>(key);
 
     const { selectEntities, selectAll } = adapter.getSelectors();
 
-    this.all = createSelector(stateSelector, selectAll);
+    this.all = createSelector(selectState, selectAll);
     this.entities = createSelector(
-      stateSelector,
+      selectState,
       selectEntities as (state: EntityState<T>) => Record<ReturnType<IdSelector<T>>, T | undefined>,
     );
     this.entity = (item: Partial<T>) =>
       createSelector(this.entities, (entities) => entities?.[adapter.selectId(item as T)]);
-    this.queries = createSelector(stateSelector, (state) => state.queries);
-    this.errors = createSelector(stateSelector, (state) => state.errors);
-    this.loadings = createSelector(stateSelector, (state) => state.loadings);
+    this.queries = createSelector(selectState, (state) => state.queries);
+    this.errors = createSelector(selectState, (state) => state.errors);
+    this.loadings = createSelector(selectState, (state) => state.loadings);
 
     this.error = (queryId: string) => createSelector(this.errors, (queries) => queries[queryId]);
     this.loading = (queryId: string) => createSelector(this.loadings, (queries) => queries[queryId]);
 
     this.query = (queryId: string) => createSelector(this.queries, (queries) => queries[queryId]);
 
-    const entitiesFirstMemoized = createSelectorFirstMemoized(stateSelector, (state) => state.entities);
+    const entitiesFirstMemoized = createSelectorFirstMemoized(selectState, (state) => state.entities);
 
     this.queryAll = (queryId: string) =>
       createSelector(this.query(queryId), entitiesFirstMemoized, (query, entities) => {

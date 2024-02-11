@@ -9,7 +9,7 @@ import { K5cFakeProgressBarService } from './fake-progress-bar.service';
 @Component({
   standalone: true,
   imports: [NgIf, AsyncPipe],
-  selector: 'k5c-fake-progress-bar',
+  selector: 'kc-fake-progress-bar, k5c-fake-progress-bar',
   templateUrl: './fake-progress-bar.component.html',
   styleUrls: ['./fake-progress-bar.component.scss'],
   animations: [toggleO(300)],

@@ -1,4 +1,4 @@
-import { MonoTypeOperatorFunction, concatMap, delay, of } from 'rxjs';
+import { type MonoTypeOperatorFunction, concatMap, delay, of } from 'rxjs';
 
 export const delayFirst = <T>(due: number | Date = 300): MonoTypeOperatorFunction<T> => {
   return concatMap((value, index) => {

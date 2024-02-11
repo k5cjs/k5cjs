@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 
-import { MountConfig } from 'cypress/angular';
+import { type MountConfig } from 'cypress/angular';
 
 import { KcInput } from './input';
 
