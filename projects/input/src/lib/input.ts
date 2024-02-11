@@ -5,7 +5,7 @@ import { KcControl, kcControlProviders } from '@k5cjs/control';
 import { InputType } from './input.type';
 
 @Directive({
-  selector: 'input[kc-input]',
+  selector: 'input[kcInput], input[kc-input]',
   standalone: true,
   providers: kcControlProviders(KcInput),
 })

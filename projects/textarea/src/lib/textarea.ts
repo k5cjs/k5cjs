@@ -3,7 +3,7 @@ import { AfterViewInit, Directive, DoCheck, HostListener, OnDestroy, OnInit } fr
 import { KcControl, kcControlProviders } from '@k5cjs/control';
 
 @Directive({
-  selector: 'textarea[kc-textarea]',
+  selector: 'textarea[kcTextarea], textarea[kc-textarea]',
   providers: kcControlProviders(KcTextarea),
   standalone: true,
 })

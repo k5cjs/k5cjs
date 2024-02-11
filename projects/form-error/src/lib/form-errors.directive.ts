@@ -16,7 +16,6 @@ import { KC_FORM_FIELD } from '@k5cjs/form-field';
 import { KcError } from './form-error.directive';
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: '[kcErrors]',
   standalone: true,
   exportAs: 'kcErrors',

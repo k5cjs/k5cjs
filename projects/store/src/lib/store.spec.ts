@@ -1,3 +1,4 @@
+/* eslint-disable @ngrx/good-action-hygiene */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 import { TestBed, fakeAsync, flush } from '@angular/core/testing';
@@ -52,9 +53,9 @@ function reducer(selectId: IdSelector<FeatureStoreType> | null) {
 
       ...reducerBase(adapter(selectId), actions),
 
-      on(createAction('set', props<{ payload: State }>()), (_, { payload }) => payload),
+      on(createAction('set', props<{ payload: State }>()), (_, { payload }): StateBase<FeatureStoreType> => payload),
 
-      on(createAction('reset'), (state) => {
+      on(createAction('reset'), (state): StateBase<FeatureStoreType> => {
         reloadSelectors += 10;
 
         return { ...state, reloadSelectors };
@@ -141,6 +142,7 @@ class StoreService extends StoreServiceBase<FeatureStoreType> {
 describe('Store', () => {
   let service: StoreService;
   let http: HttpService;
+  // eslint-disable-next-line @ngrx/no-typed-global-store
   let store: Store<{ [key]: StateBase<FeatureStoreType> }>;
 
   beforeEach(() => {

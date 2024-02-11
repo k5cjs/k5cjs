@@ -11,8 +11,7 @@ import { KcToggleOptions } from '../types';
 import { KcToggleItemDirective } from './toggle-item.directive';
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
-  selector: '[toggleGroup]',
+  selector: '[kcToggleGroup], [toggleGroup]',
   exportAs: 'toggleGroup',
   providers: [provideValueAccessor(KcToggleGroupDirective)],
 })

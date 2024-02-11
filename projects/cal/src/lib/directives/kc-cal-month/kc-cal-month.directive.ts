@@ -4,7 +4,7 @@ export interface CalMonthDef<T> {
   template: TemplateRef<T>;
 }
 
-@Directive({ selector: '[kc-cal-month]' })
+@Directive({ selector: '[kcCalMonth], [kc-cal-month]' })
 export class KcCalMonthDirective<T = unknown> implements CalMonthDef<T> {
   constructor(public template: TemplateRef<T>) {}
 }

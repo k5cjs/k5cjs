@@ -1,3 +1,4 @@
+/* eslint-disable @ngrx/prefer-inline-action-props */
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AtLeastDeep } from '@k5cjs/types';

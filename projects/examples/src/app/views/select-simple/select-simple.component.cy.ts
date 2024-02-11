@@ -1,4 +1,4 @@
-import { MountConfig } from 'cypress/angular';
+import { type MountConfig } from 'cypress/angular';
 
 import { SelectSimpleComponent } from './select-simple.component';
 import { SelectSimpleModule } from './select-simple.module';

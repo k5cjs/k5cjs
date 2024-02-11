@@ -3,8 +3,7 @@ import { Directive, ElementRef, Input } from '@angular/core';
 import { FormGroupDirective } from '@angular/forms';
 
 @Directive({
-  // eslint-disable-next-line @angular-eslint/directive-selector
-  selector: '[scrollToError]',
+  selector: '[kcScrollToError], [scrollToError]',
   standalone: true,
 })
 // eslint-disable-next-line @angular-eslint/directive-class-suffix

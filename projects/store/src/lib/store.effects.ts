@@ -1,6 +1,7 @@
+/* eslint-disable @ngrx/no-multiple-actions-in-effects */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { ObservableInput, catchError, concatMap, first, map, of, tap } from 'rxjs';
+import { type ObservableInput, catchError, concatMap, first, map, of, tap } from 'rxjs';
 
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -18,6 +19,7 @@ const createSuccesActionBody = <T extends Params = Params<string | number | bool
 @Injectable()
 export class EffectsBase<T extends { id: PropertyKey }> {
   protected _actions$ = inject(Actions);
+  // eslint-disable-next-line @ngrx/use-consistent-global-store-name
   protected _store = inject(Store);
 
   protected identifiers: Record<PropertyKey, Options & Action> = {};
