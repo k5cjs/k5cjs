@@ -94,6 +94,7 @@ export abstract class WrappedFormControl implements OnInit, DoCheck, ControlValu
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.valueAccessor.setDisabledState?.(isDisabled);
+    // TODO: setDisabledState is called before this.valueAccessor to be available
+    this.valueAccessor?.setDisabledState?.(isDisabled);
   }
 }
