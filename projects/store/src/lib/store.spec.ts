@@ -1,8 +1,8 @@
 /* eslint-disable @ngrx/good-action-hygiene */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
-import { TestBed, fakeAsync, flush } from '@angular/core/testing';
-import { Observable, first, map, of } from 'rxjs';
+import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
+import { Observable, catchError, delay, first, map, of, throwError, zip } from 'rxjs';
 
 import { AtLeastDeep } from '@k5cjs/types';
 import { EffectsModule } from '@ngrx/effects';
@@ -75,9 +75,17 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
     return of({ items: [], total: 0 });
   }
 
+  test = 0;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   getById(_options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
-    throw new Error('Method not implemented.');
+    if (this.test) {
+      return of({ item: { id: '1', name: 'first' } });
+    }
+
+    this.test += 1;
+
+    return throwError(() => 'errror');
   }
 
   delete(
@@ -1062,6 +1070,107 @@ describe('Store', () => {
     flush();
 
     expect(expected).toEqual(undefined);
+  }));
+
+  it('getById error multiple requests', fakeAsync(() => {
+    spyOn(http, 'getById').and.returnValues(
+      of({ item: { id: '1', name: 'first' } }),
+      throwError(() => new HttpErrorResponse({ error: 'Error message' })),
+      of({ item: { id: '3', name: 'third' } }),
+    );
+
+    let expected1: unknown;
+    let expected2: unknown;
+    let expected3: unknown;
+
+    zip(
+      service.getById({ params: { item: { id: '1' } } }),
+      service
+        .getById({ params: { item: { id: '2' } } })
+        .pipe(catchError(({ error }: { error: string }) => of(new HttpErrorResponse({ error })))),
+      service.getById({ params: { item: { id: '3' } } }),
+    ).subscribe(([result1, result2, result3]) => {
+      expected1 = result1;
+      expected2 = result2;
+      expected3 = result3;
+    });
+
+    flush();
+
+    expect(expected1!).toEqual({ item: { id: '1', name: 'first' } });
+    expect(expected2!).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected3!).toEqual({ item: { id: '3', name: 'third' } });
+  }));
+
+  it('check paralel dispaches', fakeAsync(() => {
+    spyOn(http, 'getById').and.returnValues(
+      of({ item: { id: '1', name: 'first' } }).pipe(delay(300)),
+      throwError(() => new HttpErrorResponse({ error: 'Error message' })).pipe(delay(200)),
+      of({ item: { id: '3', name: 'third' } }).pipe(delay(100)),
+    );
+
+    let expected1: unknown;
+    let expected2: unknown;
+    let expected3: unknown;
+
+    zip(
+      service.getById({ params: { item: { id: '1' } } }),
+      service
+        .getById({ params: { item: { id: '2' } } })
+        .pipe(catchError(({ error }: { error: string }) => of(new HttpErrorResponse({ error })))),
+      service.getById({ params: { item: { id: '3' } } }),
+    ).subscribe(([result1, result2, result3]) => {
+      expected1 = result1;
+      expected2 = result2;
+      expected3 = result3;
+    });
+
+    tick(300);
+    flush();
+
+    let expectedState: State;
+    store
+      .select(key)
+      .pipe(first())
+      .subscribe((value) => (expectedState = value));
+
+    flush();
+
+    expect(expected1!).toEqual({ item: { id: '1', name: 'first' } });
+    expect(expected2!).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected3!).toEqual({ item: { id: '3', name: 'third' } });
+    expect(expectedState!).toEqual({
+      ids: ['3', '1'],
+      entities: {
+        '1': {
+          id: '1',
+          name: 'first',
+        },
+        '3': {
+          id: '3',
+          name: 'third',
+        },
+      },
+      errors: {
+        [service.query({ params: { item: { id: '1' } } })]: undefined,
+        [service.query({ params: { item: { id: '2' } } })]: new HttpErrorResponse({ error: 'Error message' }),
+        [service.query({ params: { item: { id: '3' } } })]: undefined,
+      },
+      loadings: {
+        [service.query({ params: { item: { id: '1' } } })]: false,
+        [service.query({ params: { item: { id: '2' } } })]: false,
+        [service.query({ params: { item: { id: '3' } } })]: false,
+      },
+      queries: {
+        [service.query({ params: { item: { id: '1' } } })]: {
+          ids: ['1'],
+        },
+        [service.query({ params: { item: { id: '3' } } })]: {
+          ids: ['3'],
+        },
+      },
+      reloadSelectors,
+    });
   }));
 
   describe('Store with select id', () => {

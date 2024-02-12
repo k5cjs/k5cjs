@@ -1,7 +1,7 @@
 /* eslint-disable @ngrx/no-multiple-actions-in-effects */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { type ObservableInput, catchError, concatMap, first, map, of, tap } from 'rxjs';
+import { type ObservableInput, catchError, concatMap, first, map, mergeMap, of, tap } from 'rxjs';
 
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
@@ -29,7 +29,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
       ofType(this._actions.getByQuery),
       this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
-      concatMap(([action, queries]) =>
+      mergeMap(([action, queries]) =>
         queries[action.query]
           ? of(this._actions.getByQueryIsLoaded(action))
           : this._http.getByQuery(action).pipe(
@@ -51,7 +51,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
       ofType(this._actions.getById),
       this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
-      concatMap(([action, queries]) =>
+      mergeMap(([action, queries]) =>
         queries[action.query]
           ? of(this._actions.getByIdIsLoaded(action))
           : this._http.getById(action).pipe(
@@ -72,7 +72,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     return this._actions$.pipe(
       ofType(this._actions.create),
       this._setIdentified(),
-      concatMap((action) =>
+      mergeMap((action) =>
         this._http.create(action).pipe(
           this._callBefore(action),
           concatMap((response) => [
@@ -90,7 +90,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
   set$ = createEffect(() => {
     return this._actions$.pipe(
       ofType(this._actions.set),
-      concatMap(({ query, params, ...rest }) => [
+      mergeMap(({ query, params, ...rest }) => [
         this._actions.setSuccess({ ...rest, query, params }),
         ...this._reloadIdentifiers(this._actions.setSuccess, rest),
       ]),
@@ -101,7 +101,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     return this._actions$.pipe(
       ofType(this._actions.update),
       this._setIdentified(),
-      concatMap((action) =>
+      mergeMap((action) =>
         this._http.update(action).pipe(
           this._callBefore(action),
           concatMap((params) => [
@@ -120,7 +120,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     return this._actions$.pipe(
       ofType(this._actions.updateAll),
       this._setIdentified(),
-      concatMap((action) =>
+      mergeMap((action) =>
         this._http.updateAll(action).pipe(
           this._callBefore(action),
           concatMap((response) => [
@@ -139,7 +139,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
     return this._actions$.pipe(
       ofType(this._actions.delete),
       this._setIdentified(),
-      concatMap((action) =>
+      mergeMap((action) =>
         this._http.delete(action).pipe(
           this._callBefore(action),
           concatMap((params) => [

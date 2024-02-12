@@ -232,7 +232,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected _dispatch(action: Action, ...finishedActions: ActionCreatorType<any>[]): Observable<string>;
   protected _dispatch(
-    action: Action,
+    action: Action & { query: string },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...finishedActions: [...ActionCreatorType<any>[], ActionCreatorType<any>[]] | ActionCreatorType<any>[]
   ): Observable<string> {
@@ -243,7 +243,8 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
 
     return this._actions$.pipe(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ofType<ActionCreatorType<any>>(...finishedActions.flat()),
+      ofType<ActionCreatorType<any> & { query: string }>(...finishedActions.flat()),
+      filter(({ query }) => query === action.query),
       map(({ type }) => {
         if (errors.some((error) => error.type === type)) {
           throw new Error(type);
