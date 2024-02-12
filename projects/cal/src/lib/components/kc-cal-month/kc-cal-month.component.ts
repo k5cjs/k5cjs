@@ -83,20 +83,26 @@ export class KcCalMonthComponent implements OnInit {
       const y = Math.trunc(i / 7);
       const x = i % 7;
 
+      /**
+       * `dayStart` - day of the week for a specific date ex: Tuesday = 2
+       *
+       * `localeDayStart` - first day of the week according to locale ex: en = 0 (Sun), fr = 1 (Mon)
+       *
+       *  - the result will be a value from [0, 6] range (possible days of weeks)
+       */
+      const offset = (7 + dayStart - localeDayStart) % 7;
+
       this._weeks[y].days[x] = {
         date: new Date(
           month.getFullYear(),
           month.getMonth(),
 
           /**
+           *
            * `i + 1` i starts at zero, but the date starts at 1
            *
-           *  `- dayStart` shifts the calendar cells back to the correct day of the month
-           *
-           *  `- localeDayStart` is used to account for the locale-specific first day of the week
-           *
            */
-          i + 1 - dayStart - localeDayStart,
+          i + 1 - offset,
         ),
         month,
       };
