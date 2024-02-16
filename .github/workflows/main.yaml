@@ -9,6 +9,7 @@ on:
     branches:
       - 'master'
       - 'alpha'
+      - '[0-9]+.[0-9]+.[0-9]+'
 
 # Ensure only one workflow per branch is running
 concurrency:
