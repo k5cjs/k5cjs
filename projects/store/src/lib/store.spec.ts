@@ -158,7 +158,7 @@ describe('Store', () => {
       imports: [
         StoreModule.forRoot({ [key]: reducer(null) }),
         EffectsModule.forRoot([Effects]),
-        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' , connectInZone: true}),
       ],
       teardown: {
         destroyAfterEach: false,
@@ -1183,7 +1183,7 @@ describe('Store', () => {
         imports: [
           StoreModule.forRoot({ [key]: reducer(selectId) }),
           EffectsModule.forRoot([Effects]),
-          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' , connectInZone: true}),
         ],
         teardown: {
           destroyAfterEach: false,
