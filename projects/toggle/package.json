@@ -1,9 +1,8 @@
 {
   "name": "@k5cjs/toggle",
-  "version": "0.0.1-alpha.3",
+  "version": "17.0.0",
   "peerDependencies": {
-    "@angular/common": "^16.2.0",
-    "@angular/core": "^16.2.0"
+    "@angular/core": "^17.2.1"
   },
   "dependencies": {
     "tslib": "^2.3.0"
