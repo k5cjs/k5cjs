@@ -1,0 +1,11 @@
+{
+  "name": "@k5cjs/router",
+  "version": "0.0.1-alpha.0",
+  "peerDependencies": {
+    "@angular/router": "^16.2.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "sideEffects": false
+}
