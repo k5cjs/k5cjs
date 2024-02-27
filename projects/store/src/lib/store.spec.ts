@@ -158,7 +158,7 @@ describe('Store', () => {
       imports: [
         StoreModule.forRoot({ [key]: reducer(null) }),
         EffectsModule.forRoot([Effects]),
-        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' , connectInZone: true}),
+        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
       ],
       teardown: {
         destroyAfterEach: false,
@@ -235,8 +235,8 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('getById success', fakeAsync(() => {
@@ -306,8 +306,8 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('create success', fakeAsync(() => {
@@ -399,9 +399,9 @@ describe('Store', () => {
 
     flush();
 
-    expect(expected!).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expected).toBeUndefined();
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('update success', fakeAsync(() => {
@@ -468,8 +468,8 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('update all success', fakeAsync(() => {
@@ -580,8 +580,8 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('delete success', fakeAsync(() => {
@@ -674,8 +674,8 @@ describe('Store', () => {
       .subscribe((value) => (expectedState = value));
 
     expect(expected).toBeUndefined();
-    expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-    expect(expectedError!).toEqual(expectedErrorFromError!);
+    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(expectedErrorFromError);
 
     expect(expectedState!).toEqual({
       ids: ['1'],
@@ -1097,9 +1097,9 @@ describe('Store', () => {
 
     flush();
 
-    expect(expected1!).toEqual({ item: { id: '1', name: 'first' } });
-    expect(expected2!).toEqual(new HttpErrorResponse({ error: 'Error message' }));
-    expect(expected3!).toEqual({ item: { id: '3', name: 'third' } });
+    expect(expected1).toEqual({ item: { id: '1', name: 'first' } });
+    expect(expected2).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
   }));
 
   it('check paralel dispaches', fakeAsync(() => {
@@ -1136,9 +1136,9 @@ describe('Store', () => {
 
     flush();
 
-    expect(expected1!).toEqual({ item: { id: '1', name: 'first' } });
-    expect(expected2!).toEqual(new HttpErrorResponse({ error: 'Error message' }));
-    expect(expected3!).toEqual({ item: { id: '3', name: 'third' } });
+    expect(expected1).toEqual({ item: { id: '1', name: 'first' } });
+    expect(expected2).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
     expect(expectedState!).toEqual({
       ids: ['3', '1'],
       entities: {
@@ -1183,7 +1183,7 @@ describe('Store', () => {
         imports: [
           StoreModule.forRoot({ [key]: reducer(selectId) }),
           EffectsModule.forRoot([Effects]),
-          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' , connectInZone: true}),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
         ],
         teardown: {
           destroyAfterEach: false,
@@ -1266,8 +1266,8 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('getById success', fakeAsync(() => {
@@ -1337,8 +1337,8 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('create success', fakeAsync(() => {
@@ -1434,9 +1434,9 @@ describe('Store', () => {
 
       flush();
 
-      expect(expected!).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expected).toBeUndefined();
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('update success', fakeAsync(() => {
@@ -1506,8 +1506,8 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('update all success', fakeAsync(() => {
@@ -1626,8 +1626,8 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('delete success', fakeAsync(() => {
@@ -1722,8 +1722,8 @@ describe('Store', () => {
         .subscribe((value) => (expectedState = value));
 
       expect(expected).toBeUndefined();
-      expect(expectedError!).toEqual(new HttpErrorResponse({ error: 'error message' }));
-      expect(expectedError!).toEqual(expectedErrorFromError!);
+      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(expectedErrorFromError);
 
       expect(expectedState!).toEqual({
         ids: [selectId({ id: '1', name: 'first' })],
