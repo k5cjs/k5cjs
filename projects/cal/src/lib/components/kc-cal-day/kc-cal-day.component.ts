@@ -12,6 +12,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { KcCal, KcCalSelector } from '../../services';
 import { KC_CAL_SELECTOR } from '../../tokens';
+import { findLeftMostDay, findRightMostDay, isDateBetween, isDateEqual, removeTime } from '../../utils';
 
 @Component({
   selector: 'kc-cal-day',
@@ -22,7 +23,7 @@ import { KC_CAL_SELECTOR } from '../../tokens';
 export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implements OnDestroy {
   @Input()
   set day(value: Date) {
-    this._day = this._removeTime(value);
+    this._day = removeTime(value);
   }
   get day(): Date {
     return this._day;
@@ -31,18 +32,22 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
   @Input()
   set month(value: Date) {
-    this._month = this._removeTime(value);
+    this._month = removeTime(value);
   }
   get month(): Date {
     return this._month;
   }
   private _month!: Date;
 
+  protected _isHovered = false;
+
   private _destroy: Subject<void>;
 
-  private _isHovered = false;
-
-  constructor(@Inject(KC_CAL_SELECTOR) protected _selector: T, private _cdr: ChangeDetectorRef, private _kcCal: KcCal) {
+  constructor(
+    @Inject(KC_CAL_SELECTOR) protected _selector: T,
+    protected _cdr: ChangeDetectorRef,
+    protected _kcCal: KcCal,
+  ) {
     this._destroy = new Subject();
 
     this._selector.changed.pipe(takeUntil(this._destroy)).subscribe(() => {
@@ -63,7 +68,7 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
   @HostBinding('class.kc-cal-day--disabled')
   get disabled(): boolean {
-    const current = this._removeTime(new Date());
+    const current = removeTime(new Date());
 
     return this.day.getTime() > current.getTime();
   }
@@ -82,22 +87,22 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
   get start(): boolean {
     const { from, to, hovered } = this._selector;
 
-    const leftMost = this._findLeftMostDay([from, to, hovered]);
+    const leftMost = findLeftMostDay([from, to, hovered]);
 
     if (!leftMost) return false;
 
-    return this._isDateEqual(this.day, leftMost);
+    return isDateEqual(this.day, leftMost);
   }
 
   @HostBinding('class.kc-cal-day--end')
   get end(): boolean {
     const { from, to, hovered } = this._selector;
 
-    const rightMost = this._findRightMostDay([from, to, hovered]);
+    const rightMost = findRightMostDay([from, to, hovered]);
 
     if (!rightMost) return false;
 
-    return this._isDateEqual(this.day, rightMost);
+    return isDateEqual(this.day, rightMost);
   }
 
   @HostBinding('class.kc-cal-day--rounded')
@@ -107,7 +112,7 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
   @HostBinding('class.kc-cal-day--current')
   get current(): boolean {
-    return this._isDateEqual(this.day, this._removeTime(new Date()));
+    return isDateEqual(this.day, removeTime(new Date()));
   }
 
   @HostBinding('class.kc-cal-day--hovered')
@@ -120,16 +125,13 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
     if (!from && !to) return this._isHovered;
 
     // when 'to' is not set, hover when is between from & hovered dates
-    if (!!from && !to)
-      return this._isDateBetween(this.day, from, hovered) || this._isDateBetween(this.day, hovered, from);
+    if (!!from && !to) return isDateBetween(this.day, from, hovered) || isDateBetween(this.day, hovered, from);
 
     // when 'from' is not set, hover when is between to & hovered dates
-    if (!from && !!to) return this._isDateBetween(this.day, to, hovered) || this._isDateBetween(this.day, hovered, to);
+    if (!from && !!to) return isDateBetween(this.day, to, hovered) || isDateBetween(this.day, hovered, to);
 
     // hover when is between either from/to & hovered dates
-    return (
-      (!!from && this._isDateBetween(this.day, from, hovered)) || (!!to && this._isDateBetween(this.day, hovered, to))
-    );
+    return (!!from && isDateBetween(this.day, from, hovered)) || (!!to && isDateBetween(this.day, hovered, to));
   }
 
   @HostBinding('class.kc-cal-day--hovered-other')
@@ -155,37 +157,5 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
   ngOnDestroy(): void {
     this._destroy.next();
-  }
-
-  private _isDateEqual(date1: Date, date2: Date): boolean {
-    return date1.getTime() === date2.getTime();
-  }
-
-  private _removeTime(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
-  }
-
-  private _isDateBetween(checkDate: Date, startDate: Date, endDate: Date): boolean {
-    return checkDate >= startDate && checkDate <= endDate;
-  }
-
-  private _findLeftMostDay(dates: (Date | null)[]): Date | null {
-    const validDates = dates.filter((date): date is Date => !!date);
-
-    if (validDates.length === 0) {
-      return null;
-    }
-
-    return validDates.reduce((leftmostDate, date) => (date < leftmostDate ? date : leftmostDate), validDates[0]);
-  }
-
-  private _findRightMostDay(dates: (Date | null)[]): Date | null {
-    const validDates = dates.filter((date): date is Date => !!date);
-
-    if (validDates.length === 0) {
-      return null;
-    }
-
-    return validDates.reduce((rightMostDate, date) => (date > rightMostDate ? date : rightMostDate), validDates[0]);
   }
 }
