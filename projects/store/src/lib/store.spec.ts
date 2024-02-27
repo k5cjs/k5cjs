@@ -620,10 +620,10 @@ describe('Store', () => {
         [service.query({ params: { item: { id: '1' } } })]: undefined,
       },
       loadings: {
-        [service.query({ params: { item: { id: '1' } } })]: false,
+        [service.query({ params: { item: { id: '1' } } })]: undefined,
       },
       queries: {
-        [service.query({ params: { item: { id: '1' } } })]: { ids: [] },
+        [service.query({ params: { item: { id: '1' } } })]: undefined,
       },
       reloadSelectors,
     });
@@ -1670,10 +1670,10 @@ describe('Store', () => {
           [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
         },
         loadings: {
-          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: false,
+          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
         },
         queries: {
-          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: { ids: [] },
+          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
         },
         reloadSelectors,
       });

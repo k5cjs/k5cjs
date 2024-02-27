@@ -150,16 +150,16 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
     ),
   ),
 
-  on(actions.deleteSuccess, (state, { query, params: { item, config }, ...options }) =>
+  on(actions.deleteSuccess, (state, { query, params: { item }, ...options }) =>
     adapter.removeOne(item.id as string, {
       ...state,
-      loadings: { ...state.loadings, [query]: false },
+      loadings: { ...state.loadings, [query]: undefined },
       errors: { ...state.errors, [query]: undefined },
-      queries: { ...state.queries, [query]: { ...config, ids: [] } },
+      queries: { ...state.queries, [query]: undefined },
       ...resetQueries(options, {
-        loadings: { [query]: false },
+        loadings: { [query]: undefined },
         errors: { [query]: undefined },
-        queries: { [query]: { ...config, ids: [] } },
+        queries: { [query]: undefined },
       }),
       ...reloadSelectors(state, options),
     }),
