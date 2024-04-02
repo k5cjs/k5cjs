@@ -32,6 +32,8 @@ import { Observable, Subject, asapScheduler, observeOn } from 'rxjs';
 
 import { KcControlType } from './control.type';
 
+export type Parent = (FormGroupDirective | NgForm) & { _kcListeners?: Set<() => void> };
+
 export const kcControlProviders = <T>(component: Type<T>): Provider[] => [
   {
     provide: NG_VALUE_ACCESSOR,
@@ -99,6 +101,8 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onTouchedNew = () => {};
 
+  private _submitCallbackFn!: () => void;
+
   constructor() {
     const renderer = inject(Renderer2);
     const elementRef = inject<ElementRef<E>>(ElementRef);
@@ -130,7 +134,9 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
         .subscribe(() => this._stateChanges.next());
     }
 
-    if (this._parent) this._interceptParentProperties(this._parent);
+    this._submitCallbackFn = this._submitCallback.bind(this);
+
+    this._addSubmitCallback();
   }
 
   ngAfterViewInit(): void {
@@ -147,6 +153,8 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     this._stateChanges.complete();
 
     this._autofillMonitor.stopMonitoring(this.elementRef.nativeElement);
+
+    this._removeSubmitCallback();
   }
 
   override registerOnTouched(fn: () => void): void {
@@ -234,19 +242,6 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     return this._parentFormGroup || this._parentForm;
   }
   /**
-   * intercepts the ngSubmit method of the form
-   * to emit a state change when the form is submitted
-   */
-  private _interceptParentProperties(form: FormGroupDirective | NgForm): void {
-    const onSubmit = form.onSubmit.bind(form);
-
-    form.onSubmit = (...args) => {
-      void this._ngZone.runOutsideAngular(() => Promise.resolve().then(() => this._stateChanges.next()));
-
-      return onSubmit(...args);
-    };
-  }
-  /**
    * intercepts the markAsTouched method of the control
    * to emit a state change
    */
@@ -258,5 +253,37 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
 
       return tmpMarkAsTouched();
     };
+  }
+
+  private _addSubmitCallback(): void {
+    if (!this._parent) return;
+
+    const parent = this._parent as Parent;
+
+    parent._kcListeners ||= new Set();
+
+    parent._kcListeners.add(this._submitCallbackFn);
+
+    if (parent.onSubmit.name === 'onSubmit') {
+      const submit = parent.onSubmit.bind(parent);
+
+      parent.onSubmit = (...args) => {
+        void this._ngZone.runOutsideAngular(() =>
+          Promise.resolve().then(() => parent._kcListeners?.forEach((listener) => listener())),
+        );
+        return submit(...args);
+      };
+    }
+  }
+
+  private _removeSubmitCallback(): void {
+    const parent = this._parent as Parent;
+
+    parent?._kcListeners?.delete(this._submitCallbackFn);
+  }
+
+  private _submitCallback(): void {
+    // emit a state change when the form is submitted
+    this._stateChanges.next();
   }
 }

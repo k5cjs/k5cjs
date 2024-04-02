@@ -8,11 +8,11 @@ import {
   ViewChildren,
   runInInjectionContext,
 } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { take } from 'rxjs';
 
-import { KcControl, kcControlProviders } from './control';
+import { KcControl, Parent, kcControlProviders } from './control';
 
 @Directive({
   selector: '[kcControl]',
@@ -268,5 +268,38 @@ describe('InputDirective', () => {
       expect(control.onTouched()).toEqual(undefined);
       expect(control.onTouchedNew()).toEqual(undefined);
     });
+  });
+
+  it('should call submit cb functions', fakeAsync(() => {
+    fixture.detectChanges();
+    const parent1 = component.dir1['_parent'];
+    const parent3 = component.dir3['_parent'] as Parent;
+    const spyObj = {
+      cb: () => {
+        //
+      },
+    };
+    const spyCb = spyOn(spyObj, 'cb');
+    parent3._kcListeners?.add(spyObj.cb);
+
+    expect(parent1).toEqual(null);
+    expect(parent3._kcListeners?.size).toEqual(2);
+
+    component.submit.nativeElement.click();
+    fixture.detectChanges();
+    flush();
+    fixture.detectChanges();
+
+    expect(spyCb).toHaveBeenCalled();
+  }));
+
+  it('should remove cb on destory', () => {
+    fixture.detectChanges();
+    const parent3 = component.dir3['_parent'] as Parent;
+
+    expect(parent3._kcListeners?.size).toEqual(1);
+
+    component.dir3.ngOnDestroy();
+    expect(parent3._kcListeners?.size).toEqual(0);
   });
 });
