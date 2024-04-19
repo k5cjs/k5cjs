@@ -157,6 +157,12 @@ export abstract class KcControl<T = string, E extends HTMLElement = HTMLElement>
     this._removeSubmitCallback();
   }
 
+  override writeValue(value: unknown): void {
+    super.writeValue(value);
+
+    this._stateChanges.next();
+  }
+
   override registerOnTouched(fn: () => void): void {
     this.onTouchedNew = fn;
   }

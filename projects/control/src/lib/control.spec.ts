@@ -302,4 +302,18 @@ describe('InputDirective', () => {
     component.dir3.ngOnDestroy();
     expect(parent3._kcListeners?.size).toEqual(0);
   });
+
+  it('should update state from outside', () => {
+    fixture.detectChanges();
+
+    const spy = jasmine.createSpy('autofillStream');
+
+    component.dir1.stateChanges.subscribe({ next: spy });
+
+    component.control.patchValue('test', { emitEvent: false });
+    fixture.detectChanges();
+
+    expect(component.dir1.value).toEqual('test');
+    expect(spy).toHaveBeenCalled();
+  });
 });
