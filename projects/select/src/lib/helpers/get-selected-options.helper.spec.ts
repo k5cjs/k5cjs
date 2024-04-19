@@ -175,4 +175,33 @@ describe('get selected options', () => {
 
     expect(test).toEqual(expected);
   });
+
+  it('it should work with custom option compareFn', () => {
+    const options: KcOption<{ value: number }>[] = [
+      {
+        value: { value: 1 },
+        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value.value,
+      },
+      {
+        value: { value: 2 },
+        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value.value,
+      },
+    ];
+
+    const values = [
+      {
+        value: 1,
+        label: 'Label 1',
+      },
+      {
+        value: 2,
+        label: 'Label 2',
+      },
+    ];
+
+    expect(getSelectedOptions(options, values)).toEqual([
+      [{ value: 1 }, options[0]],
+      [{ value: 2 }, options[1]],
+    ]);
+  });
 });

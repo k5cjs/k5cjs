@@ -14,7 +14,10 @@ export class GroupMultipleComponent {
   options: KcGroup<string, string, string>;
 
   constructor(private _fb: UntypedFormBuilder) {
-    this.control = this._fb.control({});
+    this.control = this._fb.control({
+      locations: ['location 1'],
+      users: ['waiter 1'],
+    });
 
     this.options = {
       locations: {
