@@ -7,20 +7,28 @@ import { MapEmitSelect } from './map-emit-select.helpers';
 type Options<V, K, L> = KcOption<V, K, L>[] | KcOption<V, K, L>[][] | KcGroup<V, K, L>;
 type Value<V> = KcOptionValue<V> | KcOptionGroupValue<V>;
 
+const compareOptions = <V, K, L>(value: V | KcOptionGroupValue<V> | undefined, option: KcOption<V, K, L>): boolean => {
+  if (typeof value === 'undefined') return false;
+
+  if (option.compareFn) return option.compareFn(value, option);
+
+  if ('key' in option) return option.key === value;
+
+  return option.value === value;
+};
+
 const simpleOptions = <V, K, L>(options: KcOption<V, K, L>[] | KcOption<V, K, L>[][], value: Value<V>) => {
   if (isOptionChunks(options)) {
     return options.flat().filter((option) => {
-      if (Array.isArray(value))
-        return value.some((value) => (option.key ? value === option.key : value === option.value));
+      if (Array.isArray(value)) return value.some((value) => compareOptions(value, option));
 
-      return option.key ? value === option.key : value === option.value;
+      return compareOptions(value, option);
     });
   } else {
     return options.filter((option) => {
-      if (Array.isArray(value))
-        return value.some((value) => (option.key ? value === option.key : value === option.value));
+      if (Array.isArray(value)) return value.some((value) => compareOptions(value, option));
 
-      return option.key ? value === option.key : value === option.value;
+      return compareOptions(value, option);
     });
   }
 };
@@ -61,8 +69,10 @@ const groupOptions = <V, K, L>(
 
 export const getSelectedOptions = <V, K, L>(
   options: Options<V, K, L>,
-  value: Value<V>,
+  value: Value<V> | undefined,
 ): [K | V, KcOption<V, K, L>][] | undefined => {
+  if (typeof value === 'undefined') return undefined;
+
   if (Array.isArray(options)) {
     return simpleOptions(options, value).map((option) => [option.key || option.value, option]);
   } else if (options) {

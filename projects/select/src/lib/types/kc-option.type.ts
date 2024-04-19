@@ -10,6 +10,7 @@ export interface KcOption<V, K = V, L = string> {
   value: V;
   key?: K;
   label?: L;
+  compareFn?: (selectedOption: V | KcOptionGroupValue<V>, currentOption: KcOption<V, K, L>) => boolean;
 }
 
 export type KcGroup<V, K = V, L = string> = {
