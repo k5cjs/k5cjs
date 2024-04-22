@@ -151,7 +151,7 @@ export const reducerBase = <T extends { id: PropertyKey }, S extends StateBase<T
   ),
 
   on(actions.deleteSuccess, (state, { query, params: { item }, ...options }) =>
-    adapter.removeOne(item.id as string, {
+    adapter.removeOne(adapter.selectId(item) as string, {
       ...state,
       loadings: { ...state.loadings, [query]: undefined },
       errors: { ...state.errors, [query]: undefined },
