@@ -47,7 +47,9 @@ export class KcErrors implements AfterContentInit {
   protected _destroy = inject(DestroyRef);
 
   constructor() {
-    this._formField.stateChanges.pipe(takeUntilDestroyed(this._destroy)).subscribe(() => this._render());
+    this._formField.stateChanges
+      .pipe(takeUntilDestroyed(this._destroy))
+      .subscribe(() => this._errors && this._render());
   }
 
   ngAfterContentInit(): void {
