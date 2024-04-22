@@ -90,8 +90,8 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
 
   delete(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>,
-  ): Observable<{ item: Pick<FeatureStoreType, 'id'> }> {
+    _options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>,
+  ): Observable<{ item: FeatureStoreType }> {
     throw new Error('Method not implemented.');
   }
 
@@ -599,7 +599,7 @@ describe('Store', () => {
       },
     });
 
-    spyOn(http, 'delete').and.returnValue(of({ item: { id: '1' } }));
+    spyOn(http, 'delete').and.returnValue(of({ item: { id: '1', name: 'first' } }));
 
     let expected: boolean | undefined = true;
     service.delete({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
@@ -1645,12 +1645,10 @@ describe('Store', () => {
         },
       });
 
-      spyOn(http, 'delete').and.returnValue(of({ item: { id: selectId({ id: '1', name: 'first' }) } }));
+      spyOn(http, 'delete').and.returnValue(of({ item: { id: '1', name: 'first' } }));
 
       let expected: boolean | undefined = true;
-      service
-        .delete({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })
-        .subscribe((value) => (expected = value));
+      service.delete({ params: { item: { id: '1', name: 'first' } } }).subscribe((value) => (expected = value));
 
       flush();
 
@@ -1667,13 +1665,13 @@ describe('Store', () => {
         ids: [],
         entities: {},
         errors: {
-          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
         },
         loadings: {
-          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
         },
         queries: {
-          [service.query({ params: { item: { id: selectId({ id: '1', name: 'first' }) } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
         },
         reloadSelectors,
       });

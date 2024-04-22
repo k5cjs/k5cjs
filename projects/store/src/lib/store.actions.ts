@@ -37,8 +37,8 @@ export class ActionsBase<T extends { id: PropertyKey }> {
   updateAllSuccess: Success<{ items: T[]; config?: Params; before?: Params }>;
   updateAllError: Error<{ error: HttpErrorResponse }>;
 
-  delete: Init<{ item: Pick<T, 'id'> }>;
-  deleteSuccess: Success<{ item: Pick<T, 'id'>; config?: Params; before?: Params }>;
+  delete: Init<{ item: AtLeastDeep<T, 'id'> }>;
+  deleteSuccess: Success<{ item: T; config?: Params; before?: Params }>;
   deleteError: Error<{ error: HttpErrorResponse }>;
 
   protected _type: (action: string) => string;
@@ -96,10 +96,10 @@ export class ActionsBase<T extends { id: PropertyKey }> {
       >(),
     );
 
-    this.delete = createAction(this._type('delete'), props<ActionInit<{ item: Pick<T, 'id'> }>>());
+    this.delete = createAction(this._type('delete'), props<ActionInit<{ item: AtLeastDeep<T, 'id'> }>>());
     this.deleteSuccess = createAction(
       this._type('delete success'),
-      props<ActionSuccess<{ item: Pick<T, 'id'>; config?: Params; before?: Params }>>(),
+      props<ActionSuccess<{ item: T; config?: Params; before?: Params }>>(),
     );
     this.deleteError = createAction(this._type('delete error'), props<ActionError<{ error: HttpErrorResponse }>>());
   }

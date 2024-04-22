@@ -162,7 +162,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     );
   }
 
-  delete(options: Options<{ item: Pick<T, 'id'> } & Params>): Observable<undefined> {
+  delete(options: Options<{ item: AtLeastDeep<T, 'id'> } & Params>): Observable<undefined> {
     const query = this._query({ params: options.params });
 
     return this._dispatch(

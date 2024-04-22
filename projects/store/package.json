@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/store",
-  "version": "0.0.1-alpha.12",
+  "version": "0.0.1-alpha.13",
   "peerDependencies": {
     "@angular/common": "^16.2.0",
     "@angular/core": "^16.2.0",

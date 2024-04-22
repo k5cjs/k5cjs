@@ -24,6 +24,7 @@
     "test:tables": "ng test tables --browsers=Firefox --code-coverage",
     "test:scroll": "ng test scroll --browsers=Firefox --code-coverage",
     "test:select": "ng test select --browsers=Firefox --code-coverage",
+    "test:store": "ng test store --browsers=Firefox --code-coverage",
     "test:selection-model": "ng test selection-model --browsers=Firefox --code-coverage",
     "test:examples": "ng test examples --browsers=Firefox --code-coverage",
     "tests": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessCI",
