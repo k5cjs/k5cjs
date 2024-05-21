@@ -180,11 +180,11 @@ describe('get selected options', () => {
     const options: KcOption<{ value: number }>[] = [
       {
         value: { value: 1 },
-        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value.value,
+        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value,
       },
       {
         value: { value: 2 },
-        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value.value,
+        compareFn: (selectedOption, currentOption) => selectedOption.value === currentOption.value,
       },
     ];
 

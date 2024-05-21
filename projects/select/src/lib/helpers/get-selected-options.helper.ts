@@ -10,7 +10,7 @@ type Value<V> = KcOptionValue<V> | KcOptionGroupValue<V>;
 const compareOptions = <V, K, L>(value: V | KcOptionGroupValue<V> | undefined, option: KcOption<V, K, L>): boolean => {
   if (typeof value === 'undefined') return false;
 
-  if (option.compareFn) return option.compareFn(value, option);
+  if (option.compareFn) return option.compareFn(value, option.value);
 
   if ('key' in option) return option.key === value;
 
