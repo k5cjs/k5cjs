@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 export class Grid {
   cols = 15;
   rows = 55;
 
+  cellWidth = 100;
   cellHeight = 50;
-  cellWidth = 50;
 
   matrix: (GridItem | null)[][] = [];
 
@@ -58,14 +59,10 @@ export class Grid {
       }
     }
 
-    console.table(this.matrix);
-
     item.render();
   }
 
   change(col: number, row: number, item: GridItem): void {
-    console.log('change', col, row);
-
     for (let x = 0; x < item.cols; x++) {
       for (let y = 0; y < item.rows; y++) {
         const cellItem = this.matrix[row + y][col + x];
@@ -73,12 +70,23 @@ export class Grid {
 
         if (!cellItem) continue;
 
-        console.warn('change', cellItem);
         cellItem.row += 1;
-        cellItem.y += 50;
+        // cellItem.y += 50 * cellItem._scale;
         cellItem.render();
       }
     }
+  }
+
+  scale(scale: number): void {
+    this._element.style.transform = `scale(${scale})`;
+
+    this.matrix.forEach((row) => {
+      row.forEach((item) => {
+        if (!item) return;
+
+        item.scale(scale);
+      });
+    });
   }
 }
 
@@ -88,6 +96,11 @@ export class GridItem {
    */
   col: number;
   row: number;
+  /**
+   * cell dimensions
+   */
+  cellWidth = 100;
+  cellHeight = 50;
   /**
    * size in grid
    */
@@ -101,8 +114,8 @@ export class GridItem {
   /**
    * mouse position
    */
-  clientX = 0;
-  clientY = 0;
+  mouseX = 0;
+  mouseY = 0;
   /**
    * offset from left top corner to mouse position
    */
@@ -111,8 +124,17 @@ export class GridItem {
 
   /////
 
+  /**
+   * scroll position of container
+   */
   scrollTop = 0;
   scrollLeft = 0;
+
+  // scale = 0.5;
+  private _scale = 1;
+  //
+  private _actualCellWidth = this.cellWidth * this._scale;
+  private _actualCellHeight = this.cellHeight * this._scale;
 
   constructor(
     col: number,
@@ -126,20 +148,32 @@ export class GridItem {
     this.col = col;
     this.row = row;
 
-    this.x = this.col * 50;
-    this.y = this.row * 50;
+    this.x = this.col * this._actualCellWidth;
+    this.y = this.row * this._actualCellHeight;
+  }
+
+  scale(scale: number) {
+    this.x = this.x * (scale / this._scale);
+    this.y = this.y * (scale / this._scale);
+
+    this._scale = scale;
+
+    this._actualCellWidth = this.cellWidth * this._scale;
+    this._actualCellHeight = this.cellHeight * this._scale;
   }
 
   render(color = 'yellow') {
     this._element.style.cssText = `
-      transform: translate3d(${this.x}px, ${this.y}px, 0);
+      transform: translate3d(${this.x * (1 / this._scale)}px, ${this.y * (1 / this._scale)}px, 0);
       background: ${color};
+      width: ${this.cellWidth * this.cols}px;
+      height: ${this.cellHeight * this.rows}px;
     `;
 
-    this.col = Math.round(this.x / 50);
+    this.col = Math.round(this.x / this._actualCellWidth);
     if (this.col < 0) this.col = 0;
 
-    this.row = Math.round(this.y / 50);
+    this.row = Math.round(this.y / this._actualCellHeight);
     if (this.row < 0) this.row = 0;
 
     // this._grid.change(this.col, this.row, this);
@@ -152,16 +186,13 @@ export class GridItem {
 
     cancelAnimationFrame(this._requestAnimationFrameId);
 
-    this.clientX = e.clientX;
-    this.clientY = e.clientY;
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
 
-    this.x = this.clientX + this.scrollLeft - this.offsetLeft;
-    this.y = this.clientY + this.scrollTop - this.offsetTop;
+    this.x = this.mouseX + this.scrollLeft - this.offsetLeft;
+    this.y = this.mouseY + this.scrollTop - this.offsetTop;
 
-    this._element.style.cssText = `
-        transform: translate3d(${this.x}px, ${this.y}px, 0);
-        background: green;
-      `;
+    this.render('green');
 
     this._scrollY();
   };
@@ -174,14 +205,21 @@ export class GridItem {
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
 
-    this.col = Math.round(this.x / 50);
+    console.table({
+      x: this.x,
+      y: this.y,
+      col: this.col,
+      row: this.row,
+    });
+
+    this.col = Math.trunc(this.x / this._actualCellWidth);
     if (this.col < 0) this.col = 0;
 
-    this.row = Math.round(this.y / 50);
+    this.row = Math.trunc(this.y / this._actualCellHeight);
     if (this.row < 0) this.row = 0;
 
-    this.x = this.col * 50;
-    this.y = this.row * 50;
+    this.x = this.col * this._actualCellWidth;
+    this.y = this.row * this._actualCellHeight;
 
     this.render('orange');
   };
@@ -192,32 +230,31 @@ export class GridItem {
     this.scrollLeft = this._container.scrollLeft;
     this.scrollTop = this._container.scrollTop;
 
-    this.clientX = e.clientX;
-    this.clientY = e.clientY;
+    this.mouseX = e.clientX;
+    this.mouseY = e.clientY;
 
-    this.offsetLeft = this.clientX + this.scrollLeft - this.x;
-    this.offsetTop = this.clientY + this.scrollTop - this.y;
+    this.offsetLeft = this.mouseX + this.scrollLeft - this.x;
+    this.offsetTop = this.mouseY + this.scrollTop - this.y;
 
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
   };
 
   private _scrollY() {
-    if (this.clientY - this.offsetTop < 0) {
-      const offset = Math.abs(this.clientY - this.offsetTop);
+    if (this.mouseY - this.offsetTop < 0) {
+      const offset = Math.abs(this.mouseY - this.offsetTop);
       const percent = offset / 150;
 
       const speed = Math.round(1 + percent * 15);
 
       this._scrollUp(speed);
-    } else if (this.clientY - this.offsetTop + 150 > this._container.clientHeight) {
-      const offset = this.clientY - this.offsetTop + 150 - this._container.clientHeight;
+    } else if (this.mouseY - this.offsetTop + 150 > this._container.clientHeight) {
+      const offset = this.mouseY - this.offsetTop + 150 - this._container.clientHeight;
       const percent = offset / 150;
 
       const speed = Math.round(1 + percent * 15);
 
       this._scrollDown(speed);
-      console.log(speed);
     }
   }
 
@@ -236,9 +273,9 @@ export class GridItem {
   }
 
   private _scrollDown(speed: number) {
+    // add new row if scroll is at the bottom
     if (this._container.scrollHeight <= this.scrollTop + this._container.offsetHeight + speed) {
       this._grid.rows += 1;
-      console.log('before, top: ', this._container.scrollTop, this.y);
       this._grid.render();
 
       this._scrollDown(speed);
@@ -269,6 +306,8 @@ export class GridComponent implements OnInit {
   @ViewChild('gridItem0', { static: true }) gridItemElement0!: ElementRef<HTMLElement>;
   @ViewChild('gridItem1', { static: true }) gridItemElement1!: ElementRef<HTMLElement>;
 
+  scale = new FormControl(1, { nonNullable: true });
+
   constructor(private _elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
@@ -278,5 +317,9 @@ export class GridComponent implements OnInit {
 
     grid.add(new GridItem(3, 3, this.gridItemElement0.nativeElement, this._elementRef.nativeElement, grid));
     grid.add(new GridItem(3, 10, this.gridItemElement1.nativeElement, this._elementRef.nativeElement, grid));
+
+    this.scale.valueChanges.subscribe((value) => {
+      grid.scale(value);
+    });
   }
 }
