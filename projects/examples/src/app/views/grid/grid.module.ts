@@ -3,15 +3,10 @@ import { CommonModule } from '@angular/common';
 
 import { GridRoutingModule } from './grid-routing.module';
 import { GridComponent } from './grid.component';
-
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [
-    GridComponent
-  ],
-  imports: [
-    CommonModule,
-    GridRoutingModule
-  ]
+  declarations: [GridComponent],
+  imports: [CommonModule, GridRoutingModule, ReactiveFormsModule],
 })
-export class GridModule { }
+export class GridModule {}

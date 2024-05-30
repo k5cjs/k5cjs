@@ -8,6 +8,7 @@
 
 .grid {
   @apply
+    origin-top-left
     overflow-hidden
     bg-sky-500;
 
@@ -16,8 +17,6 @@
       absolute
       top-0
       left-0
-      w-[150px]
-      h-[150px]
       z-10
       cursor-pointer
       bg-sky-900;
