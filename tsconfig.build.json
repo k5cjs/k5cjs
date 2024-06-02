@@ -34,7 +34,8 @@
       "@k5cjs/store": ["dist/store"],
       "@k5cjs/types": ["dist/types"],
       "@k5cjs/toggle": ["dist/toggle"],
-      "@k5cjs/fake-progress-bar": ["dist/fake-progress-bar"]
+      "@k5cjs/fake-progress-bar": ["dist/fake-progress-bar"],
+      "@k5cjs/grid": ["dist/grid"]
     },
     "target": "ES2022",
     "module": "es2020",
@@ -47,5 +48,5 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "exclude": ["cypress", "cypress.config.ts", "projects/**/*.cy.ts"],
+  "exclude": ["cypress", "cypress.config.ts", "projects/**/*.cy.ts"]
 }

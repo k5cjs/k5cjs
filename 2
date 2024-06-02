@@ -1,0 +1,165 @@
+import { Direction, getDirection } from './get-direction';
+
+fdescribe('get direction', () => {
+  it('get overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │       │
+     *  │   ┌───────┐
+     *  │   │   │   │
+     *  └───│───┘   │
+     *      │       │
+     *      └───────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 4, height: 4 };
+    const rectangle2 = { x: 3, y: 3, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Bottom);
+  });
+
+  it('should detect top overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │       │
+     *  │   ┌───│───┐
+     *  │   │   │   │
+     *  └───────┘   │
+     *      │       │
+     *      └───────┘
+     *
+     */
+    const rectangle1 = { x: 3, y: 3, width: 4, height: 4 };
+    const rectangle2 = { x: 1, y: 1, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Top);
+  });
+
+  it('should detect right overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │     ┌───────┐
+     *  │     │ │     │
+     *  │     │ │     │
+     *  └─────│─┘     │
+     *        └───────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 4, height: 4 };
+    const rectangle2 = { x: 4, y: 2, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Right);
+  });
+
+  it('should detect left overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │     ┌─│─────┐
+     *  │     │ │     │
+     *  │     │ │     │
+     *  └───────┘     │
+     *        └───────┘
+     *
+     */
+    const rectangle1 = { x: 4, y: 2, width: 4, height: 4 };
+    const rectangle2 = { x: 1, y: 1, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Left);
+  });
+
+  it('should detect center overlap', () => {
+    /**
+     *
+     *  ┌───────────┐
+     *  │           │
+     *  │   ┌───┐   │
+     *  │   │   │   │
+     *  │   └───┘   │
+     *  │           │
+     *  └───────────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 6, height: 6 };
+    const rectangle2 = { x: 3, y: 3, width: 2, height: 2 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Center);
+  });
+
+  it('should detect overlap when one rectangle completely overlaps another', () => {
+    /**
+     *
+     *  ┌───────────────┐
+     *  │               │
+     *  │   ┌───┐       │
+     *  │   │   │       │
+     *  │   └───┘       │
+     *  │               │
+     *  │               │
+     *  │               │
+     *  └───────────────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 8, height: 8 };
+    const rectangle2 = { x: 3, y: 3, width: 2, height: 2 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Center);
+  });
+
+  fit('should detect overlap when one rectangle completely overlaps another', () => {
+    /**
+     *
+     *  ┌───────────────┐
+     *  │               │
+     *  │ ┌───┐         │
+     *  │ │   │         │
+     *  │ └───┘         │
+     *  │               │
+     *  │               │
+     *  │               │
+     *  └───────────────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 8, height: 8 };
+    const rectangle2 = { x: 2, y: 2, width: 2, height: 2 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Center);
+  });
+
+  it('should detect top corner overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │ ┌─────│─┐
+     *  │ │     │ │
+     *  │ │     │ │
+     *  └───────┘ │
+     *    └───────┘
+     *
+     */
+    const rectangle1 = { x: 2, y: 2, width: 4, height: 4 };
+    const rectangle2 = { x: 1, y: 1, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Top);
+  });
+
+  it('should detect bottom corner overlap', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │ ┌───────┐
+     *  │ │     │ │
+     *  │ │     │ │
+     *  └─│─────┘ │
+     *    └───────┘
+     *
+     */
+    const rectangle1 = { x: 1, y: 1, width: 4, height: 4 };
+    const rectangle2 = { x: 2, y: 2, width: 4, height: 4 };
+
+    expect(getDirection(rectangle1, rectangle2)).toEqual(Direction.Bottom);
+  });
+});

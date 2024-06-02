@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, OnInit, ViewChild } fro
 import { FormControl } from '@angular/forms';
 
 export class Grid {
-  cols = 15;
-  rows = 55;
+  cols = 10;
+  rows = 10;
 
   cellWidth = 100;
   cellHeight = 50;
@@ -52,27 +52,67 @@ export class Grid {
     this._element.appendChild(this.girdLines);
   }
 
-  add(item: GridItem) {
-    for (let x = 0; x < item.cols; x++) {
-      for (let y = 0; y < item.rows; y++) {
-        this.matrix[item.row + y][item.col + x] = item;
+  change(item: GridItem, col: number, row: number): void {
+    for (let x = item.col; x < item.col + item.cols; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        const over = this.matrix[y][x];
+
+        // console.log('over', over);
+
+        if (!over) continue;
+
+        // if (over.isDragging) continue;
+
+        if (over === item) continue;
+
+        this.shiftToLeft(over, 1);
+        over.rerender(over.col - 1, over.row);
+
+        this.change(item, col, row);
       }
     }
 
-    item.render();
+    this.removeBy(item, col, row);
+    this.add(item);
+
+    // console.table(this.matrix);
   }
 
-  change(col: number, row: number, item: GridItem): void {
-    for (let x = 0; x < item.cols; x++) {
-      for (let y = 0; y < item.rows; y++) {
-        const cellItem = this.matrix[row + y][col + x];
-        if (cellItem === item) continue;
+  shiftToLeft(item: GridItem, shift: number) {
+    // remove cols from right
+    for (let x = item.col + item.cols - shift; x < item.col + item.cols; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        this.matrix[y][x] = null;
+      }
+    }
+    // add cols to left
+    for (let x = item.col - shift; x < item.col; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        this.matrix[y][x] = item;
+      }
+    }
+  }
 
-        if (!cellItem) continue;
+  add(item: GridItem) {
+    for (let x = item.col; x < item.col + item.cols; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        this.matrix[y][x] = item;
+      }
+    }
+  }
 
-        cellItem.row += 1;
-        // cellItem.y += 50 * cellItem._scale;
-        cellItem.render();
+  removeBy(item: GridItem, col: number, row: number) {
+    for (let x = col; x < col + item.cols; x++) {
+      for (let y = row; y < row + item.rows; y++) {
+        this.matrix[y][x] = null;
+      }
+    }
+  }
+
+  remove(item: GridItem) {
+    for (let x = item.col; x < item.col + item.cols; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        this.matrix[y][x] = null;
       }
     }
   }
@@ -130,6 +170,8 @@ export class GridItem {
   scrollTop = 0;
   scrollLeft = 0;
 
+  isDragging = false;
+
   // scale = 0.5;
   private _scale = 1;
   //
@@ -139,6 +181,8 @@ export class GridItem {
   constructor(
     col: number,
     row: number,
+    cols: number,
+    rows: number,
     private _element: HTMLElement,
     private _container: HTMLElement,
     private _grid: Grid,
@@ -148,8 +192,21 @@ export class GridItem {
     this.col = col;
     this.row = row;
 
+    this.cols = cols;
+    this.rows = rows;
+
     this.x = this.col * this._actualCellWidth;
     this.y = this.row * this._actualCellHeight;
+  }
+
+  rerender(col: number, row: number) {
+    this.col = col;
+    this.row = row;
+
+    this.x = this.col * this._actualCellWidth;
+    this.y = this.row * this._actualCellHeight;
+
+    this.render();
   }
 
   scale(scale: number) {
@@ -163,12 +220,18 @@ export class GridItem {
   }
 
   render(color = 'yellow') {
+    const opacity = color === 'green' ? 0.5 : 1;
+
     this._element.style.cssText = `
       transform: translate3d(${this.x * (1 / this._scale)}px, ${this.y * (1 / this._scale)}px, 0);
       background: ${color};
       width: ${this.cellWidth * this.cols}px;
       height: ${this.cellHeight * this.rows}px;
+      opacity: ${opacity};
     `;
+
+    const col = this.col;
+    const row = this.row;
 
     this.col = Math.round(this.x / this._actualCellWidth);
     if (this.col < 0) this.col = 0;
@@ -176,7 +239,7 @@ export class GridItem {
     this.row = Math.round(this.y / this._actualCellHeight);
     if (this.row < 0) this.row = 0;
 
-    // this._grid.change(this.col, this.row, this);
+    this._grid.change(this, col, row);
   }
 
   private _requestAnimationFrameId = 0;
@@ -200,17 +263,12 @@ export class GridItem {
   onMouseUp = (e: MouseEvent) => {
     e.preventDefault();
 
+    this.isDragging = false;
+
     cancelAnimationFrame(this._requestAnimationFrameId);
 
     document.removeEventListener('mousemove', this.onMouseMove);
     document.removeEventListener('mouseup', this.onMouseUp);
-
-    console.table({
-      x: this.x,
-      y: this.y,
-      col: this.col,
-      row: this.row,
-    });
 
     this.col = Math.trunc(this.x / this._actualCellWidth);
     if (this.col < 0) this.col = 0;
@@ -226,6 +284,8 @@ export class GridItem {
 
   onMouseDown = (e: MouseEvent) => {
     e.preventDefault();
+
+    this.isDragging = true;
 
     this.scrollLeft = this._container.scrollLeft;
     this.scrollTop = this._container.scrollTop;
@@ -305,21 +365,31 @@ export class GridComponent implements OnInit {
   @ViewChild('grid', { static: true }) gridElement!: ElementRef<HTMLElement>;
   @ViewChild('gridItem0', { static: true }) gridItemElement0!: ElementRef<HTMLElement>;
   @ViewChild('gridItem1', { static: true }) gridItemElement1!: ElementRef<HTMLElement>;
+  @ViewChild('gridItem2', { static: true }) gridItemElement2!: ElementRef<HTMLElement>;
 
   scale = new FormControl(1, { nonNullable: true });
 
   constructor(private _elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit(): void {
-    const grid = new Grid(this.gridElement.nativeElement);
-
-    grid.render();
-
-    grid.add(new GridItem(3, 3, this.gridItemElement0.nativeElement, this._elementRef.nativeElement, grid));
-    grid.add(new GridItem(3, 10, this.gridItemElement1.nativeElement, this._elementRef.nativeElement, grid));
-
-    this.scale.valueChanges.subscribe((value) => {
-      grid.scale(value);
-    });
+    // const grid = new Grid(this.gridElement.nativeElement);
+    //
+    // grid.render();
+    //
+    // const item1 = new GridItem(0, 1, 2, 2, this.gridItemElement0.nativeElement, this._elementRef.nativeElement, grid);
+    // grid.add(item1);
+    // item1.render();
+    //
+    // const item2 = new GridItem(3, 1, 3, 3, this.gridItemElement1.nativeElement, this._elementRef.nativeElement, grid);
+    // grid.add(item2);
+    // item2.render();
+    //
+    // const item3 = new GridItem(4, 4, 3, 3, this.gridItemElement2.nativeElement, this._elementRef.nativeElement, grid);
+    // grid.add(item3);
+    // item3.render();
+    //
+    // this.scale.valueChanges.subscribe((value) => {
+    //   grid.scale(value);
+    // });
   }
 }
