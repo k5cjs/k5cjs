@@ -1,0 +1,17 @@
+<div #grid class="grid">
+  <lib-item
+    *libGrid="let item"
+    [col]="item.col"
+    [row]="item.row"
+    [cols]="item.cols"
+    [rows]="item.rows"
+    [matrice]="item.matrice"
+    [id]="item.id"
+    [template]="item.template"
+    class="grid__item"
+  >
+    <div>id: {{ item.id }}</div>
+    <div>col: {{ item.col }}</div>
+    <div>row: {{ item.row }}</div>
+  </lib-item>
+</div>
