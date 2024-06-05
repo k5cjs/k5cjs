@@ -15,26 +15,29 @@ export class ItemComponent implements OnChanges {
   @Input({ required: true }) matrice!: Matrice;
   @Input({ required: true }) id!: symbol;
   @Input({ required: true }) template!: EmbeddedViewRef<unknown>;
+  @Input({ required: true }) scale!: number;
 
   elementRef = inject(ElementRef);
 
   cellWidth = 100;
   cellHeight = 100;
 
-  private _scale = 1;
   //
-  private _actualCellWidth = this.cellWidth * this._scale;
-  private _actualCellHeight = this.cellHeight * this._scale;
+  private _actualCellWidth!: number;
+  private _actualCellHeight!: number;
 
   private _requestAnimationFrameId!: number;
 
   ngOnChanges(): void {
     if (this.isMouseDown) return;
 
+    this._actualCellWidth = this.cellWidth * this.scale;
+    this._actualCellHeight = this.cellHeight * this.scale;
+
     this.x = this.col * this._actualCellWidth;
     this.y = this.row * this._actualCellHeight;
 
-    console.log('on change', this.id, this.col, this.row);
+    console.log('on change', this.id, this.col, this.row, this.scale);
 
     this.render();
   }
@@ -71,7 +74,16 @@ export class ItemComponent implements OnChanges {
 
     this.render('green');
 
-    this.matrice.change({
+    this.matrice.reset({
+      id: this.id,
+      col: this.col,
+      row: this.row,
+      cols: this.cols,
+      rows: this.rows,
+      template: this.template,
+    });
+
+    this.matrice.move({
       id: this.id,
       col: this.col,
       row: this.row,
@@ -93,17 +105,19 @@ export class ItemComponent implements OnChanges {
     // document.removeEventListener('mouseup', this.onMouseUp);
 
     this.col = Math.trunc(this.x / this._actualCellWidth);
-    if (this.col < 0) this.col = 0;
+    // if (this.col < 0) this.col = 0;
 
     this.row = Math.trunc(this.y / this._actualCellHeight);
-    if (this.row < 0) this.row = 0;
+    // if (this.row < 0) this.row = 0;
 
     this.x = this.col * this._actualCellWidth;
     this.y = this.row * this._actualCellHeight;
 
     this.render('orange');
 
-    this.matrice.change({
+    this.matrice.update();
+
+    this.matrice.move({
       id: this.id,
       col: this.col,
       row: this.row,
@@ -130,6 +144,8 @@ export class ItemComponent implements OnChanges {
 
     document.addEventListener('mousemove', this.onMouseMove);
     // document.addEventListener('mouseup', this.onMouseUp);
+    //
+    this.matrice.init();
   }
 
   render(color = 'yellow') {
@@ -137,7 +153,7 @@ export class ItemComponent implements OnChanges {
     const transition = color !== 'green' ? 'transform 300ms' : null;
 
     this.elementRef.nativeElement.style.cssText = `
-      transform: translate3d(${this.x * (1 / this._scale)}px, ${this.y * (1 / this._scale)}px, 0);
+      transform: translate3d(${this.x * (1 / this.scale)}px, ${this.y * (1 / this.scale)}px, 0);
       background: ${color};
       width: ${this.cellWidth * this.cols}px;
       height: ${this.cellHeight * this.rows}px;
@@ -149,9 +165,9 @@ export class ItemComponent implements OnChanges {
     const row = this.row;
 
     this.col = Math.trunc(this.x / this._actualCellWidth);
-    if (this.col < 0) this.col = 0;
+    // if (this.col < 0) this.col = 0;
 
     this.row = Math.trunc(this.y / this._actualCellHeight);
-    if (this.row < 0) this.row = 0;
+    // if (this.row < 0) this.row = 0;
   }
 }
