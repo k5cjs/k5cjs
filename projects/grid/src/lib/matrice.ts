@@ -15,50 +15,119 @@ interface Item {
  */
 export class Matrice {
   private _grid: (symbol | null)[][];
+  private _history: Map<symbol, Item>[];
+
   private _items: Map<symbol, Item> = new Map();
 
-  private _index = 0;
-
-  constructor(public cols: number, public rows: number) {
+  constructor(public cols: number, public rows: number, public preview: EmbeddedViewRef<unknown>) {
     this._grid = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+    this._history = [];
   }
 
-  addNew(item: Item) {
+  add(item: Item) {
     for (let y = item.row; y < item.row + item.rows; y++) {
       for (let x = item.col; x < item.col + item.cols; x++) {
-        this._grid[y][x] = item.id;
+        if (this._grid[y]) this._grid[y][x] = item.id;
       }
     }
 
     this._items.set(item.id, item);
 
+    this.pushToHistory();
+
     return item;
   }
 
-  add(col: number, row: number, cols: number, rows: number) {
-    const id = Symbol(this._index++);
+  // tmpGrid: (symbol | null)[][] = [];
+  tmpItems: Map<symbol, Item> = new Map();
 
-    for (let y = row; y < row + rows; y++) {
-      for (let x = col; x < col + cols; x++) {
-        this._grid[y][x] = id;
-      }
+  init() {
+    // this.tmpGrid = this._grid.map((row) => row.map((id) => id));
+    this.tmpItems = new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }]));
+
+    // console.table(this.tmpGrid);
+    console.log('init');
+  }
+
+  lastCol1 = 0;
+  lastRow1 = 0;
+
+  reset(item: Item) {
+    if (item.col === this.lastCol1 && item.row === this.lastRow1) return;
+
+    this.lastCol1 = item.col;
+    this.lastRow1 = item.row;
+
+    // this._grid = this.tmpGrid.map((row) => row.map((id) => id));
+    this._items = new Map([...this.tmpItems.entries()].map(([key, item]) => [key, { ...item }]));
+
+    this._items.forEach((item1) => {
+      if (!item1.template) return;
+
+      if (item.id === item1.id) return;
+
+      (item1.template.context as any).$implicit.col = item1.col;
+      (item1.template.context as any).$implicit.row = item1.row;
+      (item1.template.context as any).$implicit.cols = item1.cols;
+      (item1.template.context as any).$implicit.rows = item1.rows;
+
+      item1.template.detectChanges();
+    });
+
+    console.log('reset');
+
+    console.table(this._grid);
+  }
+
+  update() {
+    // this.tmpGrid = this._grid.map((row) => row.map((id) => id));
+    this.tmpItems = new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }]));
+  }
+
+  test = 0;
+
+  lastCol = 0;
+  lastRow = 0;
+
+  move(item: Item) {
+    /**
+     * skip if the item is already at the last position
+     */
+    if (item.col === this.lastCol && item.row === this.lastRow) return;
+
+    this.lastCol = item.col;
+    this.lastRow = item.row;
+
+    this.remove(this._items.get(item.id)!);
+
+    this.test = 0;
+
+    const change = this.change(item);
+
+    if (!change) {
+      throw new Error('Can not move');
     }
 
-    const item: Item = { id, col, row, cols, rows };
+    (this.preview.context as any).$implicit.col = item.col;
+    (this.preview.context as any).$implicit.row = item.row;
+    (this.preview.context as any).$implicit.cols = item.cols;
+    (this.preview.context as any).$implicit.rows = item.rows;
 
-    this._items.set(id, item);
-
-    return item;
+    this.preview.detectChanges();
   }
 
   change(item: Item): boolean {
-    if (item.col === this._items.get(item.id)!.col && item.row === this._items.get(item.id)!.row) return true;
+    this.test++;
 
-    console.log('change', item.id, item.col, item.row);
+    if (this.test > 100) {
+      throw new Error('to many requests');
+    }
 
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        const over = this._grid[y][x];
+        const over = this._grid[y]?.[x];
+
+        console.log('over', over, item);
 
         if (!over) continue;
 
@@ -70,8 +139,6 @@ export class Matrice {
           { x: overItem.col, y: overItem.row, width: overItem.cols, height: overItem.rows },
           { x: item.col, y: item.row, width: item.cols, height: item.rows },
         );
-
-        console.log('direction', direction);
 
         if (direction === Position.Right) {
           const shift = overItem.col + overItem.cols - item.col;
@@ -89,10 +156,11 @@ export class Matrice {
           const shift = item.row + item.rows - overItem.row;
 
           if (!this.shiftToBottom(overItem, shift)) return false;
-        } else {
-          this.swap(this._items.get(item.id)!, overItem);
-          console.log('center');
+        } else if (direction === Position.Center) {
+          // this.swap(this._items.get(item.id)!, overItem);
 
+          return false;
+        } else {
           return false;
         }
 
@@ -101,7 +169,7 @@ export class Matrice {
     }
 
     this.remove(this._items.get(item.id)!);
-    this.addNew(item);
+    this.add(item);
     this._items.set(item.id, item);
 
     (item.template!.context as any).$implicit.col = item.col;
@@ -140,8 +208,6 @@ export class Matrice {
     }
 
     item.col -= shift;
-
-    console.log('shiftToLeft', (item.template!.context as any).$implicit.col, item.col);
 
     (item.template!.context as any).$implicit.col = item.col;
     item.template!.detectChanges();
@@ -270,8 +336,8 @@ export class Matrice {
     item2.cols = cols;
     item2.rows = rows;
 
-    this.addNew(item1);
-    this.addNew(item2);
+    this.add(item1);
+    this.add(item2);
 
     (item1.template!.context as any).$implicit.col = item1.col;
     (item1.template!.context as any).$implicit.row = item1.row;
@@ -284,24 +350,17 @@ export class Matrice {
     (item2.template!.context as any).$implicit.cols = item2.cols;
     (item2.template!.context as any).$implicit.rows = item2.rows;
     item2.template!.detectChanges();
-
-    debugger;
   }
 
   remove(item: Item) {
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        this._grid[y][x] = null;
+        if (this._grid[y]) this._grid[y][x] = null;
       }
     }
   }
 
-  clone(): Matrice {
-    const matrice = new Matrice(this.cols, this.rows);
-
-    matrice._grid = this._grid.map((row) => row.slice());
-    matrice._items = new Map(this._items);
-
-    return matrice;
+  pushToHistory(): void {
+    this._history.push(new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }])));
   }
 }

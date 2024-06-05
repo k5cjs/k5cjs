@@ -92,16 +92,16 @@ export const getPosition = (staticRectangle: Rectangle, movingRectangle: Rectang
     },
   ];
 
-  console.log(directions, {
-    staticRectangle,
-    movingRectangle,
-    movingCenter,
-    staticTop,
-    staticRight,
-    staticBottom,
-    staticLeft,
-    staticCenter,
-  });
+  // console.log(directions, {
+  //   staticRectangle,
+  //   movingRectangle,
+  //   movingCenter,
+  //   staticTop,
+  //   staticRight,
+  //   staticBottom,
+  //   staticLeft,
+  //   staticCenter,
+  // });
 
   return directions.reduce((prev, current) => (prev.distance <= current.distance ? prev : current)).direction;
 };

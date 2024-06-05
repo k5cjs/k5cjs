@@ -1,4 +1,13 @@
-<div #grid class="grid">
+<div #grid class="grid" [style.transform]="'scale(' + scale + ')'">
+  <lib-preview
+    *libPreview="let item"
+    [col]="item.col"
+    [row]="item.row"
+    [cols]="item.cols"
+    [rows]="item.rows"
+    [scale]="scale"
+  ></lib-preview>
+
   <lib-item
     *libGrid="let item"
     [col]="item.col"
@@ -8,6 +17,7 @@
     [matrice]="item.matrice"
     [id]="item.id"
     [template]="item.template"
+    [scale]="scale"
     class="grid__item"
   >
     <div>id: {{ item.id }}</div>
