@@ -1,12 +1,16 @@
-<div #grid class="grid" [style.transform]="'scale(' + scale + ')'">
-  <lib-preview
+<button (click)="back()">back</button>
+
+<div #gridRef class="grid">
+  <kc-lib-lines [cols]="grid.cols" [rows]="grid.rows" [grid]="grid" [scale]="scale" />
+
+  <kc-lib-preview
     *libPreview="let item"
     [col]="item.col"
     [row]="item.row"
     [cols]="item.cols"
     [rows]="item.rows"
     [scale]="scale"
-  ></lib-preview>
+  />
 
   <lib-item
     *libGrid="let item"
@@ -14,10 +18,12 @@
     [row]="item.row"
     [cols]="item.cols"
     [rows]="item.rows"
-    [matrice]="item.matrice"
+    [grid]="item.grid"
     [id]="item.id"
     [template]="item.template"
     [scale]="scale"
+    (move)="move($event)"
+    (stop)="stop()"
     class="grid__item"
   >
     <div>id: {{ item.id }}</div>

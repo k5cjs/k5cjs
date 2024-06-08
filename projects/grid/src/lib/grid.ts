@@ -1,87 +1,73 @@
 import { EmbeddedViewRef } from '@angular/core';
 
+import { Cell } from './cell.type';
 import { Position, getPosition } from './get-position';
 
-interface Item {
-  id: symbol;
-  col: number;
-  row: number;
-  cols: number;
-  rows: number;
-  template?: EmbeddedViewRef<unknown>;
-}
-/**
- *
- */
-export class Matrice {
-  private _grid: (symbol | null)[][];
+type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
+
+export class Grid {
+  /**
+   * cols are the number of columns in the grid
+   */
+  public cols: number;
+  /**
+   * rows are the number of rows in the grid
+   */
+  public rows: number;
+  /**
+   * cellWidth is the width of each cell in the grid
+   */
+  public cellWidth: number;
+  /**
+   * cellHeight is the height of each cell in the grid
+   */
+  public cellHeight: number;
+
+  public scrollTop = 0;
+  public scrollLeft = 0;
+  /**
+   * preview is the preview of the item that is being dragged
+   */
+  public preview: EmbeddedViewRef<{ $implicit: Cell }>;
+
+  private _matrix: (symbol | null)[][];
+  private _items: Map<symbol, Item> = new Map();
   private _history: Map<symbol, Item>[];
 
-  private _items: Map<symbol, Item> = new Map();
+  constructor(configs: {
+    cols: number;
+    rows: number;
+    cellWidth: number;
+    cellHeight: number;
+    preview: EmbeddedViewRef<{ $implicit: Cell }>;
+    scrollTop: number;
+    scrollLeft: number;
+  }) {
+    this.cols = configs.cols;
+    this.rows = configs.rows;
+    this.cellWidth = configs.cellWidth;
+    this.cellHeight = configs.cellHeight;
+    this.preview = configs.preview;
+    this.scrollTop = configs.scrollTop;
+    this.scrollLeft = configs.scrollLeft;
 
-  constructor(public cols: number, public rows: number, public preview: EmbeddedViewRef<unknown>) {
-    this._grid = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+    this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
     this._history = [];
   }
 
   add(item: Item) {
     for (let y = item.row; y < item.row + item.rows; y++) {
       for (let x = item.col; x < item.col + item.cols; x++) {
-        if (this._grid[y]) this._grid[y][x] = item.id;
+        if (this._matrix[y]) this._matrix[y][x] = item.id;
       }
     }
 
     this._items.set(item.id, item);
 
+    this._history = [];
     this.pushToHistory();
 
     return item;
-  }
-
-  // tmpGrid: (symbol | null)[][] = [];
-  tmpItems: Map<symbol, Item> = new Map();
-
-  init() {
-    // this.tmpGrid = this._grid.map((row) => row.map((id) => id));
-    this.tmpItems = new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }]));
-
-    // console.table(this.tmpGrid);
-    console.log('init');
-  }
-
-  lastCol1 = 0;
-  lastRow1 = 0;
-
-  reset(item: Item) {
-    if (item.col === this.lastCol1 && item.row === this.lastRow1) return;
-
-    this.lastCol1 = item.col;
-    this.lastRow1 = item.row;
-
-    // this._grid = this.tmpGrid.map((row) => row.map((id) => id));
-    this._items = new Map([...this.tmpItems.entries()].map(([key, item]) => [key, { ...item }]));
-
-    this._items.forEach((item1) => {
-      if (!item1.template) return;
-
-      if (item.id === item1.id) return;
-
-      (item1.template.context as any).$implicit.col = item1.col;
-      (item1.template.context as any).$implicit.row = item1.row;
-      (item1.template.context as any).$implicit.cols = item1.cols;
-      (item1.template.context as any).$implicit.rows = item1.rows;
-
-      item1.template.detectChanges();
-    });
-
-    console.log('reset');
-
-    console.table(this._grid);
-  }
-
-  update() {
-    // this.tmpGrid = this._grid.map((row) => row.map((id) => id));
-    this.tmpItems = new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }]));
   }
 
   test = 0;
@@ -89,11 +75,22 @@ export class Matrice {
   lastCol = 0;
   lastRow = 0;
 
-  move(item: Item) {
+  move(item: Item): boolean {
+    /**
+     * skip if the item is out of the grid
+     */
+    if (item.col < 0 || item.row < 0 || item.col + item.cols > this.cols || item.row + item.rows > this.rows)
+      return false;
+
     /**
      * skip if the item is already at the last position
      */
-    if (item.col === this.lastCol && item.row === this.lastRow) return;
+    if (item.col === this.lastCol && item.row === this.lastRow) return false;
+
+    const tmpItems = this._cloneItems();
+
+    this.restoreFromHistory();
+    this.updateGrid();
 
     this.lastCol = item.col;
     this.lastRow = item.row;
@@ -105,15 +102,36 @@ export class Matrice {
     const change = this.change(item);
 
     if (!change) {
-      throw new Error('Can not move');
+      this._items = tmpItems;
+      this.updateGrid();
+      this.render();
+
+      console.error('unabe to change', item);
+
+      return false;
     }
 
-    (this.preview.context as any).$implicit.col = item.col;
-    (this.preview.context as any).$implicit.row = item.row;
-    (this.preview.context as any).$implicit.cols = item.cols;
-    (this.preview.context as any).$implicit.rows = item.rows;
+    this.renderPreview(item);
 
-    this.preview.detectChanges();
+    this._items.set(item.id, item);
+    item.template.context.$implicit.col = item.col;
+    item.template.context.$implicit.row = item.row;
+    item.template.context.$implicit.cols = item.cols;
+    item.template.context.$implicit.rows = item.rows;
+
+    item.template.detectChanges();
+
+    this.render();
+
+    return true;
+  }
+
+  drop(): boolean {
+    this.pushToHistory();
+    this.updateGrid();
+    this.render();
+
+    return true;
   }
 
   change(item: Item): boolean {
@@ -125,9 +143,7 @@ export class Matrice {
 
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        const over = this._grid[y]?.[x];
-
-        console.log('over', over, item);
+        const over = this._matrix[y]?.[x];
 
         if (!over) continue;
 
@@ -168,17 +184,6 @@ export class Matrice {
       }
     }
 
-    this.remove(this._items.get(item.id)!);
-    this.add(item);
-    this._items.set(item.id, item);
-
-    (item.template!.context as any).$implicit.col = item.col;
-    (item.template!.context as any).$implicit.row = item.row;
-    (item.template!.context as any).$implicit.cols = item.cols;
-    (item.template!.context as any).$implicit.rows = item.rows;
-
-    item.template!.detectChanges();
-
     return true;
   }
 
@@ -197,20 +202,19 @@ export class Matrice {
     // remove cols from right
     for (let x = item.col + item.cols - shift; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        this._grid[y][x] = null;
+        this._matrix[y][x] = null;
       }
     }
     // add cols to left
     for (let x = item.col - shift; x < item.col; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        this._grid[y][x] = item.id;
+        this._matrix[y][x] = item.id;
       }
     }
 
     item.col -= shift;
 
-    (item.template!.context as any).$implicit.col = item.col;
-    item.template!.detectChanges();
+    this._rerenderItem(item.template, item);
 
     return true;
   }
@@ -230,21 +234,20 @@ export class Matrice {
     // remove cols from left
     for (let x = item.col; x < item.col + shift; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        this._grid[y][x] = null;
+        this._matrix[y][x] = null;
       }
     }
 
     // add cols to right
     for (let x = item.col + item.cols; x < item.col + item.cols + shift; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        this._grid[y][x] = item.id;
+        this._matrix[y][x] = item.id;
       }
     }
 
     item.col += shift;
 
-    (item.template!.context as any).$implicit.col = item.col;
-    item.template!.detectChanges();
+    this._rerenderItem(item.template, item);
 
     return true;
   }
@@ -264,21 +267,20 @@ export class Matrice {
     // remove rows from bottom
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row + item.rows - shift; y < item.row + item.rows; y++) {
-        this._grid[y][x] = null;
+        this._matrix[y][x] = null;
       }
     }
 
     // add rows to top
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row - shift; y < item.row; y++) {
-        this._grid[y][x] = item.id;
+        this._matrix[y][x] = item.id;
       }
     }
 
     item.row -= shift;
 
-    (item.template!.context as any).$implicit.row = item.row;
-    item.template!.detectChanges();
+    this._rerenderItem(item.template, item);
 
     return true;
   }
@@ -298,21 +300,20 @@ export class Matrice {
     // remove rows from top
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + shift; y++) {
-        this._grid[y][x] = null;
+        this._matrix[y][x] = null;
       }
     }
 
     // add rows to bottom
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row + item.rows; y < item.row + item.rows + shift; y++) {
-        this._grid[y][x] = item.id;
+        this._matrix[y][x] = item.id;
       }
     }
 
     item.row += shift;
 
-    (item.template!.context as any).$implicit.row = item.row;
-    item.template!.detectChanges();
+    this._rerenderItem(item.template, item);
 
     return true;
   }
@@ -339,28 +340,79 @@ export class Matrice {
     this.add(item1);
     this.add(item2);
 
-    (item1.template!.context as any).$implicit.col = item1.col;
-    (item1.template!.context as any).$implicit.row = item1.row;
-    (item1.template!.context as any).$implicit.cols = item1.cols;
-    (item1.template!.context as any).$implicit.rows = item1.rows;
-    item1.template!.detectChanges();
+    item1.template.context.$implicit.col = item1.col;
+    item1.template.context.$implicit.row = item1.row;
+    item1.template.context.$implicit.cols = item1.cols;
+    item1.template.context.$implicit.rows = item1.rows;
+    item1.template.detectChanges();
 
-    (item2.template!.context as any).$implicit.col = item2.col;
-    (item2.template!.context as any).$implicit.row = item2.row;
-    (item2.template!.context as any).$implicit.cols = item2.cols;
-    (item2.template!.context as any).$implicit.rows = item2.rows;
-    item2.template!.detectChanges();
+    item2.template.context.$implicit.col = item2.col;
+    item2.template.context.$implicit.row = item2.row;
+    item2.template.context.$implicit.cols = item2.cols;
+    item2.template.context.$implicit.rows = item2.rows;
+    item2.template.detectChanges();
   }
 
   remove(item: Item) {
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
-        if (this._grid[y]) this._grid[y][x] = null;
+        if (this._matrix[y]) this._matrix[y][x] = null;
       }
     }
   }
 
   pushToHistory(): void {
-    this._history.push(new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }])));
+    const items = this._cloneItems();
+    this._history.push(items);
+  }
+
+  restoreFromHistory(): void {
+    if (this._history.length === 0) return;
+
+    this._items = new Map(
+      [...this._history[this._history.length - 1].entries()].map(([key, item]) => [key, { ...item }]),
+    );
+  }
+
+  updateGrid(): void {
+    this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
+
+    this._items.forEach((item) => {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        for (let x = item.col; x < item.col + item.cols; x++) {
+          if (this._matrix[y]) this._matrix[y][x] = item.id;
+        }
+      }
+    });
+  }
+
+  render() {
+    this._items.forEach((item) => this._rerenderItem(item.template, item));
+  }
+
+  renderPreview(item: Item) {
+    this._rerenderItem(this.preview, item);
+  }
+
+  back() {
+    if (this._history.length === 1) return;
+
+    this._history.pop();
+    this.restoreFromHistory();
+    this.updateGrid();
+    this.render();
+  }
+
+  private _cloneItems(): Map<symbol, Item> {
+    return new Map([...this._items.entries()].map(([key, item]) => [key, { ...item }]));
+  }
+
+  private _rerenderItem(template: Item['template'], { col, row, cols, rows }: Partial<Omit<Item, 'template'>>) {
+    if (col !== undefined) template.context.$implicit.col = col;
+    if (row !== undefined) template.context.$implicit.row = row;
+    if (cols !== undefined) template.context.$implicit.cols = cols;
+    if (rows !== undefined) template.context.$implicit.rows = rows;
+
+    template.detectChanges();
   }
 }

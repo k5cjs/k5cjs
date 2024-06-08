@@ -1,173 +1,193 @@
-import { Component, ElementRef, EmbeddedViewRef, HostListener, Input, OnChanges, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EmbeddedViewRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  inject,
+} from '@angular/core';
 
-import { Matrice } from '../matrice';
+import { Cell } from '../cell.type';
+import { Grid } from '../grid';
 
 @Component({
   selector: 'lib-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ItemComponent implements OnChanges {
+export class ItemComponent implements OnInit, OnChanges {
   @Input({ required: true }) col!: number;
   @Input({ required: true }) row!: number;
   @Input({ required: true }) cols!: number;
   @Input({ required: true }) rows!: number;
-  @Input({ required: true }) matrice!: Matrice;
+  @Input({ required: true }) grid!: Grid;
   @Input({ required: true }) id!: symbol;
-  @Input({ required: true }) template!: EmbeddedViewRef<unknown>;
+  @Input({ required: true }) template!: EmbeddedViewRef<{ $implicit: Cell }>;
   @Input({ required: true }) scale!: number;
 
-  elementRef = inject(ElementRef);
+  @Output() move = new EventEmitter<ItemComponent>();
+  @Output() stop = new EventEmitter<void>();
 
-  cellWidth = 100;
-  cellHeight = 100;
+  elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   //
-  private _actualCellWidth!: number;
-  private _actualCellHeight!: number;
+  width!: number;
+  height!: number;
 
-  private _requestAnimationFrameId!: number;
+  ngOnInit(): void {}
 
   ngOnChanges(): void {
     if (this.isMouseDown) return;
 
-    this._actualCellWidth = this.cellWidth * this.scale;
-    this._actualCellHeight = this.cellHeight * this.scale;
+    this.width = this.grid.cellWidth * this.scale;
+    this.height = this.grid.cellHeight * this.scale;
 
-    this.x = this.col * this._actualCellWidth;
-    this.y = this.row * this._actualCellHeight;
-
-    console.log('on change', this.id, this.col, this.row, this.scale);
+    this.x = this.col * this.width;
+    this.y = this.row * this.height;
 
     this.render();
   }
 
-  mouseX = 0;
-  mouseY = 0;
+  /**
+   * actual position in grid (x, y) in pixels
+   */
   x = 0;
+  /**
+   * actual position in grid (x, y) in pixels
+   */
   y = 0;
-  scrollLeft = 0;
-  scrollTop = 0;
   offsetLeft = 0;
+  /**
+   * distance from mouse to top corner of the item
+   */
   offsetTop = 0;
 
   isMouseDown = false;
 
   onMouseMove = this._onMouseMove.bind(this);
-  onMouseUp = this._onMouseUp.bind(this);
-  onMouseDown = this._onMouseDown.bind(this);
-
-  // @HostListener('mousemove', ['$event'])
-  private _onMouseMove(e: MouseEvent): void {
-    e.preventDefault();
-    // e.stopPropagation();
-
-    if (!this.isMouseDown) return;
-
-    cancelAnimationFrame(this._requestAnimationFrameId);
-
-    this.mouseX = e.clientX;
-    this.mouseY = e.clientY;
-
-    this.x = this.mouseX + this.scrollLeft - this.offsetLeft;
-    this.y = this.mouseY + this.scrollTop - this.offsetTop;
-
-    this.render('green');
-
-    this.matrice.reset({
-      id: this.id,
-      col: this.col,
-      row: this.row,
-      cols: this.cols,
-      rows: this.rows,
-      template: this.template,
-    });
-
-    this.matrice.move({
-      id: this.id,
-      col: this.col,
-      row: this.row,
-      cols: this.cols,
-      rows: this.rows,
-      template: this.template,
-    });
-  }
-
-  @HostListener('mouseup', ['$event'])
-  private _onMouseUp(e: MouseEvent): void {
-    e.preventDefault();
-
-    this.isMouseDown = false;
-
-    cancelAnimationFrame(this._requestAnimationFrameId);
-
-    document.removeEventListener('mousemove', this.onMouseMove);
-    // document.removeEventListener('mouseup', this.onMouseUp);
-
-    this.col = Math.trunc(this.x / this._actualCellWidth);
-    // if (this.col < 0) this.col = 0;
-
-    this.row = Math.trunc(this.y / this._actualCellHeight);
-    // if (this.row < 0) this.row = 0;
-
-    this.x = this.col * this._actualCellWidth;
-    this.y = this.row * this._actualCellHeight;
-
-    this.render('orange');
-
-    this.matrice.update();
-
-    this.matrice.move({
-      id: this.id,
-      col: this.col,
-      row: this.row,
-      cols: this.cols,
-      rows: this.rows,
-      template: this.template,
-    });
-  }
 
   @HostListener('mousedown', ['$event'])
-  private _onMouseDown(e: MouseEvent): void {
+  protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
 
     this.isMouseDown = true;
 
-    // this.scrollLeft = this._container.scrollLeft;
-    // this.scrollTop = this._container.scrollTop;
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
 
-    this.mouseX = e.clientX;
-    this.mouseY = e.clientY;
-
-    this.offsetLeft = this.mouseX + this.scrollLeft - this.x;
-    this.offsetTop = this.mouseY + this.scrollTop - this.y;
+    this.offsetLeft = mouseX + this.grid.scrollLeft - this.x;
+    this.offsetTop = mouseY + this.grid.scrollTop - this.y;
 
     document.addEventListener('mousemove', this.onMouseMove);
-    // document.addEventListener('mouseup', this.onMouseUp);
-    //
-    this.matrice.init();
+  }
+
+  /**
+   * use event from window to avoid losing the mouseup event when the mouse is out of the item
+   */
+  @HostListener('window:mouseup', ['$event'])
+  protected _onMouseUp(e: MouseEvent): void {
+    if (!this.isMouseDown) return;
+
+    e.preventDefault();
+
+    this.isMouseDown = false;
+
+    this.stop.emit();
+
+    document.removeEventListener('mousemove', this.onMouseMove);
+
+    this.x = this.col * this.width;
+    this.y = this.row * this.height;
+    this.grid.drop();
+
+    this.render('orange');
+  }
+
+  protected _onMouseMove(e: MouseEvent): void {
+    if (!this.isMouseDown) return;
+
+    e.preventDefault();
+
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+
+    this.x = mouseX + this.grid.scrollLeft - this.offsetLeft;
+    this.y = mouseY + this.grid.scrollTop - this.offsetTop;
+
+    const col = Math.trunc(this.x / this.width);
+    const row = Math.trunc(this.y / this.height);
+
+    this.render('green');
+
+    this.move.emit(this);
+
+    const allowToMove = this.grid.move({
+      id: this.id,
+      col,
+      row,
+      cols: this.cols,
+      rows: this.rows,
+      template: this.template,
+    });
+    /**
+     * skip if movement is not possible
+     */
+    if (!allowToMove) return;
+    /**
+     * save the last position when the movement is possible
+     */
+    this.col = col;
+    this.row = row;
+  }
+
+  renderMove(color = 'green'): void {
+    this.col = Math.trunc(this.x / this.width);
+    this.row = Math.trunc(this.y / this.height);
+
+    this.render(color);
+
+    const col = Math.trunc(this.x / this.width);
+    const row = Math.trunc(this.y / this.height);
+
+    const allowToMove = this.grid.move({
+      id: this.id,
+      col,
+      row,
+      cols: this.cols,
+      rows: this.rows,
+      template: this.template,
+    });
+    /**
+     * skip if movement is not possible
+     */
+    if (!allowToMove) return;
+    /**
+     * save the last position when the movement is possible
+     */
+    this.col = col;
+    this.row = row;
   }
 
   render(color = 'yellow') {
     const opacity = color === 'green' ? 0.5 : 1;
     const transition = color !== 'green' ? 'transform 300ms' : null;
+    const zIndex = color === 'green' ? 999 : 1;
 
+    // transform: translate3d(${this.x * (1 / this.scale)}px, ${this.y * (1 / this.scale)}px, 0);
     this.elementRef.nativeElement.style.cssText = `
-      transform: translate3d(${this.x * (1 / this.scale)}px, ${this.y * (1 / this.scale)}px, 0);
+      transform: translate3d(${this.x}px, ${this.y}px, 0);
       background: ${color};
-      width: ${this.cellWidth * this.cols}px;
-      height: ${this.cellHeight * this.rows}px;
+      width: ${this.width * this.cols}px;
+      height: ${this.height * this.rows}px;
       opacity: ${opacity};
       transition: ${transition};
+      z-index: ${zIndex};
     `;
-
-    const col = this.col;
-    const row = this.row;
-
-    this.col = Math.trunc(this.x / this._actualCellWidth);
-    // if (this.col < 0) this.col = 0;
-
-    this.row = Math.trunc(this.y / this._actualCellHeight);
-    // if (this.row < 0) this.row = 0;
   }
 }

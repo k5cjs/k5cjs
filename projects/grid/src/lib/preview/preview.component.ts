@@ -1,9 +1,10 @@
-import { Component, ElementRef, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, inject } from '@angular/core';
 
 @Component({
-  selector: 'lib-preview',
+  selector: 'kc-lib-preview',
   templateUrl: './preview.component.html',
   styleUrls: ['./preview.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewComponent implements OnChanges {
   @Input({ required: true }) col!: number;
@@ -13,18 +14,16 @@ export class PreviewComponent implements OnChanges {
 
   @Input({ required: true }) scale!: number;
 
-  elementRef = inject(ElementRef);
+  elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
 
   cellWidth = 100;
   cellHeight = 100;
 
-  ngOnChanges(changes: SimpleChanges): void {
+  ngOnChanges(): void {
     this.render();
   }
 
   render(): void {
-    console.log('render', this.col, this.row, this.cols, this.rows, this.scale);
-
     const actualCellWidth = this.cellWidth * this.scale;
     const actualCellHeight = this.cellHeight * this.scale;
 
@@ -32,9 +31,9 @@ export class PreviewComponent implements OnChanges {
     const y = this.row * actualCellHeight;
 
     this.elementRef.nativeElement.style.cssText = `
-      transform: translate3d(${x * (1 / this.scale)}px, ${y * (1 / this.scale)}px, 0);
-      width: ${this.cellWidth * this.cols}px;
-      height: ${this.cellHeight * this.rows}px;
+      transform: translate3d(${x}px, ${y}px, 0);
+      width: ${actualCellWidth * this.cols}px;
+      height: ${actualCellHeight * this.rows}px;
       transition: transform 300ms;
     `;
   }

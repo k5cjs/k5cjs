@@ -1,17 +1,15 @@
 :host {
   @apply
-    block
-    h-screen
-    overflow-x-hidden
-    overflow-y-auto;
+    flex
+    flex-col
+    overflow-hidden;
 }
 
 .grid {
   @apply
     relative
-    z-10
-    origin-top-left
-    overflow-hidden
+    flex-1
+    overflow-auto
     bg-sky-500;
 
   &__item {
