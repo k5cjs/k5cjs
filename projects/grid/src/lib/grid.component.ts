@@ -1,128 +1,159 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 
+import { Grid } from './grid';
 import { GridDirective } from './grid.directive';
-import { Matrice } from './matrice';
+import { ItemComponent } from './item/item.component';
 import { PreviewDirective } from './preview.directive';
 
 @Component({
-  selector: 'lib-grid',
+  selector: 'kc-lib-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GridComponent implements OnInit, OnChanges {
+export class GridComponent implements OnInit {
   @Input() scale = 1;
 
-  @ViewChild('grid', { static: true }) grid!: ElementRef<HTMLElement>;
+  @ViewChild('gridRef', { static: true }) gridRef!: ElementRef<HTMLElement>;
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
-  cols = 10;
-  rows = 10;
+  grid!: Grid;
 
-  elementRef = inject(ElementRef);
-
-  matrice!: Matrice;
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // this.matrice.scale = this.scale;
-    console.log('scale', this.scale);
-  }
+  private _cdr = inject(ChangeDetectorRef);
+  private _requestAnimationFrameId!: number;
+  private _isMoving = false;
 
   ngOnInit(): void {
-    this.matrice = new Matrice(this.cols, this.rows, this.preview.render({}));
-
-    this.lines();
-
-    const id1 = Symbol('id1');
-    const chart1 = this.gridElement.render({ col: 1, row: 1, cols: 2, rows: 2, matrice: this.matrice, id: id1 });
-
-    (chart1.context as any).$implicit.template = chart1;
-
-    this.matrice.add({
-      id: id1,
-      col: 1,
-      row: 1,
-      cols: 2,
-      rows: 2,
-      template: chart1,
+    this.grid = new Grid({
+      cols: 10,
+      rows: 100,
+      cellWidth: 100,
+      cellHeight: 100,
+      preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0 }),
+      scrollTop: this.gridRef.nativeElement.scrollTop,
+      scrollLeft: this.gridRef.nativeElement.scrollLeft,
     });
 
-    const id2 = Symbol('id2');
-    const chart2 = this.gridElement.render({ col: 3, row: 1, cols: 3, rows: 3, matrice: this.matrice, id: id2 });
+    const items = [
+      { col: 1, row: 1, cols: 2, rows: 2 },
+      { col: 3, row: 1, cols: 3, rows: 3 },
+      { col: 1, row: 3, cols: 2, rows: 2 },
+      { col: 3, row: 4, cols: 2, rows: 2 },
+    ];
 
-    (chart2.context as any).$implicit.template = chart2;
+    items.forEach((item) => {
+      const chart = this.gridElement.render({ grid: this.grid, ...item });
+      (chart.context as any).$implicit.template = chart;
 
-    this.matrice.add({
-      id: id2,
-      col: 3,
-      row: 1,
-      cols: 3,
-      rows: 3,
-      template: chart2,
+      this.grid.add({
+        ...chart.context.$implicit,
+        template: chart,
+      });
     });
 
-    const id3 = Symbol('id3');
-    const chart3 = this.gridElement.render({ col: 1, row: 3, cols: 2, rows: 2, matrice: this.matrice, id: id3 });
+    this.scroll();
+  }
 
-    (chart3.context as any).$implicit.template = chart3;
-
-    this.matrice.add({
-      id: id3,
-      col: 1,
-      row: 3,
-      cols: 2,
-      rows: 2,
-      template: chart3,
+  scroll(): void {
+    this.gridRef.nativeElement.addEventListener('wheel', (event) => {
+      if (this._isMoving) event.preventDefault();
     });
 
-    const id4 = Symbol('id4');
-    const chart4 = this.gridElement.render({ col: 3, row: 4, cols: 2, rows: 2, matrice: this.matrice, id: id4 });
+    this.gridRef.nativeElement.addEventListener('scroll', () => {
+      if (this._isMoving) return;
 
-    (chart4.context as any).$implicit.template = chart4;
-
-    this.matrice.add({
-      id: id4,
-      col: 3,
-      row: 4,
-      cols: 2,
-      rows: 2,
-      template: chart4,
+      this.grid.scrollTop = this.gridRef.nativeElement.scrollTop;
     });
   }
 
-  lines(): void {
-    const girdLines = document.createElement('div');
+  back(): void {
+    this.grid.back();
+  }
 
-    girdLines.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: repeat(${this.cols}, 1fr);
-      grid-template-rows: repeat(${this.rows}, 1fr);
-      border: 1px solid #000;
-    `;
+  stop(): void {
+    cancelAnimationFrame(this._requestAnimationFrameId);
+    this._isMoving = false;
+  }
 
-    for (let y = 0; y < this.rows; y++) {
-      for (let x = 0; x < this.cols; x++) {
-        const cell = document.createElement('div');
-        cell.innerHTML = `${x}, ${y}`;
+  move(item: ItemComponent) {
+    /**
+     * cancel previous requestAnimationFrame
+     * because we want to start new one that will to current position
+     */
+    cancelAnimationFrame(this._requestAnimationFrameId);
 
-        cell.style.cssText = `
-          border: 1px solid #000;
-        `;
-        girdLines.appendChild(cell);
-      }
+    const test = item.y - this.gridRef.nativeElement.scrollTop;
+    const mouseYContainer = item.y + item.height * item.rows - this.gridRef.nativeElement.scrollTop;
+
+    if (test < 0) {
+      const offset = Math.abs(test);
+      const percent = offset / (item.height * item.rows);
+
+      const speed = Math.round(10 * percent);
+
+      this._scrollUp(speed, item);
+    } else if (mouseYContainer > this.gridRef.nativeElement.clientHeight) {
+      const offset = mouseYContainer - this.gridRef.nativeElement.clientHeight;
+      const percent = offset / (item.height * item.rows);
+
+      const speed = Math.round(10 * percent);
+
+      this._scrollDown(speed, item);
+    }
+  }
+
+  private _scrollUp(increase: number, item: ItemComponent): void {
+    if (this.grid.scrollTop <= 0) return;
+
+    this._requestAnimationFrameId = requestAnimationFrame(() => {
+      this.grid.scrollTop -= increase;
+      item.y -= increase;
+
+      this._scrollY(this.grid.scrollTop);
+
+      item.renderMove('green');
+
+      this._scrollUp(increase, item);
+    });
+  }
+
+  private _scrollDown(increase: number, item: ItemComponent) {
+    const scrollHeight = this.gridRef.nativeElement.offsetHeight + this.grid.scrollTop;
+    const gridHeight = this.grid.rows * this.grid.cellHeight * this.scale;
+
+    // add new row if scroll is at the bottom
+    if (scrollHeight + increase >= gridHeight) {
+      this.grid.rows += 1;
+      this._cdr.detectChanges();
+
+      this._scrollDown(increase, item);
+      return;
     }
 
-    this.grid.nativeElement.appendChild(girdLines);
+    this._requestAnimationFrameId = requestAnimationFrame(() => {
+      this.grid.scrollTop += increase;
+      item.y += increase;
 
-    this.grid.nativeElement.style.cssText = `
-      position: relative;
-      width: ${this.cols * 100}px;
-      height: ${this.rows * 100}px;
-    `;
+      this._scrollY(this.grid.scrollTop);
+
+      item.renderMove('green');
+
+      this._scrollDown(increase, item);
+    });
+  }
+
+  private _scrollY(top: number): void {
+    this._isMoving = true;
+    this.gridRef.nativeElement.scrollTo({ top, behavior: 'instant' });
   }
 }

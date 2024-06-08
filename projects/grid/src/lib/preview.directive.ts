@@ -1,6 +1,8 @@
 import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 
-type Context = { $implicit: Record<PropertyKey, unknown> };
+import { Cell } from './cell.type';
+
+type Context = { $implicit: Cell };
 
 @Directive({
   selector: '[libPreview]',
@@ -8,7 +10,9 @@ type Context = { $implicit: Record<PropertyKey, unknown> };
 export class PreviewDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(context: Record<PropertyKey, unknown>): EmbeddedViewRef<unknown> {
-    return this.viewContainer.createEmbeddedView(this.template, { $implicit: context });
+  render(context: Omit<Cell, 'id'>): EmbeddedViewRef<Context> {
+    const id = Symbol('id');
+
+    return this.viewContainer.createEmbeddedView(this.template, { $implicit: { id, ...context } });
   }
 }

@@ -1,6 +1,9 @@
 import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 
-type Context = { $implicit: Record<PropertyKey, unknown> };
+import { Cell } from './cell.type';
+import { Grid } from './grid';
+
+type Context = { $implicit: Cell & { grid: Grid } };
 
 @Directive({
   selector: '[libGrid]',
@@ -8,7 +11,9 @@ type Context = { $implicit: Record<PropertyKey, unknown> };
 export class GridDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(context: Record<PropertyKey, unknown>): EmbeddedViewRef<unknown> {
-    return this.viewContainer.createEmbeddedView(this.template, { $implicit: context });
+  render(context: Omit<Cell, 'id'> & { grid: Grid }): EmbeddedViewRef<Context> {
+    const id = Symbol('id');
+
+    return this.viewContainer.createEmbeddedView<Context>(this.template, { $implicit: { id, ...context } });
   }
 }
