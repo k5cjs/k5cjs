@@ -35,7 +35,7 @@ export class GridComponent implements OnInit {
 
   ngOnInit(): void {
     this.grid = new Grid({
-      cols: 10,
+      cols: 100,
       rows: 100,
       cellWidth: 100,
       cellHeight: 100,
@@ -73,6 +73,7 @@ export class GridComponent implements OnInit {
       if (this._isMoving) return;
 
       this.grid.scrollTop = this.gridRef.nativeElement.scrollTop;
+      this.grid.scrollLeft = this.gridRef.nativeElement.scrollLeft;
     });
   }
 
@@ -95,65 +96,94 @@ export class GridComponent implements OnInit {
     const test = item.y - this.gridRef.nativeElement.scrollTop;
     const mouseYContainer = item.y + item.height * item.rows - this.gridRef.nativeElement.scrollTop;
 
+    let increaseX = 0;
+    let increaseY = 0;
+
     if (test < 0) {
       const offset = Math.abs(test);
       const percent = offset / (item.height * item.rows);
 
       const speed = Math.round(10 * percent);
 
-      this._scrollUp(speed, item);
+      increaseY = -speed;
     } else if (mouseYContainer > this.gridRef.nativeElement.clientHeight) {
       const offset = mouseYContainer - this.gridRef.nativeElement.clientHeight;
       const percent = offset / (item.height * item.rows);
 
       const speed = Math.round(10 * percent);
 
-      this._scrollDown(speed, item);
+      increaseY = speed;
     }
+
+    const testX = item.x - this.gridRef.nativeElement.scrollLeft;
+    const mouseXContainer = item.x + item.width * item.cols - this.gridRef.nativeElement.scrollLeft;
+
+    if (testX < 0) {
+      const offset = Math.abs(testX);
+      const percent = offset / (item.width * item.cols);
+
+      const speed = Math.round(10 * percent);
+
+      increaseX = -speed;
+    } else if (mouseXContainer > this.gridRef.nativeElement.clientWidth) {
+      const offset = mouseXContainer - this.gridRef.nativeElement.clientWidth;
+      const percent = offset / (item.width * item.cols);
+
+      const speed = Math.round(10 * percent);
+
+      increaseX = speed;
+    }
+
+    this._scroll(item, increaseX, increaseY);
   }
 
-  private _scrollUp(increase: number, item: ItemComponent): void {
-    if (this.grid.scrollTop <= 0) return;
+  private _scroll(item: ItemComponent, increaseX: number, increaseY: number): void {
+    if (increaseX === 0 && increaseY === 0) return;
 
-    this._requestAnimationFrameId = requestAnimationFrame(() => {
-      this.grid.scrollTop -= increase;
-      item.y -= increase;
+    if (this.grid.scrollLeft + increaseX <= 0) increaseX = 0;
+    if (this.grid.scrollTop + increaseY <= 0) increaseY = 0;
 
-      this._scrollY(this.grid.scrollTop);
+    const scrollWidth = this.gridRef.nativeElement.offsetWidth + this.grid.scrollLeft;
+    const gridWidth = this.grid.cols * this.grid.cellWidth * this.scale;
 
-      item.renderMove('green');
+    // add new column if scroll is at the right
+    if (scrollWidth + increaseX >= gridWidth) {
+      this.grid.cols += 1;
+      this._cdr.detectChanges();
 
-      this._scrollUp(increase, item);
-    });
-  }
+      this._scroll(item, increaseX, increaseY);
+      return;
+    }
 
-  private _scrollDown(increase: number, item: ItemComponent) {
     const scrollHeight = this.gridRef.nativeElement.offsetHeight + this.grid.scrollTop;
     const gridHeight = this.grid.rows * this.grid.cellHeight * this.scale;
 
     // add new row if scroll is at the bottom
-    if (scrollHeight + increase >= gridHeight) {
+    if (scrollHeight + increaseY >= gridHeight) {
       this.grid.rows += 1;
       this._cdr.detectChanges();
 
-      this._scrollDown(increase, item);
+      this._scroll(item, increaseX, increaseY);
       return;
     }
 
     this._requestAnimationFrameId = requestAnimationFrame(() => {
-      this.grid.scrollTop += increase;
-      item.y += increase;
+      this.grid.scrollLeft += increaseX;
+      this.grid.scrollTop += increaseY;
 
-      this._scrollY(this.grid.scrollTop);
+      item.x += increaseX;
+      item.y += increaseY;
 
       item.renderMove('green');
 
-      this._scrollDown(increase, item);
-    });
-  }
+      this._isMoving = true;
+      this.gridRef.nativeElement.scrollTo({
+        left: this.grid.scrollLeft,
+        top: this.grid.scrollTop,
+        behavior: 'instant',
+      });
 
-  private _scrollY(top: number): void {
-    this._isMoving = true;
-    this.gridRef.nativeElement.scrollTo({ top, behavior: 'instant' });
+      this._scroll(item, increaseX, increaseY);
+    });
   }
 }
