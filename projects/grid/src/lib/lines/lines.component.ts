@@ -32,9 +32,6 @@ export class LinesComponent implements OnChanges {
       left: 0;
       width: 100%;
       height: 100%;
-      display: grid;
-      grid-template-columns: repeat(${this.cols}, 1fr);
-      grid-template-rows: repeat(${this.rows}, 1fr);
       border: 1px solid #000;
     `;
 
@@ -44,7 +41,11 @@ export class LinesComponent implements OnChanges {
         cell.innerHTML = `${x}, ${y}`;
 
         cell.style.cssText = `
+          position: absolute;
+          width: ${100 / this.cols}%;
+          height: ${100 / this.rows}%;
           border: 1px solid #000;
+          transform: translate(${x * 100}%, ${y * 100}%);
         `;
         girdLines.appendChild(cell);
       }
@@ -54,8 +55,8 @@ export class LinesComponent implements OnChanges {
 
     this.gridRef.nativeElement.style.cssText = `
       position: relative;
-      width: ${this.cols * this.grid.cellWidth * this.scale}px;
-      height: ${this.rows * this.grid.cellHeight * this.scale}px;
+      width: 100%;
+      height: 100%;
     `;
   }
 }

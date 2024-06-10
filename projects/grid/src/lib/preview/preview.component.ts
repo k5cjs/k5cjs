@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, inject } from '@angular/core';
 
+import { Grid } from '../grid';
+
 @Component({
   selector: 'kc-lib-preview',
   templateUrl: './preview.component.html',
@@ -14,6 +16,8 @@ export class PreviewComponent implements OnChanges {
 
   @Input({ required: true }) scale!: number;
 
+  @Input() grid!: Grid;
+
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
 
   cellWidth = 100;
@@ -24,16 +28,10 @@ export class PreviewComponent implements OnChanges {
   }
 
   render(): void {
-    const actualCellWidth = this.cellWidth * this.scale;
-    const actualCellHeight = this.cellHeight * this.scale;
-
-    const x = this.col * actualCellWidth;
-    const y = this.row * actualCellHeight;
-
     this.elementRef.nativeElement.style.cssText = `
-      transform: translate3d(${x}px, ${y}px, 0);
-      width: ${actualCellWidth * this.cols}px;
-      height: ${actualCellHeight * this.rows}px;
+      transform: translate(${this.col * (100 / this.cols)}%, ${this.row * (100 / this.rows)}%);
+      width: ${(100 / this.grid.cols) * this.cols}%;
+      height: ${(100 / this.grid.rows) * this.rows}%;
       transition: transform 300ms;
     `;
   }

@@ -29,9 +29,18 @@ export class ItemComponent implements OnInit, OnChanges {
   @Input({ required: true }) grid!: Grid;
   @Input({ required: true }) id!: symbol;
   @Input({ required: true }) template!: EmbeddedViewRef<{ $implicit: Cell }>;
+  @Input({ required: true }) gridRef!: HTMLElement;
   @Input({ required: true }) scale!: number;
 
-  @Output() move = new EventEmitter<ItemComponent>();
+  @Output() move = new EventEmitter<{
+    offsetHeight: number;
+    offsetWidth: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    item: ItemComponent;
+  }>();
   @Output() stop = new EventEmitter<void>();
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -45,11 +54,11 @@ export class ItemComponent implements OnInit, OnChanges {
   ngOnChanges(): void {
     if (this.isMouseDown) return;
 
-    this.width = this.grid.cellWidth * this.scale;
-    this.height = this.grid.cellHeight * this.scale;
+    this.width = (100 / this.grid.cols) * this.cols;
+    this.height = (100 / this.grid.rows) * this.rows;
 
-    this.x = this.col * this.width;
-    this.y = this.row * this.height;
+    this.x = (this.col * 100) / this.grid.cols;
+    this.y = (this.row * 100) / this.grid.rows;
 
     this.render();
   }
@@ -58,15 +67,15 @@ export class ItemComponent implements OnInit, OnChanges {
    * actual position in grid (x, y) in pixels
    */
   x = 0;
-  /**
+  /*
    * actual position in grid (x, y) in pixels
    */
   y = 0;
-  offsetLeft = 0;
+  mouseOffsetLeft = 0;
   /**
    * distance from mouse to top corner of the item
    */
-  offsetTop = 0;
+  mouseOffsetTop = 0;
 
   isMouseDown = false;
 
@@ -76,13 +85,15 @@ export class ItemComponent implements OnInit, OnChanges {
   protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
 
+    const { x, y } = this.elementRef.nativeElement.getBoundingClientRect();
+
     this.isMouseDown = true;
 
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
-    this.offsetLeft = mouseX + this.grid.scrollLeft - this.x;
-    this.offsetTop = mouseY + this.grid.scrollTop - this.y;
+    this.mouseOffsetLeft = mouseX - x;
+    this.mouseOffsetTop = mouseY - y;
 
     document.addEventListener('mousemove', this.onMouseMove);
   }
@@ -102,8 +113,9 @@ export class ItemComponent implements OnInit, OnChanges {
 
     document.removeEventListener('mousemove', this.onMouseMove);
 
-    this.x = this.col * this.width;
-    this.y = this.row * this.height;
+    this.x = (this.col * 100) / this.grid.cols;
+    this.y = (this.row * 100) / this.grid.rows;
+
     this.grid.drop();
 
     this.render('orange');
@@ -114,18 +126,29 @@ export class ItemComponent implements OnInit, OnChanges {
 
     e.preventDefault();
 
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
+    const itemOffsetTop = e.clientY - this.gridRef.offsetTop - this.mouseOffsetTop; // px
+    const itemY = itemOffsetTop + this.grid.scrollTop;
 
-    this.x = mouseX + this.grid.scrollLeft - this.offsetLeft;
-    this.y = mouseY + this.grid.scrollTop - this.offsetTop;
+    const itemOffsetLeft = e.clientX - this.gridRef.offsetLeft - this.mouseOffsetLeft; // px
+    const itemX = itemOffsetLeft + this.grid.scrollLeft;
 
-    const col = Math.trunc(this.x / this.width);
-    const row = Math.trunc(this.y / this.height);
+    this.x = (itemX * 100) / this.gridRef.offsetWidth;
+    this.y = (itemY * 100) / this.gridRef.offsetHeight;
+
+    const col = this._col();
+    const row = this._row();
 
     this.render('green');
 
-    this.move.emit(this);
+    this.move.emit({
+      offsetHeight: this.gridRef.offsetHeight,
+      offsetWidth: this.gridRef.offsetWidth,
+      x: itemOffsetLeft,
+      y: itemOffsetTop,
+      width: this.elementRef.nativeElement.offsetWidth,
+      height: this.elementRef.nativeElement.offsetHeight,
+      item: this,
+    });
 
     const allowToMove = this.grid.move({
       id: this.id,
@@ -147,13 +170,10 @@ export class ItemComponent implements OnInit, OnChanges {
   }
 
   renderMove(color = 'green'): void {
-    this.col = Math.trunc(this.x / this.width);
-    this.row = Math.trunc(this.y / this.height);
-
     this.render(color);
 
-    const col = Math.trunc(this.x / this.width);
-    const row = Math.trunc(this.y / this.height);
+    const col = this._col();
+    const row = this._row();
 
     const allowToMove = this.grid.move({
       id: this.id,
@@ -179,15 +199,22 @@ export class ItemComponent implements OnInit, OnChanges {
     const transition = color !== 'green' ? 'transform 300ms' : null;
     const zIndex = color === 'green' ? 999 : 1;
 
-    // transform: translate3d(${this.x * (1 / this.scale)}px, ${this.y * (1 / this.scale)}px, 0);
     this.elementRef.nativeElement.style.cssText = `
-      transform: translate3d(${this.x}px, ${this.y}px, 0);
+      transform: translate(${this.x}cqw, ${this.y}cqh);
       background: ${color};
-      width: ${this.width * this.cols}px;
-      height: ${this.height * this.rows}px;
+      width: ${this.width}%;
+      height: ${this.height}%;
       opacity: ${opacity};
       transition: ${transition};
       z-index: ${zIndex};
     `;
+  }
+
+  private _col(): number {
+    return Math.trunc((this.grid.cols * this.x) / 100);
+  }
+
+  private _row(): number {
+    return Math.trunc((this.grid.rows * this.y) / 100);
   }
 }

@@ -223,7 +223,7 @@ export class GridItem {
     const opacity = color === 'green' ? 0.5 : 1;
 
     this._element.style.cssText = `
-      transform: translate3d(${this.x * (1 / this._scale)}px, ${this.y * (1 / this._scale)}px, 0);
+      transform: translate(${this.x * (1 / this._scale)}px, ${this.y * (1 / this._scale)}px);
       background: ${color};
       width: ${this.cellWidth * this.cols}px;
       height: ${this.cellHeight * this.rows}px;
