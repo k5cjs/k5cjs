@@ -2,15 +2,23 @@
   @apply
     flex
     flex-col
+    p-5
     overflow-hidden;
 }
 
 .grid {
   @apply
-    relative
-    flex-1
+    w-full
+    h-full
     overflow-auto
     bg-sky-500;
+
+  &__items {
+    @apply
+      relative
+      mx-auto
+      [container-type:size];
+  }
 
   &__item {
     @apply

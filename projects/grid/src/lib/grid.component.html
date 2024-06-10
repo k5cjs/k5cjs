@@ -1,33 +1,42 @@
 <button (click)="back()">back</button>
 
 <div #gridRef class="grid">
-  <kc-lib-lines [cols]="grid.cols" [rows]="grid.rows" [grid]="grid" [scale]="scale" />
-
-  <kc-lib-preview
-    *libPreview="let item"
-    [col]="item.col"
-    [row]="item.row"
-    [cols]="item.cols"
-    [rows]="item.rows"
-    [scale]="scale"
-  />
-
-  <lib-item
-    *libGrid="let item"
-    [col]="item.col"
-    [row]="item.row"
-    [cols]="item.cols"
-    [rows]="item.rows"
-    [grid]="item.grid"
-    [id]="item.id"
-    [template]="item.template"
-    [scale]="scale"
-    (move)="move($event)"
-    (stop)="stop()"
-    class="grid__item"
+  <div
+    #tst
+    class="grid__items"
+    [style.width.px]="grid.cols * grid.cellWidth * scale"
+    [style.height.px]="grid.rows * grid.cellHeight * scale"
   >
-    <div>id: {{ item.id }}</div>
-    <div>col: {{ item.col }}</div>
-    <div>row: {{ item.row }}</div>
-  </lib-item>
+    <kc-lib-lines [cols]="grid.cols" [rows]="grid.rows" [grid]="grid" [scale]="scale" />
+
+    <kc-lib-preview
+      *libPreview="let item"
+      [col]="item.col"
+      [row]="item.row"
+      [cols]="item.cols"
+      [rows]="item.rows"
+      [scale]="scale"
+      [grid]="grid"
+    />
+
+    <lib-item
+      *libGrid="let item"
+      [col]="item.col"
+      [row]="item.row"
+      [cols]="item.cols"
+      [rows]="item.rows"
+      [grid]="item.grid"
+      [id]="item.id"
+      [template]="item.template"
+      [scale]="scale"
+      [gridRef]="tst"
+      (move)="move($event)"
+      (stop)="stop()"
+      class="grid__item"
+    >
+      <div>id: {{ item.id }}</div>
+      <div>col: {{ item.col }}</div>
+      <div>row: {{ item.row }}</div>
+    </lib-item>
+  </div>
 </div>
