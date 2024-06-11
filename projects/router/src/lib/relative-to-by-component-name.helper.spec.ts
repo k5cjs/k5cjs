@@ -1,10 +1,19 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Type, inject } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, flush } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { relativeToByComponentName } from './relative-to-by-component-name.helper';
+import { relativeToByComponent, relativeToByComponentName } from './relative-to-by-component-name.helper';
+
+@Component({
+  selector: 'kc-incorrect',
+  template: `
+    Dummy3
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+class IncorrectComponent {}
 
 @Component({
   selector: 'kc-dumpy3',
@@ -18,6 +27,10 @@ class Dumpy3Component {
 
   relative(name: string): ActivatedRoute {
     return relativeToByComponentName(this._roue, name);
+  }
+
+  relativeComponent(component: Type<unknown>): ActivatedRoute {
+    return relativeToByComponent(this._roue, component);
   }
 }
 
@@ -33,6 +46,10 @@ class Dumpy2Component {
 
   relative(name: string): ActivatedRoute {
     return relativeToByComponentName(this._roue, name);
+  }
+
+  relativeComponent(component: Type<unknown>): ActivatedRoute {
+    return relativeToByComponent(this._roue, component);
   }
 }
 
@@ -62,7 +79,7 @@ describe('KcTextarea', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [DumpyComponent, Dumpy1Component, Dumpy2Component, Dumpy3Component],
+      declarations: [DumpyComponent, Dumpy1Component, Dumpy2Component, Dumpy3Component, IncorrectComponent],
       imports: [
         RouterTestingModule.withRoutes([
           {
@@ -100,9 +117,10 @@ describe('KcTextarea', () => {
     const dummy2 = fixture.debugElement.query(By.directive(Dumpy2Component)).componentInstance as Dumpy2Component;
 
     void expect(dummy2.relative('Dumpy1Component').component!.name).toEqual('Dumpy1Component');
+    void expect(dummy2.relativeComponent(Dumpy1Component).component).toEqual(Dumpy1Component);
   }));
 
-  it('check incorect name component name', fakeAsync(() => {
+  it('check incorrect name component name', fakeAsync(() => {
     fixture.detectChanges();
 
     void router.navigateByUrl('/editor/(dialog:id)');
@@ -112,7 +130,8 @@ describe('KcTextarea', () => {
 
     const dummy2 = fixture.debugElement.query(By.directive(Dumpy2Component)).componentInstance as Dumpy2Component;
 
-    void expect(dummy2.relative('IncorectComponent').component?.name).toEqual(undefined);
+    void expect(dummy2.relative('IncorrectComponent').component?.name).toEqual(undefined);
+    void expect(dummy2.relativeComponent(IncorrectComponent).component?.name).toEqual(undefined);
   }));
 
   it('check navigation', fakeAsync(() => {
@@ -126,6 +145,28 @@ describe('KcTextarea', () => {
     const dummy2 = fixture.debugElement.query(By.directive(Dumpy2Component)).componentInstance as Dumpy2Component;
 
     void router.navigate([{ outlets: { dialog: ['id-3'] } }], { relativeTo: dummy2.relative('Dumpy1Component') });
+
+    flush();
+    fixture.detectChanges();
+
+    const dummy3 = fixture.debugElement.query(By.directive(Dumpy3Component)).componentInstance as Dumpy3Component;
+
+    void expect(dummy3).toBeTruthy();
+  }));
+
+  it('check navigation new function', fakeAsync(() => {
+    fixture.detectChanges();
+
+    void router.navigateByUrl('/editor/(dialog:id)');
+
+    flush();
+    fixture.detectChanges();
+
+    const dummy2 = fixture.debugElement.query(By.directive(Dumpy2Component)).componentInstance as Dumpy2Component;
+
+    void router.navigate([{ outlets: { dialog: ['id-3'] } }], {
+      relativeTo: dummy2.relativeComponent(Dumpy1Component),
+    });
 
     flush();
     fixture.detectChanges();
