@@ -1,42 +1,55 @@
 <button (click)="back()">back</button>
 
 <div #gridRef class="grid">
-  <div
-    #tst
-    class="grid__items"
-    [style.width.px]="grid.cols * grid.cellWidth * scale"
-    [style.height.px]="grid.rows * grid.cellHeight * scale"
-  >
-    <kc-lib-lines [cols]="grid.cols" [rows]="grid.rows" [grid]="grid" [scale]="scale" />
+  <div #content>
+    <div>header</div>
+    <!-- [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
+    <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
+      <kc-lib-lines
+        [cols]="grid.cols"
+        [rows]="grid.rows"
+        [grid]="grid"
+        [scale]="scale"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+      />
 
-    <kc-lib-preview
-      *libPreview="let item"
-      [col]="item.col"
-      [row]="item.row"
-      [cols]="item.cols"
-      [rows]="item.rows"
-      [scale]="scale"
-      [grid]="grid"
-    />
+      <kc-lib-preview
+        *libPreview="let item"
+        [col]="item.col"
+        [row]="item.row"
+        [cols]="item.cols"
+        [rows]="item.rows"
+        [event]="item.event"
+        [scale]="scale"
+        [grid]="grid"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+      />
 
-    <lib-item
-      *libGrid="let item"
-      [col]="item.col"
-      [row]="item.row"
-      [cols]="item.cols"
-      [rows]="item.rows"
-      [grid]="item.grid"
-      [id]="item.id"
-      [template]="item.template"
-      [scale]="scale"
-      [gridRef]="tst"
-      (move)="move($event)"
-      (stop)="stop()"
-      class="grid__item"
-    >
-      <div>id: {{ item.id }}</div>
-      <div>col: {{ item.col }}</div>
-      <div>row: {{ item.row }}</div>
-    </lib-item>
+      <lib-item
+        *libGrid="let item"
+        [col]="item.col"
+        [row]="item.row"
+        [cols]="item.cols"
+        [rows]="item.rows"
+        [grid]="item.grid"
+        [id]="item.id"
+        [template]="item.template"
+        [scale]="scale"
+        [gridRef]="items"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+        (move)="move($event)"
+        (stop)="stop()"
+        class="grid__item"
+      >
+        <div>id: {{ item.id }}</div>
+        <div>col: {{ item.col }}</div>
+        <div>row: {{ item.row }}</div>
+      </lib-item>
+    </div>
+
+    <div>footer</div>
   </div>
 </div>

@@ -11,9 +11,7 @@ type Context = { $implicit: Cell & { grid: Grid } };
 export class GridDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(context: Omit<Cell, 'id'> & { grid: Grid }): EmbeddedViewRef<Context> {
-    const id = Symbol('id');
-
-    return this.viewContainer.createEmbeddedView<Context>(this.template, { $implicit: { id, ...context } });
+  render(context: Cell & { grid: Grid }): EmbeddedViewRef<Context> {
+    return this.viewContainer.createEmbeddedView<Context>(this.template, { $implicit: { ...context } });
   }
 }

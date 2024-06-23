@@ -13,20 +13,60 @@ import { PreviewDirective } from './preview.directive';
 })
 export class GridComponent implements OnInit {
   @Input() scale = 1;
+  @Input() cols = 0;
+  @Input() rows = 0;
+  @Input() autoWidth = true;
+  @Input() items: { col: number; row: number; cols: number; rows: number }[] = [];
+
+  @Input()
+  set colsGaps(value: [number, ...number[]]) {
+    /**
+     * generate array of cols gaps
+     * the size of the array is length of cols - 1
+     * because we have gaps between cols
+     */
+    this._colsGaps = new Array(this.cols - 1).fill(0).map((_, i) => value[i] || value[0]);
+  }
+  get colsGaps(): number[] {
+    return this._colsGaps;
+  }
+
+  private _colsGaps: number[] = [10];
+
+  @Input()
+  set rowsGaps(value: [number, ...number[]]) {
+    /**
+     * generate array of rows gaps
+     * the size of the array is length of rows - 1
+     * because we have gaps between rows
+     */
+    this._rowsGaps = new Array(this.rows - 1).fill(0).map((_, i) => value[i] || value[0]);
+  }
+  get rowsGaps(): number[] {
+    return this._rowsGaps;
+  }
+  _rowsGaps: number[] = [10];
 
   @ViewChild('gridRef', { static: true }) gridRef!: ElementRef<HTMLElement>;
+  @ViewChild('content', { static: true }) content!: ElementRef<HTMLElement>;
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
   grid!: Grid;
 
+  colsTotalGaps!: number;
+  rowsTotalGaps!: number;
+
   private _requestAnimationFrameId!: number;
   private _isMoving = false;
 
   ngOnInit(): void {
+    this.colsTotalGaps = this._colsTotalGaps();
+    this.rowsTotalGaps = this._rowsTotalGaps();
+
     this.grid = new Grid({
-      cols: 15,
-      rows: 15,
+      cols: this.cols,
+      rows: this.rows,
       cellWidth: 100,
       cellHeight: 100,
       preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0 }),
@@ -34,16 +74,8 @@ export class GridComponent implements OnInit {
       scrollLeft: this.gridRef.nativeElement.scrollLeft,
     });
 
-    const items = [
-      { col: 1, row: 1, cols: 2, rows: 2 },
-      { col: 3, row: 1, cols: 3, rows: 3 },
-      { col: 1, row: 3, cols: 2, rows: 2 },
-      { col: 3, row: 4, cols: 2, rows: 2 },
-      { col: 5, row: 4, cols: 1, rows: 1 },
-    ];
-
-    items.forEach((item) => {
-      const chart = this.gridElement.render({ grid: this.grid, ...item });
+    this.items.forEach((item, i) => {
+      const chart = this.gridElement.render({ grid: this.grid, ...item, id: Symbol(`item-${i}`) });
       (chart.context as any).$implicit.template = chart;
 
       this.grid.add({
@@ -77,23 +109,7 @@ export class GridComponent implements OnInit {
     this._isMoving = false;
   }
 
-  move({
-    offsetHeight,
-    offsetWidth,
-    x,
-    y,
-    width,
-    height,
-    item,
-  }: {
-    offsetHeight: number;
-    offsetWidth: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    item: ItemComponent;
-  }) {
+  move({ x, y, width, height, item }: { x: number; y: number; width: number; height: number; item: ItemComponent }) {
     /**
      * cancel previous requestAnimationFrame
      * because we want to start new one that will to current position
@@ -120,7 +136,7 @@ export class GridComponent implements OnInit {
 
       increaseY = speed;
 
-      console.log('scroll down');
+      console.log('scroll down', increaseY);
     }
 
     if (x < 0) {
@@ -138,19 +154,10 @@ export class GridComponent implements OnInit {
       increaseX = speed;
     }
 
-    const increaseYPercentage = ((y + increaseY + this.grid.scrollTop) * 100) / offsetHeight - item.y;
-    const increaseXPercentage = ((x + increaseX + this.grid.scrollLeft) * 100) / offsetWidth - item.x;
-
-    this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
+    this._scroll(item, increaseX, increaseY);
   }
 
-  private _scroll(
-    item: ItemComponent,
-    increaseX: number,
-    increaseY: number,
-    increaseYPercentage: number,
-    increaseXPercentage: number,
-  ): void {
+  private _scroll(item: ItemComponent, increaseX: number, increaseY: number): void {
     if (increaseX === 0 && increaseY === 0) return;
 
     if (this.grid.scrollLeft + increaseX <= 0) increaseX = 0;
@@ -158,43 +165,48 @@ export class GridComponent implements OnInit {
     if (this.grid.scrollTop + increaseY <= 0) increaseY = 0;
 
     const scrollWidth = this.gridRef.nativeElement.offsetWidth + this.grid.scrollLeft;
-    const gridWidth = Math.max(
-      this.grid.cols * this.grid.cellWidth * this.scale,
-      this.gridRef.nativeElement.offsetWidth,
-    );
-
-    console.log(scrollWidth, increaseX, gridWidth);
+    const contentWidth = this.content.nativeElement.offsetWidth;
 
     // add new column if scroll is at the right
-    if (scrollWidth + increaseX > gridWidth) {
-      // this.grid.cols += 1;
-      // this._cdr.detectChanges();
-      //
-      // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
-      return;
+    if (scrollWidth + increaseX > contentWidth) {
+      const remainingWidth = contentWidth - scrollWidth;
+
+      if (remainingWidth > 0) {
+        increaseX = remainingWidth;
+      } else {
+        // this.grid.cols += 1;
+        // this._cdr.detectChanges();
+        //
+        // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
+        return;
+      }
     }
 
     const scrollHeight = this.gridRef.nativeElement.offsetHeight + this.grid.scrollTop;
-    const gridHeight = Math.max(
-      this.grid.rows * this.grid.cellHeight * this.scale,
-      this.gridRef.nativeElement.offsetHeight,
-    );
+    const contentHeight = this.content.nativeElement.offsetHeight;
 
     // add new row if scroll is at the bottom
-    if (scrollHeight + increaseY > gridHeight) {
-      // this.grid.rows += 1;
-      // this._cdr.detectChanges();
-      //
-      // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
-      return;
+    if (scrollHeight + increaseY > contentHeight) {
+      const remainingHeight = contentHeight - scrollHeight;
+
+      if (remainingHeight > 0) {
+        increaseY = remainingHeight;
+      } else {
+        console.log('add new row');
+        // this.grid.rows += 1;
+        // this._cdr.detectChanges();
+        //
+        // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
+        return;
+      }
     }
 
     this._requestAnimationFrameId = requestAnimationFrame(() => {
       this.grid.scrollLeft += increaseX;
       this.grid.scrollTop += increaseY;
 
-      item.x += increaseXPercentage;
-      item.y += increaseYPercentage;
+      item.x += increaseX;
+      item.y += increaseY;
 
       item.renderMove('green');
 
@@ -206,7 +218,27 @@ export class GridComponent implements OnInit {
         behavior: 'instant',
       });
 
-      this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
+      this._scroll(item, increaseX, increaseY);
     });
+  }
+
+  private _colsTotalGaps(): number {
+    let total = 0;
+
+    for (let i = 0; i < this.cols; i++) {
+      total += this.colsGaps[i] ?? this.colsGaps[0] ?? 0;
+    }
+
+    return total;
+  }
+
+  private _rowsTotalGaps(): number {
+    let total = 0;
+
+    for (let i = 0; i < this.rows; i++) {
+      total += this.rowsGaps[i] ?? this.rowsGaps[0] ?? 0;
+    }
+
+    return total;
   }
 }
