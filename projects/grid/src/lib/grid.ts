@@ -1,6 +1,6 @@
 import { EmbeddedViewRef } from '@angular/core';
 
-import { Cell } from './cell.type';
+import { Cell, CellEvent } from './cell.type';
 import { Position, getPosition } from './get-position';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
@@ -75,17 +75,25 @@ export class Grid {
   lastCol = 0;
   lastRow = 0;
 
+  capture(item: Item): void {
+    console.log('capture', item);
+    this.renderPreview(item, CellEvent.Capture);
+  }
+
   move(item: Item): boolean {
     /**
      * skip if the item is out of the grid
      */
-    if (item.col < 0 || item.row < 0 || item.col + item.cols > this.cols || item.row + item.rows > this.rows)
+    if (item.col < 0 || item.row < 0 || item.col + item.cols > this.cols || item.row + item.rows > this.rows) {
       return false;
+    }
 
     /**
      * skip if the item is already at the last position
      */
-    if (item.col === this.lastCol && item.row === this.lastRow) return false;
+    if (item.col === this.lastCol && item.row === this.lastRow) {
+      return false;
+    }
 
     const tmpItems = this._cloneItems();
 
@@ -106,12 +114,10 @@ export class Grid {
       this.updateGrid();
       this.render();
 
-      console.error('unabe to change', item);
-
       return false;
     }
 
-    this.renderPreview(item);
+    this.renderPreview(item, CellEvent.Move);
 
     this._items.set(item.id, item);
     item.template.context.$implicit.col = item.col;
@@ -390,7 +396,9 @@ export class Grid {
     this._items.forEach((item) => this._rerenderItem(item.template, item));
   }
 
-  renderPreview(item: Item) {
+  renderPreview(item: Item, event: CellEvent) {
+    this.preview.context.$implicit.event = event;
+
     this._rerenderItem(this.preview, item);
   }
 
