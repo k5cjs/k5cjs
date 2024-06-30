@@ -1,7 +1,9 @@
 import { EmbeddedViewRef } from '@angular/core';
+import { Subject } from 'rxjs';
 
-import { Cell, CellEvent } from './cell.type';
+import { Cell, GridEvent } from './cell.type';
 import { Position, getPosition } from './get-position';
+import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from './helpers/shift-to.helper';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
 
@@ -31,8 +33,14 @@ export class Grid {
   public preview: EmbeddedViewRef<{ $implicit: Cell }>;
 
   private _matrix: (symbol | null)[][];
-  private _items: Map<symbol, Item> = new Map();
+  _items: Map<symbol, Item> = new Map();
   private _history: Map<symbol, Item>[];
+
+  event = new Subject<GridEvent>();
+
+  private _lastMoveCol = 0;
+  private _lastMoveRow = 0;
+  private _preventTooMuchRecursion = 0;
 
   constructor(configs: {
     cols: number;
@@ -70,14 +78,12 @@ export class Grid {
     return item;
   }
 
-  test = 0;
-
-  lastCol = 0;
-  lastRow = 0;
-
   capture(item: Item): void {
-    console.log('capture', item);
-    this.renderPreview(item, CellEvent.Capture);
+    this.renderPreview(item, GridEvent.Capture);
+  }
+
+  release(item: Item): void {
+    this.renderPreview(item, GridEvent.Release);
   }
 
   move(item: Item): boolean {
@@ -91,7 +97,7 @@ export class Grid {
     /**
      * skip if the item is already at the last position
      */
-    if (item.col === this.lastCol && item.row === this.lastRow) {
+    if (item.col === this._lastMoveCol && item.row === this._lastMoveRow) {
       return false;
     }
 
@@ -100,13 +106,12 @@ export class Grid {
     this.restoreFromHistory();
     this.updateGrid();
 
-    this.lastCol = item.col;
-    this.lastRow = item.row;
+    this._lastMoveCol = item.col;
+    this._lastMoveRow = item.row;
 
     this.remove(this._items.get(item.id)!);
 
-    this.test = 0;
-
+    this._preventTooMuchRecursion = 0;
     const change = this.change(item);
 
     if (!change) {
@@ -117,7 +122,7 @@ export class Grid {
       return false;
     }
 
-    this.renderPreview(item, CellEvent.Move);
+    this.renderPreview(item, GridEvent.Move);
 
     this._items.set(item.id, item);
     item.template.context.$implicit.col = item.col;
@@ -141,11 +146,11 @@ export class Grid {
   }
 
   change(item: Item): boolean {
-    this.test++;
-
-    if (this.test > 100) {
-      throw new Error('to many requests');
+    if (this._preventTooMuchRecursion > 500) {
+      return false;
     }
+
+    this._preventTooMuchRecursion += 1;
 
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
@@ -165,19 +170,19 @@ export class Grid {
         if (direction === Position.Right) {
           const shift = overItem.col + overItem.cols - item.col;
 
-          if (!this.shiftToLeft(overItem, shift)) return false;
+          if (!this._shiftToLeft(overItem, shift)) return false;
         } else if (direction === Position.Left) {
           const shift = item.col + item.cols - overItem.col;
 
-          if (!this.shiftToRight(overItem, shift)) return false;
+          if (!this._shiftToRight(overItem, shift)) return false;
         } else if (direction === Position.Bottom) {
           const shift = overItem.row + overItem.rows - item.row;
 
-          if (!this.shiftToTop(overItem, shift)) return false;
+          if (!this._shiftToTop(overItem, shift)) return false;
         } else if (direction === Position.Top) {
           const shift = item.row + item.rows - overItem.row;
 
-          if (!this.shiftToBottom(overItem, shift)) return false;
+          if (!this._shiftToBottom(overItem, shift)) return false;
         } else if (direction === Position.Center) {
           // this.swap(this._items.get(item.id)!, overItem);
 
@@ -193,7 +198,7 @@ export class Grid {
     return true;
   }
 
-  shiftToLeft(item: Item, shift: number): boolean {
+  private _shiftToLeft(item: Item, shift: number): boolean {
     // check if there is enough space to shift to left
     if (item.col - shift < 0) return false;
 
@@ -205,18 +210,7 @@ export class Grid {
     )
       return false;
 
-    // remove cols from right
-    for (let x = item.col + item.cols - shift; x < item.col + item.cols; x++) {
-      for (let y = item.row; y < item.row + item.rows; y++) {
-        this._matrix[y][x] = null;
-      }
-    }
-    // add cols to left
-    for (let x = item.col - shift; x < item.col; x++) {
-      for (let y = item.row; y < item.row + item.rows; y++) {
-        this._matrix[y][x] = item.id;
-      }
-    }
+    shiftToLeft(this._matrix, item, shift);
 
     item.col -= shift;
 
@@ -225,7 +219,7 @@ export class Grid {
     return true;
   }
 
-  shiftToRight(item: Item, shift: number): boolean {
+  private _shiftToRight(item: Item, shift: number): boolean {
     // check if there is enough space to shift to right
     if (item.col + item.cols + shift > this.cols) return false;
 
@@ -237,19 +231,7 @@ export class Grid {
     )
       return false;
 
-    // remove cols from left
-    for (let x = item.col; x < item.col + shift; x++) {
-      for (let y = item.row; y < item.row + item.rows; y++) {
-        this._matrix[y][x] = null;
-      }
-    }
-
-    // add cols to right
-    for (let x = item.col + item.cols; x < item.col + item.cols + shift; x++) {
-      for (let y = item.row; y < item.row + item.rows; y++) {
-        this._matrix[y][x] = item.id;
-      }
-    }
+    shiftToRight(this._matrix, item, shift);
 
     item.col += shift;
 
@@ -258,7 +240,7 @@ export class Grid {
     return true;
   }
 
-  shiftToTop(item: Item, shift: number): boolean {
+  private _shiftToTop(item: Item, shift: number): boolean {
     // check if there is enough space to shift to top
     if (item.row - shift < 0) return false;
 
@@ -270,19 +252,7 @@ export class Grid {
     )
       return false;
 
-    // remove rows from bottom
-    for (let x = item.col; x < item.col + item.cols; x++) {
-      for (let y = item.row + item.rows - shift; y < item.row + item.rows; y++) {
-        this._matrix[y][x] = null;
-      }
-    }
-
-    // add rows to top
-    for (let x = item.col; x < item.col + item.cols; x++) {
-      for (let y = item.row - shift; y < item.row; y++) {
-        this._matrix[y][x] = item.id;
-      }
-    }
+    shiftToTop(this._matrix, item, shift);
 
     item.row -= shift;
 
@@ -291,7 +261,7 @@ export class Grid {
     return true;
   }
 
-  shiftToBottom(item: Item, shift: number): boolean {
+  private _shiftToBottom(item: Item, shift: number): boolean {
     // check if there is enough space to shift to bottom
     if (item.row + item.rows + shift > this.rows) return false;
 
@@ -303,19 +273,7 @@ export class Grid {
     )
       return false;
 
-    // remove rows from top
-    for (let x = item.col; x < item.col + item.cols; x++) {
-      for (let y = item.row; y < item.row + shift; y++) {
-        this._matrix[y][x] = null;
-      }
-    }
-
-    // add rows to bottom
-    for (let x = item.col; x < item.col + item.cols; x++) {
-      for (let y = item.row + item.rows; y < item.row + item.rows + shift; y++) {
-        this._matrix[y][x] = item.id;
-      }
-    }
+    shiftToBottom(this._matrix, item, shift);
 
     item.row += shift;
 
@@ -396,7 +354,8 @@ export class Grid {
     this._items.forEach((item) => this._rerenderItem(item.template, item));
   }
 
-  renderPreview(item: Item, event: CellEvent) {
+  renderPreview(item: Item, event: GridEvent) {
+    this.preview.context.$implicit.id = item.id;
     this.preview.context.$implicit.event = event;
 
     this._rerenderItem(this.preview, item);

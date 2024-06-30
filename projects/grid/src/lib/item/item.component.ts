@@ -9,6 +9,7 @@ import {
   OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   inject,
 } from '@angular/core';
 
@@ -60,11 +61,15 @@ export class ItemComponent implements OnInit, OnChanges {
     this._renderByColAndRow();
   }
 
-  ngOnChanges(): void {
+  ngOnChanges({ rowsGaps }: SimpleChanges): void {
     if (!this._isInitialized) return;
     if (this.isMouseDown) return;
 
-    this._renderByColAndRowAnimated();
+    if (rowsGaps) {
+      this._renderByColAndRow();
+    } else {
+      this._renderByColAndRowAnimated();
+    }
   }
 
   /**
@@ -119,7 +124,6 @@ export class ItemComponent implements OnInit, OnChanges {
    */
   @HostListener('window:mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
-    // console.log('_onMouseUp');
     if (!this.isMouseDown) return;
 
     e.preventDefault();
@@ -131,6 +135,15 @@ export class ItemComponent implements OnInit, OnChanges {
     this.grid.drop();
 
     this._renderByColAndRowAnimated();
+
+    this.grid.release({
+      id: this.id,
+      col: this.col,
+      row: this.row,
+      cols: this.cols,
+      rows: this.rows,
+      template: this.template,
+    });
   }
 
   protected _onMouseMove(e: MouseEvent): void {
@@ -181,8 +194,6 @@ export class ItemComponent implements OnInit, OnChanges {
    * is used to move by grid
    */
   renderMove(color = 'green'): void {
-    // console.log('renderMove');
-
     this._render(color);
 
     const col = this._col();
@@ -208,9 +219,9 @@ export class ItemComponent implements OnInit, OnChanges {
   }
 
   private _render(color = 'yellow') {
-    // console.log('_render');
-
     const zIndex = color === 'green' ? 999 : 1;
+
+    this.elementRef.nativeElement.style.transition = '';
 
     this.elementRef.nativeElement.style.transform = `translate(${this.x}px, ${this.y}px)`;
     this.elementRef.nativeElement.style.zIndex = `${zIndex}`;
@@ -262,42 +273,14 @@ export class ItemComponent implements OnInit, OnChanges {
   }
 
   private _renderByColAndRowAnimated() {
-    // console.log('_renderByColAndRowAnimated: ', this.id, this.col, this.row);
+    this.elementRef.nativeElement.style.transition = '300ms';
+    this._renderByColAndRow();
 
-    this._setFixedSize(this.elementRef.nativeElement);
-    this._animation?.cancel();
-
-    const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-
-    const colGaps = this.colsGaps.slice(0, this.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this.rowsGaps.slice(0, this.row).reduce((acc, gap) => acc + gap, 0);
-
-    const gapsInCols = this.colsGaps.slice(this.col, this.col + this.cols - 1).reduce((acc, gap) => acc + gap, 0);
-    const gapsInRows = this.rowsGaps.slice(this.row, this.row + this.rows - 1).reduce((acc, gap) => acc + gap, 0);
-
-    const xx = this.col / this.grid.cols;
-    const yy = this.row / this.grid.rows;
-
-    this._animation = this.elementRef.nativeElement.animate(
-      [
-        {
-          transform: `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`,
-          width: `calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols} * ${this.cols} + ${gapsInCols}px)`,
-          height: `calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows} * ${this.rows} + ${gapsInRows}px)`,
-        },
-      ],
-      {
-        duration: 3000,
-        easing: 'ease-in-out',
-      },
+    this.elementRef.nativeElement.addEventListener(
+      'transitionend',
+      () => (this.elementRef.nativeElement.style.transition = ''),
+      false,
     );
-
-    this._animation.onfinish = () => {
-      // console.log('onfinish', this.id);
-      this._animation?.cancel();
-      this._renderByColAndRow();
-    };
   }
 
   private _setFixedSize(element: HTMLElement): void {
@@ -305,12 +288,8 @@ export class ItemComponent implements OnInit, OnChanges {
     const height = element.offsetHeight;
     const style = getComputedStyle(element).transform;
 
-    // console.log('style', style);
-
     const [, left] = /([-\d\.]+), [-\d\.]+\)/.exec(style)!;
     const [, top] = /([-\d\.]+)\)/.exec(style)!;
-
-    // console.log('setFixedSize', { width, height, top, left, style: style });
 
     element.style.width = `${width}px`;
     element.style.height = `${height}px`;
@@ -319,8 +298,6 @@ export class ItemComponent implements OnInit, OnChanges {
   }
 
   private _renderByColAndRow() {
-    // console.log('renderByColAndRow: ', this.id, this.col, this.row);
-
     this._setWidthByCols(this.elementRef.nativeElement);
     this._setHeightByRows(this.elementRef.nativeElement);
     this._setTransform(this.elementRef.nativeElement);

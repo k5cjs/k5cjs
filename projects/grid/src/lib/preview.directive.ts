@@ -10,9 +10,7 @@ type Context = { $implicit: Cell };
 export class PreviewDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(context: Omit<Cell, 'id'>): EmbeddedViewRef<Context> {
-    const id = Symbol('id');
-
-    return this.viewContainer.createEmbeddedView(this.template, { $implicit: { id, ...context } });
+  render(context: Cell): EmbeddedViewRef<Context> {
+    return this.viewContainer.createEmbeddedView(this.template, { $implicit: { ...context } });
   }
 }

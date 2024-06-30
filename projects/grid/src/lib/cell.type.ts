@@ -1,7 +1,9 @@
-export const enum CellEvent {
+export const enum GridEvent {
   Capture = 'capture',
-  Move = 'move',
   Release = 'release',
+  Move = 'move',
+  BeforeAddRows = 'before-add-rows',
+  AfterAddRows = 'after-add-rows',
 }
 
 export interface Cell {
@@ -10,5 +12,5 @@ export interface Cell {
   row: number;
   cols: number;
   rows: number;
-  event?: CellEvent;
+  event?: GridEvent;
 }
