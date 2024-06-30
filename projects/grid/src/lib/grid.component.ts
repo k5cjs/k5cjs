@@ -1,5 +1,15 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 
+import { GridEvent } from './cell.type';
 import { Grid } from './grid';
 import { GridDirective } from './grid.directive';
 import { ItemComponent } from './item/item.component';
@@ -59,6 +69,17 @@ export class GridComponent implements OnInit {
 
   private _requestAnimationFrameId!: number;
   private _isMoving = false;
+  private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+
+  test(): void {
+    this.grid.event.next(GridEvent.BeforeAddRows);
+
+    this.grid.rows += 15;
+    this.rows += 15;
+
+    this.rowsGaps = [...this.rowsGaps, 0] as unknown as [number, ...number[]];
+    this.rowsTotalGaps = this._rowsTotalGaps();
+  }
 
   ngOnInit(): void {
     this.colsTotalGaps = this._colsTotalGaps();
@@ -69,7 +90,7 @@ export class GridComponent implements OnInit {
       rows: this.rows,
       cellWidth: 100,
       cellHeight: 100,
-      preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0 }),
+      preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') }),
       scrollTop: this.gridRef.nativeElement.scrollTop,
       scrollLeft: this.gridRef.nativeElement.scrollLeft,
     });
@@ -85,6 +106,11 @@ export class GridComponent implements OnInit {
     });
 
     this.scroll();
+
+    // setTimeout(() => {
+    //   this.grid.move({ ...[...this.grid._items][2][1], col: 5, row: 1 });
+    //   // this.grid.move({ ...[...this.grid._items][2][1], col: 6, row: 1 });
+    // }, 1000);
   }
 
   scroll(): void {
@@ -135,8 +161,6 @@ export class GridComponent implements OnInit {
       const speed = Math.round(20 * percent);
 
       increaseY = speed;
-
-      console.log('scroll down', increaseY);
     }
 
     if (x < 0) {
@@ -164,7 +188,7 @@ export class GridComponent implements OnInit {
 
     if (this.grid.scrollTop + increaseY <= 0) increaseY = 0;
 
-    const scrollWidth = this.gridRef.nativeElement.offsetWidth + this.grid.scrollLeft;
+    const scrollWidth = this.gridRef.nativeElement.clientWidth + this.grid.scrollLeft;
     const contentWidth = this.content.nativeElement.offsetWidth;
 
     // add new column if scroll is at the right
@@ -174,6 +198,7 @@ export class GridComponent implements OnInit {
       if (remainingWidth > 0) {
         increaseX = remainingWidth;
       } else {
+        console.error('add new column');
         // this.grid.cols += 1;
         // this._cdr.detectChanges();
         //
@@ -182,23 +207,33 @@ export class GridComponent implements OnInit {
       }
     }
 
-    const scrollHeight = this.gridRef.nativeElement.offsetHeight + this.grid.scrollTop;
+    const scrollHeight = this.gridRef.nativeElement.clientHeight + this.grid.scrollTop;
     const contentHeight = this.content.nativeElement.offsetHeight;
 
+    let temp: number | undefined;
+
     // add new row if scroll is at the bottom
-    if (scrollHeight + increaseY > contentHeight) {
+    if (scrollHeight + increaseY > contentHeight - 500) {
       const remainingHeight = contentHeight - scrollHeight;
 
-      if (remainingHeight > 0) {
-        increaseY = remainingHeight;
-      } else {
-        console.log('add new row');
-        // this.grid.rows += 1;
-        // this._cdr.detectChanges();
-        //
-        // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
-        return;
-      }
+      // if (remainingHeight > 0) {
+      //   temp = increaseY;
+      //   increaseY = remainingHeight;
+      // } else {
+      console.warn('add new row');
+
+      this.grid.event.next(GridEvent.BeforeAddRows);
+
+      this.grid.rows += 8;
+      this.rows += 8;
+      this.rowsGaps = [...this.rowsGaps, 0] as unknown as [number, ...number[]];
+      this.rowsTotalGaps = this._rowsTotalGaps();
+
+      this._cdr.detectChanges();
+
+      this._scroll(item, increaseX, temp || increaseY);
+      return;
+      // }
     }
 
     this._requestAnimationFrameId = requestAnimationFrame(() => {
@@ -218,7 +253,7 @@ export class GridComponent implements OnInit {
         behavior: 'instant',
       });
 
-      this._scroll(item, increaseX, increaseY);
+      this._scroll(item, increaseX, temp || increaseY);
     });
   }
 

@@ -1,3 +1,4 @@
+<button (click)="test()">test</button>
 <button (click)="back()">back</button>
 
 <div #gridRef class="grid">
@@ -23,9 +24,14 @@
         [event]="item.event"
         [scale]="scale"
         [grid]="grid"
+        [gridRef]="items"
         [colsGaps]="colsGaps"
         [rowsGaps]="rowsGaps"
-      />
+      >
+        <div>id: {{ item.id }}</div>
+        <div>col: {{ item.col }}</div>
+        <div>row: {{ item.row }}</div>
+      </kc-lib-preview>
 
       <lib-item
         *libGrid="let item"

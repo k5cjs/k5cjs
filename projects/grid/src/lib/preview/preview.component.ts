@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { CellEvent } from '../cell.type';
+import { GridEvent } from '../cell.type';
 import { Grid } from '../grid';
 
 @Component({
@@ -9,109 +9,99 @@ import { Grid } from '../grid';
   styleUrls: ['./preview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PreviewComponent implements OnChanges {
+export class PreviewComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) col!: number;
   @Input({ required: true }) row!: number;
   @Input({ required: true }) cols!: number;
   @Input({ required: true }) rows!: number;
-  @Input({ required: true }) event!: CellEvent;
+  @Input({ required: true }) event!: GridEvent;
 
   @Input({ required: true }) colsGaps!: number[];
   @Input({ required: true }) rowsGaps!: number[];
 
   @Input({ required: true }) scale!: number;
 
+  @Input({ required: true }) gridRef!: HTMLElement;
+
   @Input() grid!: Grid;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
 
-  private _animation: Animation | null = null;
+  private _isAnimating = false;
+
+  private _transitionstart = () => (this._isAnimating = true);
+  private _transitionend = () => (this._isAnimating = false);
+
+  constructor() {
+    this.elementRef.nativeElement.addEventListener('transitionstart', this._transitionstart, false);
+    this.elementRef.nativeElement.addEventListener('transitionend', this._transitionend, false);
+  }
 
   ngOnChanges(): void {
-    if (this.event === CellEvent.Capture) {
-      this.renderSkip();
+    if (this.event === GridEvent.Capture) {
+      this._updateStyle();
+      requestAnimationFrame(() => this._addAnimation());
+    } else if (this.event === GridEvent.Release) {
+      if (this._isAnimating) this._removeAnimationAfterFinished();
+      else this._removeAnimation();
     } else {
-      this.render();
+      this._updateStyle();
     }
   }
 
-  render(): void {
-    console.log('render');
+  ngOnDestroy(): void {
+    this.elementRef.nativeElement.removeEventListener('transitionstart', this._transitionstart, false);
+    this.elementRef.nativeElement.removeEventListener('transitionend', this._transitionend, false);
+  }
+
+  private _addAnimation(): void {
+    this.elementRef.nativeElement.style.transition = '300ms';
+    this.elementRef.nativeElement.style.transitionTimingFunction = 'ease';
+  }
+
+  private _removeAnimation(): void {
+    this.elementRef.nativeElement.style.transition = '';
+  }
+
+  private _removeAnimationAfterFinished(): void {
+    this.elementRef.nativeElement.addEventListener('transitionend', this._removeAnimation.bind(this), {
+      capture: false,
+      once: true,
+    });
+  }
+
+  private _updateStyle(): void {
     if (this.rows === 0 || this.cols === 0) return;
 
+    this.elementRef.nativeElement.style.width = this._widthValue();
+    this.elementRef.nativeElement.style.height = this._heightValue();
+    this.elementRef.nativeElement.style.transform = this._transformValue();
+  }
+
+  private _transformValue(): string {
     const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
 
     const colGaps = this.colsGaps.slice(0, this.col).reduce((acc, gap) => acc + gap, 0);
     const rowGaps = this.rowsGaps.slice(0, this.row).reduce((acc, gap) => acc + gap, 0);
 
-    const gapsInCols = this.colsGaps.slice(this.col, this.col + this.cols - 1).reduce((acc, gap) => acc + gap, 0);
-    const gapsInRows = this.rowsGaps.slice(this.row, this.row + this.rows - 1).reduce((acc, gap) => acc + gap, 0);
-
     const xx = this.col / this.grid.cols;
     const yy = this.row / this.grid.rows;
 
-    this._setFixedSize(this.elementRef.nativeElement);
-    this._animation?.cancel();
-
-    this._animation = this.elementRef.nativeElement.animate(
-      [
-        {
-          transform: `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`,
-          width: `calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols} * ${this.cols} + ${gapsInCols}px)`,
-          height: `calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows} * ${this.rows} + ${gapsInRows}px)`,
-        },
-      ],
-      {
-        duration: 3000,
-        fill: 'forwards',
-      },
-    );
-
-    this._animation.onfinish = () => {
-      this.renderSkip();
-      this._animation?.cancel();
-    };
+    return `translate3d(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px), 0)`;
   }
 
-  renderSkip(): void {
-    console.log('renderSkip', { col: this.col, row: this.row });
-    if (this.rows === 0 || this.cols === 0) return;
-
+  private _widthValue(): string {
     const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-
-    const colGaps = this.colsGaps.slice(0, this.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this.rowsGaps.slice(0, this.row).reduce((acc, gap) => acc + gap, 0);
-
     const gapsInCols = this.colsGaps.slice(this.col, this.col + this.cols - 1).reduce((acc, gap) => acc + gap, 0);
-    const gapsInRows = this.rowsGaps.slice(this.row, this.row + this.rows - 1).reduce((acc, gap) => acc + gap, 0);
 
-    const xx = this.col / this.grid.cols;
-    const yy = this.row / this.grid.rows;
-
-    this._animation?.cancel();
-
-    this.elementRef.nativeElement.style.transform = `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`;
-    this.elementRef.nativeElement.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols} * ${this.cols} + ${gapsInCols}px)`;
-    this.elementRef.nativeElement.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows} * ${this.rows} + ${gapsInRows}px)`;
+    return `calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols} * ${this.cols} + ${gapsInCols}px)`;
   }
 
-  private _setFixedSize(element: HTMLElement): void {
-    const width = element.offsetWidth;
-    const height = element.offsetHeight;
-    const style = getComputedStyle(element).transform;
+  private _heightValue(): string {
+    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsInRows = this.rowsGaps.slice(this.row, this.row + this.rows - 1).reduce((acc, gap) => acc + gap, 0);
 
-    // console.log('style', style);
-
-    const [, left] = /([-\d\.]+), [-\d\.]+\)/.exec(style)!;
-    const [, top] = /([-\d\.]+)\)/.exec(style)!;
-
-    // console.log('setFixedSize', { width, height, top, left, style: style });
-
-    element.style.width = `${width}px`;
-    element.style.height = `${height}px`;
-
-    element.style.transform = `translate(${left}px, ${top}px)`;
+    return `calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows} * ${this.rows} + ${gapsInRows}px)`;
   }
 }
