@@ -18,6 +18,7 @@ import { KcToggleItemDirective } from './toggle-item.directive';
 export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
   @Input() options: KcToggleOptions<T>[] = [];
   @Input({ transform: coerceBooleanProperty }) multiple = false;
+  @Input({ transform: coerceBooleanProperty }) allowClear = false;
 
   @ContentChild(KcToggleItemDirective, { static: true }) toggleItem!: KcToggleItemDirective<T>;
 
@@ -66,7 +67,8 @@ export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
   };
 
   select(obj: T) {
-    this._values.toggle(obj, obj);
+    if (this.allowClear && !this.multiple) this._values.set(obj, obj);
+    else this._values.toggle(obj, obj);
 
     this._onChange(this._values.selected!);
     this._onTouch();
