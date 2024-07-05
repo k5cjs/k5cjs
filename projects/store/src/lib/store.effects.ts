@@ -3,7 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { type ObservableInput, catchError, concatMap, first, map, mergeMap, of, tap } from 'rxjs';
 
-import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { concatLatestFrom } from '@ngrx/operators';
 import { Action, Store } from '@ngrx/store';
 
 import { ActionsBase } from './store.actions';
