@@ -1,8 +1,8 @@
 {
   "name": "@k5cjs/router",
-  "version": "17.0.2",
+  "version": "18.0.0",
   "peerDependencies": {
-    "@angular/router": "^17.2.1"
+    "@angular/router": "^18.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

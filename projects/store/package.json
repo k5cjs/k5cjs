@@ -1,13 +1,13 @@
 {
   "name": "@k5cjs/store",
-  "version": "17.0.1",
+  "version": "18.0.0",
   "peerDependencies": {
-    "@angular/common": "^17.2.1",
-    "@angular/core": "^17.2.1",
-    "@k5cjs/types": "^17.0.0",
-    "@ngrx/effects": "^17.1.0",
-    "@ngrx/entity": "^17.1.0",
-    "@ngrx/store": "^17.1.0",
+    "@angular/common": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@k5cjs/types": "^18.0.0",
+    "@ngrx/effects": "^18.0.0",
+    "@ngrx/entity": "^18.0.0",
+    "@ngrx/store": "^18.0.0",
     "object-hash": "^3.0.0"
   },
   "dependencies": {

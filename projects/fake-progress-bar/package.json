@@ -1,9 +1,9 @@
 {
   "name": "@k5cjs/fake-progress-bar",
-  "version": "17.0.0",
+  "version": "18.0.0",
   "peerDependencies": {
-    "@angular/common": "^17.2.1",
-    "@angular/core": "^17.2.1"
+    "@angular/common": "^18.0.0",
+    "@angular/core": "^18.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

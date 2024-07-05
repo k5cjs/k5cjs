@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/rxjs",
-  "version": "17.0.0",
+  "version": "18.0.0",
   "peerDependencies": {
     "rxjs": "^7.5.4"
   },
