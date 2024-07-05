@@ -13,7 +13,7 @@ export class GridComponent {
   rows = 30;
 
   colsGaps: [number, ...number[]] = [30, 100, 100, 0];
-  rowsGaps: [number, ...number[]] = [10, 100, 10, 0];
+  rowsGaps: [number, ...number[]] = [10, 100, 10, 0, 100];
 
   items: { col: number; row: number; cols: number; rows: number }[] = [
     { col: 0, row: 0, cols: 2, rows: 2 },

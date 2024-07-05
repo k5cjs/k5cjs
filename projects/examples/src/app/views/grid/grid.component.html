@@ -8,4 +8,10 @@
   [rowsGaps]="rowsGaps"
   [items]="items"
   class="grid"
-/>
+>
+  <div *gridItem="let item">
+    <div>id: {{ item.id }}</div>
+    <div>col: {{ item.col }}</div>
+    <div>row: {{ item.row }}</div>
+  </div>
+</kc-lib-grid>

@@ -32,7 +32,9 @@ export class Grid {
    */
   public preview: EmbeddedViewRef<{ $implicit: Cell }>;
 
-  private _matrix: (symbol | null)[][];
+  // TODO: change to private
+  _matrix: (symbol | null)[][];
+  // TODO: change to private
   _items: Map<symbol, Item> = new Map();
   private _history: Map<symbol, Item>[];
 
@@ -48,7 +50,13 @@ export class Grid {
     cellWidth: number;
     cellHeight: number;
     preview: EmbeddedViewRef<{ $implicit: Cell }>;
+    /**
+     * scrollTop is the scroll top of the grid
+     */
     scrollTop: number;
+    /**
+     * scrollLeft is the scroll left of the grid
+     */
     scrollLeft: number;
   }) {
     this.cols = configs.cols;
@@ -162,6 +170,7 @@ export class Grid {
 
         const overItem = this._items.get(over)!;
 
+        // TODO need to compare center of the item not first cell of left top corner
         const direction = getPosition(
           { x: overItem.col, y: overItem.row, width: overItem.cols, height: overItem.rows },
           { x: item.col, y: item.row, width: item.cols, height: item.rows },
