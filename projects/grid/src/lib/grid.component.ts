@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ContentChild,
   ElementRef,
   Input,
   OnInit,
@@ -11,6 +12,7 @@ import {
 
 import { GridEvent } from './cell.type';
 import { Grid } from './grid';
+import { GridItemDirective } from './grid-item.directive';
 import { GridDirective } from './grid.directive';
 import { ItemComponent } from './item/item.component';
 import { PreviewDirective } from './preview.directive';
@@ -62,6 +64,8 @@ export class GridComponent implements OnInit {
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
+  @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective;
+
   grid!: Grid;
 
   colsTotalGaps!: number;
@@ -96,7 +100,13 @@ export class GridComponent implements OnInit {
     });
 
     this.items.forEach((item, i) => {
-      const chart = this.gridElement.render({ grid: this.grid, ...item, id: Symbol(`item-${i}`) });
+      // const test = this.gridItem.render({ ...item, id: Symbol(`item-${i}`) });
+
+      const chart = this.gridElement.render({
+        grid: this.grid,
+        ...item,
+        id: Symbol(`item-${i}`),
+      });
       (chart.context as any).$implicit.template = chart;
 
       this.grid.add({

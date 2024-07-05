@@ -50,9 +50,7 @@
         (stop)="stop()"
         class="grid__item"
       >
-        <div>id: {{ item.id }}</div>
-        <div>col: {{ item.col }}</div>
-        <div>row: {{ item.row }}</div>
+        <ng-container *ngTemplateOutlet="gridItem.template; context: { $implicit: item }" />
       </lib-item>
     </div>
 
