@@ -71,4 +71,8 @@ export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
     this._onChange(this._values.selected!);
     this._onTouch();
   }
+
+  test() {
+    throw new Error('Cannot set multiple values to a single toggle group.');
+  }
 }
