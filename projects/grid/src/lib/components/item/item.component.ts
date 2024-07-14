@@ -17,7 +17,7 @@ import { Grid } from '../../helpers';
 import { Cell } from '../../types';
 
 @Component({
-  selector: 'lib-item',
+  selector: 'kc-grid-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
