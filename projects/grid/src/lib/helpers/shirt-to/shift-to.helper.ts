@@ -1,4 +1,4 @@
-import { Cell } from '../cell.type';
+import { Cell } from '../../types';
 
 export const shiftToTop = <T extends Cell>(matrix: (symbol | null)[][], item: T, shift: number): void => {
   // remove rows from bottom

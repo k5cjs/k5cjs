@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
 
-import { Grid } from '../grid';
+import { Grid } from '../../helpers';
 
 @Component({
   selector: 'kc-lib-lines',
   templateUrl: './lines.component.html',
-  styleUrls: ['./lines.component.css'],
+  styleUrls: ['./lines.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LinesComponent implements OnChanges {

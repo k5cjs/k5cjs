@@ -1,9 +1,9 @@
 import { EmbeddedViewRef } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Cell, GridEvent } from './cell.type';
-import { Position, getPosition } from './get-position';
-import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from './helpers/shift-to.helper';
+import { Cell, GridEvent } from '../../types';
+import { Position, getPosition } from '../get-position/get-position';
+import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from '../shirt-to/shift-to.helper';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
 
@@ -120,7 +120,7 @@ export class Grid {
     this.remove(this._items.get(item.id)!);
 
     this._preventTooMuchRecursion = 0;
-    const change = this.change(item);
+    const change = this._change(item);
 
     if (!change) {
       this._items = tmpItems;
@@ -153,7 +153,7 @@ export class Grid {
     return true;
   }
 
-  change(item: Item): boolean {
+  private _change(item: Item): boolean {
     if (this._preventTooMuchRecursion > 500) {
       return false;
     }
@@ -200,7 +200,7 @@ export class Grid {
           return false;
         }
 
-        this.change(item);
+        this._change(item);
       }
     }
 
@@ -212,7 +212,7 @@ export class Grid {
     if (item.col - shift < 0) return false;
 
     if (
-      !this.change({
+      !this._change({
         ...item,
         col: item.col - shift,
       })
@@ -233,7 +233,7 @@ export class Grid {
     if (item.col + item.cols + shift > this.cols) return false;
 
     if (
-      !this.change({
+      !this._change({
         ...item,
         col: item.col + shift,
       })
@@ -254,7 +254,7 @@ export class Grid {
     if (item.row - shift < 0) return false;
 
     if (
-      !this.change({
+      !this._change({
         ...item,
         row: item.row - shift,
       })
@@ -275,7 +275,7 @@ export class Grid {
     if (item.row + item.rows + shift > this.rows) return false;
 
     if (
-      !this.change({
+      !this._change({
         ...item,
         row: item.row + shift,
       })
