@@ -1,13 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { GridItemDirective } from './grid-item.directive';
-import { GridComponent } from './grid.component';
-import { GridDirective } from './grid.directive';
-import { ItemComponent } from './item/item.component';
-import { LinesComponent } from './lines/lines.component';
-import { PreviewComponent } from './preview/preview.component';
-import { PreviewDirective } from './preview.directive';
+import { GridComponent, ItemComponent, LinesComponent , PreviewComponent } from './components';
+import { GridDirective, GridItemDirective, PreviewDirective } from './directives';
 
 @NgModule({
   declarations: [

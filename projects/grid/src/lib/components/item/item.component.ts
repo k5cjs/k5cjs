@@ -13,13 +13,13 @@ import {
   inject,
 } from '@angular/core';
 
-import { Cell } from '../cell.type';
-import { Grid } from '../grid';
+import { Grid } from '../../helpers';
+import { Cell } from '../../types';
 
 @Component({
   selector: 'lib-item',
   templateUrl: './item.component.html',
-  styleUrls: ['./item.component.css'],
+  styleUrls: ['./item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ItemComponent implements OnInit, OnChanges {

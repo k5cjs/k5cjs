@@ -10,12 +10,10 @@ import {
   inject,
 } from '@angular/core';
 
-import { GridEvent } from './cell.type';
-import { Grid } from './grid';
-import { GridItemDirective } from './grid-item.directive';
-import { GridDirective } from './grid.directive';
-import { ItemComponent } from './item/item.component';
-import { PreviewDirective } from './preview.directive';
+import { GridDirective, GridItemDirective, PreviewDirective } from '../../directives';
+import { Grid } from '../../helpers';
+import { GridEvent } from '../../types';
+import { ItemComponent } from '../item/item.component';
 
 @Component({
   selector: 'kc-lib-grid',

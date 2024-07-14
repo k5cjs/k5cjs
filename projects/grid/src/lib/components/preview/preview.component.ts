@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { GridEvent } from '../cell.type';
-import { Grid } from '../grid';
+import { Grid } from '../../helpers';
+import { GridEvent } from '../../types';
 
 @Component({
   selector: 'kc-lib-preview',

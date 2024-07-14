@@ -1,6 +1,6 @@
-import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from './shift-to.helper';
+import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from '../shift-to.helperto.helper';
 
-fdescribe('get position', () => {
+describe('shift to', () => {
   it('shift with two position to bottom', () => {
     /**
      *  ┌───────┐
