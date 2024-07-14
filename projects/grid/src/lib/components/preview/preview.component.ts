@@ -4,7 +4,7 @@ import { Grid } from '../../helpers';
 import { GridEvent } from '../../types';
 
 @Component({
-  selector: 'kc-lib-preview',
+  selector: 'kc-grid-preview',
   templateUrl: './preview.component.html',
   styleUrls: ['./preview.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

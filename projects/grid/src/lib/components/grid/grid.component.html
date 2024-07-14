@@ -6,7 +6,7 @@
     <div>header</div>
     <!-- [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
     <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
-      <kc-lib-lines
+      <kc-grid-lines
         [cols]="grid.cols"
         [rows]="grid.rows"
         [grid]="grid"
@@ -15,7 +15,7 @@
         [rowsGaps]="rowsGaps"
       />
 
-      <kc-lib-preview
+      <kc-grid-preview
         *preview="let item"
         [col]="item.col"
         [row]="item.row"
@@ -31,9 +31,9 @@
         <div>id: {{ item.id }}</div>
         <div>col: {{ item.col }}</div>
         <div>row: {{ item.row }}</div>
-      </kc-lib-preview>
+      </kc-grid-preview>
 
-      <lib-item
+      <kc-grid-item
         *libGrid="let item"
         [col]="item.col"
         [row]="item.row"
@@ -51,7 +51,7 @@
         class="grid__item"
       >
         <ng-container *ngTemplateOutlet="gridItem.template; context: { $implicit: item }" />
-      </lib-item>
+      </kc-grid-item>
     </div>
 
     <div>footer</div>

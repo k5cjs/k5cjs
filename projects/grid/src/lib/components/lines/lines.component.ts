@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewC
 import { Grid } from '../../helpers';
 
 @Component({
-  selector: 'kc-lib-lines',
+  selector: 'kc-grid-lines',
   templateUrl: './lines.component.html',
   styleUrls: ['./lines.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
