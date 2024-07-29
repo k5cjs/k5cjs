@@ -1,8 +1,8 @@
 import { Component, EmbeddedViewRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { Grid } from '../../helpers/grid/grid';
 import { Cell } from '../../types/cell.type';
-import { Grid } from '../../grid';
 
 import { ItemComponent } from './item.component';
 

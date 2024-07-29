@@ -54,24 +54,6 @@ export class ItemComponent implements OnInit, OnChanges {
   private _animation: Animation | null = null;
 
   private _isInitialized = false;
-
-  ngOnInit(): void {
-    this._isInitialized = true;
-
-    this._renderByColAndRow();
-  }
-
-  ngOnChanges({ rowsGaps }: SimpleChanges): void {
-    if (!this._isInitialized) return;
-    if (this.isMouseDown) return;
-
-    if (rowsGaps) {
-      this._renderByColAndRow();
-    } else {
-      this._renderByColAndRowAnimated();
-    }
-  }
-
   /**
    * actual position in grid (x, y) in pixels
    */
@@ -89,6 +71,45 @@ export class ItemComponent implements OnInit, OnChanges {
   isMouseDown = false;
 
   onMouseMove = this._onMouseMove.bind(this);
+
+  isResizing = false;
+
+  ngOnInit(): void {
+    this._isInitialized = true;
+
+    this._renderByColAndRow();
+  }
+
+  ngOnChanges({ rowsGaps }: SimpleChanges): void {
+    if (!this._isInitialized) return;
+    if (this.isMouseDown) return;
+    if (this.isResizing) return;
+
+    if (rowsGaps) {
+      this._renderByColAndRow();
+    } else {
+      this._renderByColAndRowAnimated();
+    }
+  }
+
+  update({ x, y, width, height }: { x: number; y: number; width: number; height: number }): void {
+    const element = this.elementRef.nativeElement;
+
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
+
+    element.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  resizing(value: boolean): void {
+    this.isResizing = value;
+
+    if (!value) this.releaseResizing();
+  }
+
+  releaseResizing(): void {
+    this._renderByColAndRowAnimated();
+  }
 
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
@@ -315,6 +336,7 @@ export class ItemComponent implements OnInit, OnChanges {
     const xx = this.col / this.grid.cols;
     const yy = this.row / this.grid.rows;
 
+    // eslint-disable-next-line max-len
     element.style.transform = `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`;
   }
 
