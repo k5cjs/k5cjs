@@ -1,9 +1,11 @@
 import { EmbeddedViewRef } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Cell, GridEvent } from '../../types';
+import { Cell, Direction, GridEvent } from '../../types';
+import { getDirection } from '../get-direction/get-direction.helper';
 import { Position, getPosition } from '../get-position/get-position';
 import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from '../shirt-to/shift-to.helper';
+import { shrink } from '../shrink/shrink.helper';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
 
@@ -43,6 +45,8 @@ export class Grid {
   private _lastMoveCol = 0;
   private _lastMoveRow = 0;
   private _preventTooMuchRecursion = 0;
+
+  private _lastDirection = new Map<symbol, Direction>();
 
   constructor(configs: {
     cols: number;
@@ -149,6 +153,98 @@ export class Grid {
     this.pushToHistory();
     this.updateGrid();
     this.render();
+
+    return true;
+  }
+
+  private _lastResizeItem: Item | null = null;
+
+  resize(item: Item): boolean {
+    if (
+      this._lastResizeItem &&
+      this._lastResizeItem.col === item.col &&
+      this._lastResizeItem.row === item.row &&
+      this._lastResizeItem.cols === item.cols &&
+      this._lastResizeItem.rows === item.rows
+    )
+      return false;
+
+    const last = this._lastResizeItem || this._items.get(item.id)!;
+
+    const direction = getDirection(last, item);
+
+    this._lastResizeItem = item;
+
+    const tmpItems = this._cloneItems();
+
+    this.restoreFromHistory();
+    this.updateGrid();
+
+    this._preventTooMuchRecursion = 0;
+    this.remove(this._items.get(item.id)!);
+
+    if (!direction) {
+      this.renderPreview(item, GridEvent.Move);
+      return false;
+    }
+
+    const resize = this._resize(item, direction);
+
+    if (!resize) {
+      this._items = tmpItems;
+      this.updateGrid();
+      this.render();
+
+      return false;
+    }
+
+    this.renderPreview(item, GridEvent.Move);
+
+    this._items.set(item.id, item);
+    item.template.context.$implicit.col = item.col;
+    item.template.context.$implicit.row = item.row;
+    item.template.context.$implicit.cols = item.cols;
+    item.template.context.$implicit.rows = item.rows;
+
+    item.template.detectChanges();
+
+    this.render();
+
+    return true;
+  }
+
+  private _resize(item: Item, direction: Direction): boolean {
+    if (this._preventTooMuchRecursion > 500) {
+      return false;
+    }
+
+    const tmpLastDirection = new Map(this._lastDirection);
+    this._lastDirection = new Map();
+
+    this._preventTooMuchRecursion += 1;
+
+    for (let x = item.col; x < item.col + item.cols; x++) {
+      for (let y = item.row; y < item.row + item.rows; y++) {
+        const over = this._matrix[y]?.[x];
+
+        if (!over) continue;
+
+        if (item.id === over) continue;
+
+        const overItem = this._items.get(over)!;
+
+        const ddd = tmpLastDirection.get(overItem.id) || direction;
+
+        const canShrink = shrink(overItem, item, ddd);
+
+        if (!canShrink) {
+          this._lastDirection = tmpLastDirection;
+          return false;
+        }
+
+        this._lastDirection.set(overItem.id, ddd);
+      }
+    }
 
     return true;
   }
