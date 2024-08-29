@@ -104,4 +104,67 @@ describe('KcToggleGroupDirective', () => {
     expect(onChange).toHaveBeenCalledWith('b');
     expect(onTouched).toHaveBeenCalled();
   });
+
+  it('cannot unselect value that is selected in single toggle', () => {
+    directive.toggleGroup.multiple = false;
+    directive.toggleGroup.allowClear = false;
+    const onChange = jasmine.createSpy();
+    directive.toggleGroup['_onChange'] = onChange;
+
+    const onTouched = jasmine.createSpy();
+    directive.toggleGroup['_onTouch'] = onTouched;
+
+    directive.toggleGroup.select('b');
+
+    expect(onChange).toHaveBeenCalledWith('b');
+    expect(onTouched).toHaveBeenCalled();
+
+    const _values = spyOn(directive.toggleGroup['_values'], 'set');
+
+    directive.toggleGroup.select('b');
+
+    expect(_values).not.toHaveBeenCalled();
+  });
+
+  it('can unselect value that is selected in single toggle', () => {
+    directive.toggleGroup.multiple = false;
+    directive.toggleGroup.allowClear = true;
+    const onChange = jasmine.createSpy();
+    directive.toggleGroup['_onChange'] = onChange;
+
+    const onTouched = jasmine.createSpy();
+    directive.toggleGroup['_onTouch'] = onTouched;
+
+    directive.toggleGroup.select('b');
+
+    expect(onChange).toHaveBeenCalledWith('b');
+    expect(onTouched).toHaveBeenCalled();
+
+    const _values = spyOn(directive.toggleGroup['_values'], 'set');
+
+    directive.toggleGroup.select('b');
+
+    expect(_values).toHaveBeenCalled();
+  });
+
+  it('should toggle value when is multiple when is allow clear', () => {
+    directive.toggleGroup.multiple = true;
+    directive.toggleGroup.allowClear = true;
+    const onChange = jasmine.createSpy();
+    directive.toggleGroup['_onChange'] = onChange;
+
+    const onTouched = jasmine.createSpy();
+    directive.toggleGroup['_onTouch'] = onTouched;
+
+    directive.toggleGroup.select('b');
+
+    expect(onChange).toHaveBeenCalledWith('b');
+    expect(onTouched).toHaveBeenCalled();
+
+    const _values = spyOn(directive.toggleGroup['_values'], 'toggle');
+
+    directive.toggleGroup.select('b');
+
+    expect(_values).toHaveBeenCalled();
+  });
 });

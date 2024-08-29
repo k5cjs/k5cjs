@@ -21,7 +21,7 @@ jobs:
   install:
     name: Install npm packages
     runs-on: ubuntu-20.04
-    timeout-minutes: 3
+    timeout-minutes: 5
     strategy:
       matrix:
         node-version: [16.14.0]
@@ -45,7 +45,7 @@ jobs:
   prettier:
     name: Prettier
     runs-on: ubuntu-20.04
-    timeout-minutes: 2
+    timeout-minutes: 3
     needs: install
     strategy:
       matrix:
@@ -65,7 +65,7 @@ jobs:
   build-libs:
     name: Build all libraries
     runs-on: ubuntu-20.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: install
     strategy:
       matrix:
@@ -92,7 +92,7 @@ jobs:
   stylelint:
     name: Stylelint
     runs-on: ubuntu-20.04
-    timeout-minutes: 1
+    timeout-minutes: 2
     needs: install
     strategy:
       matrix:
@@ -147,7 +147,7 @@ jobs:
   tests:
     name: Unit tests
     runs-on: ubuntu-20.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     needs: [stylelint, eslint]
     strategy:
       fail-fast: true
