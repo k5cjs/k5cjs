@@ -1,9 +1,9 @@
 {
   "name": "@k5cjs/tables",
-  "version": "15.0.0",
+  "version": "16.0.0",
   "peerDependencies": {
-    "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0",
-    "@angular/cdk": "^14.0.0 || ^15.0.0 || ^16.0.0",
+    "@angular/core": "^16.2.0",
+    "@angular/cdk": "^16.2.0",
     "rxjs": "~7.5.0"
   },
   "dependencies": {
