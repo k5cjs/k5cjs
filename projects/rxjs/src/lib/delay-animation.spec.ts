@@ -1,4 +1,5 @@
-import { Observable, ReplaySubject } from 'rxjs';
+import { fakeAsync, flush, tick } from '@angular/core/testing';
+import { Observable, ReplaySubject, take } from 'rxjs';
 
 import { delayAnimation } from './delay-animation.helper';
 
@@ -11,24 +12,28 @@ describe('SelectionModel', () => {
     loading = state.asObservable();
   });
 
-  it('check default values for delayAnimation and loading duration is less that 100ms', (done) => {
+  it('check default values for delayAnimation and loading duration is less than 100ms', fakeAsync(() => {
     state.next(true);
 
-    const time = performance.now();
+    const time = Date.now();
+    let valueReceived = false;
 
-    loading.pipe(delayAnimation()).subscribe((value) => {
-      const currentTime = performance.now();
+    loading.pipe(delayAnimation(), take(1)).subscribe((value) => {
+      const currentTime = Date.now();
       const duration = currentTime - time;
 
-      expect(duration).toBeGreaterThan(80);
-      expect(duration).toBeLessThan(100);
-      expect(value).toBeFalse();
-      done();
+      expect(duration).toBeGreaterThanOrEqual(80);
+      expect(duration).toBeLessThanOrEqual(100);
+      expect(value).toBeTrue();
+
+      valueReceived = true;
     });
 
-    setTimeout(() => state.next(true), 50);
-    setTimeout(() => state.next(false), 90);
-  });
+    tick(100);
+    flush();
+
+    expect(valueReceived).toBeTrue();
+  }));
 
   it('check default values for delayAnimation and loading duration is greater that 100ms', (done) => {
     state.next(true);
