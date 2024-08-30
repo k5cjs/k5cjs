@@ -1,0 +1,25 @@
+:host {
+  @apply
+    block
+    h-screen
+    overflow-x-hidden
+    overflow-y-auto;
+}
+
+.grid {
+  @apply
+    overflow-hidden
+    bg-sky-500;
+
+  &__item {
+    @apply
+      absolute
+      top-0
+      left-0
+      w-[150px]
+      h-[150px]
+      z-10
+      cursor-pointer
+      bg-sky-900;
+  }
+}
