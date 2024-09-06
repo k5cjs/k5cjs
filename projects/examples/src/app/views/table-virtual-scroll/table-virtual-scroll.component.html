@@ -1,0 +1,23 @@
+<cdk-virtual-scroll-viewport class="viewport">
+  <table cdk-table [dataSource]="dataSource$">
+    <ng-container cdkColumnDef="id">
+      <th cdk-header-cell *cdkHeaderCellDef [style.height.px]="40">id</th>
+
+      <td *cdkCellDef="let element" [style.height.px]="40">
+        <ng-container>{{ element.id }}</ng-container>
+      </td>
+    </ng-container>
+
+    <tr cdk-header-row *cdkHeaderRowDef="['id']; sticky: true" class="head"></tr>
+
+    <tr
+      [style.height.px]="placeholderHeight"
+      cdk-row
+      *cdkRowDef="let row; let index = index; columns: []; when: placeholderWhen"
+    ></tr>
+
+    <ng-template let-row cdkRowDef cdkVirtualFor [cdkRowDefColumns]="['id']" [cdkVirtualForOf]="virtualDataSource$">
+      <tr cdk-row></tr>
+    </ng-template>
+  </table>
+</cdk-virtual-scroll-viewport>

@@ -1,0 +1,28 @@
+.viewport {
+  @apply
+    w-full 
+    h-full;
+}
+
+:host {
+  @apply
+    flex
+    flex-col
+    w-screen
+    h-screen;
+}
+
+.head {
+  @apply
+    text-center;
+}
+
+tr, td, table {
+  @apply
+    w-full;
+}
+
+
+::ng-deep .cdk-virtual-scroll-content-wrapper {
+  transform: translateY(0px) !important;
+}

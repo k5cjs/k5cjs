@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { TableVirtualScrollComponent } from './views/table-virtual-scroll/table-virtual-scroll.component';
+
 const routes: Routes = [
   {
     path: 'home',
@@ -21,6 +23,10 @@ const routes: Routes = [
   {
     path: 'cal',
     loadChildren: () => import('./views/cal'),
+  },
+  {
+    path: 'table-virtual-scroll',
+    component: TableVirtualScrollComponent,
   },
   {
     path: 'form-field',
