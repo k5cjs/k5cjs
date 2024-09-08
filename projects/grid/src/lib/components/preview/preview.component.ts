@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { Grid } from '../../helpers';
+import { KcGrid } from '../../helpers';
 import { GridEvent } from '../../types';
 
 @Component({
@@ -23,7 +23,7 @@ export class PreviewComponent implements OnChanges, OnDestroy {
 
   @Input({ required: true }) gridRef!: HTMLElement;
 
-  @Input() grid!: Grid;
+  @Input() grid!: KcGrid;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
 

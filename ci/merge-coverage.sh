@@ -21,6 +21,7 @@ mv coverage/types/coverage-final.json reports/types.json
 mv coverage/toggle/coverage-final.json reports/toggle.json
 mv coverage/fake-progress-bar/coverage-final.json reports/coverage-final.json
 mv coverage/router/coverage-final.json reports/router.json
+mv coverage/grid/coverage-final.json reports/grid.json
 
 mkdir -p .nyc_output
 

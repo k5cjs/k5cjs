@@ -1,9 +1,6 @@
-<button (click)="test()">test</button>
-<button (click)="back()">back</button>
-
 <div #gridRef class="grid">
   <div #content>
-    <div>header</div>
+    <ng-content select="[header]"></ng-content>
     <!-- [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
     <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
       <kc-grid-lines
@@ -16,7 +13,7 @@
       />
 
       <kc-grid-preview
-        *preview="let item"
+        *kcGridPreview="let item"
         [col]="item.col"
         [row]="item.row"
         [cols]="item.cols"
@@ -34,7 +31,7 @@
       </kc-grid-preview>
 
       <kc-grid-item
-        *libGrid="let item"
+        *kcGrid="let item"
         [col]="item.col"
         [row]="item.row"
         [cols]="item.cols"
@@ -54,6 +51,6 @@
       </kc-grid-item>
     </div>
 
-    <div>footer</div>
+    <ng-content select="[footer]"></ng-content>
   </div>
 </div>

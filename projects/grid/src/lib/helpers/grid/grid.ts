@@ -1,4 +1,4 @@
-import { EmbeddedViewRef } from '@angular/core';
+import { ChangeDetectorRef, EmbeddedViewRef } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { Cell, Direction, GridEvent } from '../../types';
@@ -9,7 +9,7 @@ import { shrink } from '../shrink/shrink.helper';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
 
-export class Grid {
+export class KcGrid {
   /**
    * cols are the number of columns in the grid
    */
@@ -48,6 +48,8 @@ export class Grid {
 
   private _lastDirection = new Map<symbol, Direction>();
 
+  private _cdr: ChangeDetectorRef;
+
   constructor(configs: {
     cols: number;
     rows: number;
@@ -62,6 +64,7 @@ export class Grid {
      * scrollLeft is the scroll left of the grid
      */
     scrollLeft: number;
+    changeDetectorRef: ChangeDetectorRef;
   }) {
     this.cols = configs.cols;
     this.rows = configs.rows;
@@ -70,6 +73,7 @@ export class Grid {
     this.preview = configs.preview;
     this.scrollTop = configs.scrollTop;
     this.scrollLeft = configs.scrollLeft;
+    this._cdr = configs.changeDetectorRef;
 
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
     this._history = [];
@@ -121,6 +125,7 @@ export class Grid {
     this._lastMoveCol = item.col;
     this._lastMoveRow = item.row;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.remove(this._items.get(item.id)!);
 
     this._preventTooMuchRecursion = 0;
@@ -169,6 +174,7 @@ export class Grid {
     )
       return false;
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const last = this._lastResizeItem || this._items.get(item.id)!;
 
     const direction = getDirection(last, item);
@@ -181,6 +187,7 @@ export class Grid {
     this.updateGrid();
 
     this._preventTooMuchRecursion = 0;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.remove(this._items.get(item.id)!);
 
     if (!direction) {
@@ -231,6 +238,7 @@ export class Grid {
 
         if (item.id === over) continue;
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const overItem = this._items.get(over)!;
 
         const ddd = tmpLastDirection.get(overItem.id) || direction;
@@ -264,6 +272,7 @@ export class Grid {
 
         if (item.id === over) continue;
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const overItem = this._items.get(over)!;
 
         // TODO need to compare center of the item not first cell of left top corner
@@ -457,6 +466,7 @@ export class Grid {
 
   render() {
     this._items.forEach((item) => this._rerenderItem(item.template, item));
+    this._cdr.detectChanges();
   }
 
   renderPreview(item: Item, event: GridEvent) {

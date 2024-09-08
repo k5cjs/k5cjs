@@ -5,7 +5,7 @@ import { Cell } from '../../types';
 type Context = { $implicit: Cell };
 
 @Directive({
-  selector: '[preview]',
+  selector: '[kcGridPreview]',
 })
 export class PreviewDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}

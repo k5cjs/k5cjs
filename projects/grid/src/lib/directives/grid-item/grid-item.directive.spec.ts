@@ -1,16 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GridItemDirective } from './directives/grid-item.directivee';
+import { GridItemDirective } from './grid-item.directive';
 
 @Component({
-  selector: 'kc-dummy',
+  selector: 'kc-grid-dummy',
   template: `
-    <div *gridItem>Test</div>
+    <div *kcGridItem>Test</div>
   `,
 })
 class DumpyComponent {
-  @ViewChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective;
+  @ViewChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<void>;
 }
 
 describe('GridItemDirective', () => {

@@ -1,4 +1,4 @@
-import { getRectangleIntersection } from '../intersection.helperection.helper';
+import { getRectangleIntersection } from './intersection.helper';
 
 describe('intersection', () => {
   it('get overlap', () => {

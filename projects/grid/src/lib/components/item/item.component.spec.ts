@@ -1,15 +1,16 @@
 import { Component, EmbeddedViewRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Grid } from '../../helpers/grid/grid';
+import { KcGrid } from '../../helpers/grid/grid';
 import { Cell } from '../../types/cell.type';
 
 import { ItemComponent } from './item.component';
+import { KcGridModule } from '../../grid.module';
 
 @Component({
-  selector: 'lib-test',
+  selector: 'kc-grid-test',
   template: `
-    <lib-item
+    <kc-grid-item
       [col]="col"
       [row]="row"
       [cols]="cols"
@@ -29,7 +30,8 @@ class DumpyComponent {
   row = 0;
   cols = 3;
   rows = 3;
-  grid: Grid = new Grid({} as any);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  grid: KcGrid = new KcGrid({} as any);
   id = Symbol();
   template!: EmbeddedViewRef<{ $implicit: Cell }>;
   gridRef!: HTMLElement;
@@ -46,6 +48,7 @@ describe('ItemComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [ItemComponent, DumpyComponent],
+      imports: [KcGridModule],
     });
     fixture = TestBed.createComponent(DumpyComponent);
     component = fixture.componentInstance;

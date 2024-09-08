@@ -1,4 +1,4 @@
-import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from '../shift-to.helperto.helper';
+import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from './shift-to.helper';
 
 describe('shift to', () => {
   it('shift with two position to bottom', () => {

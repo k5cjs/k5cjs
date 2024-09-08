@@ -13,7 +13,7 @@ import {
   inject,
 } from '@angular/core';
 
-import { Grid } from '../../helpers';
+import { KcGrid } from '../../helpers';
 import { Cell } from '../../types';
 
 @Component({
@@ -27,7 +27,7 @@ export class ItemComponent implements OnInit, OnChanges {
   @Input({ required: true }) row!: number;
   @Input({ required: true }) cols!: number;
   @Input({ required: true }) rows!: number;
-  @Input({ required: true }) grid!: Grid;
+  @Input({ required: true }) grid!: KcGrid;
   @Input({ required: true }) id!: symbol;
   @Input({ required: true }) template!: EmbeddedViewRef<{ $implicit: Cell }>;
   @Input({ required: true }) gridRef!: HTMLElement;
@@ -309,8 +309,10 @@ export class ItemComponent implements OnInit, OnChanges {
     const height = element.offsetHeight;
     const style = getComputedStyle(element).transform;
 
-    const [, left] = /([-\d\.]+), [-\d\.]+\)/.exec(style)!;
-    const [, top] = /([-\d\.]+)\)/.exec(style)!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [, left] = /([-\d.]+), [-\d.]+\)/.exec(style)!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [, top] = /([-\d.]+)\)/.exec(style)!;
 
     element.style.width = `${width}px`;
     element.style.height = `${height}px`;
