@@ -7,26 +7,35 @@ import {
   Input,
   OnInit,
   ViewChild,
+  forwardRef,
   inject,
 } from '@angular/core';
 
 import { GridDirective, GridItemDirective, PreviewDirective } from '../../directives';
-import { Grid } from '../../helpers';
-import { GridEvent } from '../../types';
+import { KcGrid } from '../../helpers';
+import { GridEvent, KcGridItems } from '../../types';
 import { ItemComponent } from '../item/item.component';
+import { KC_GRID } from '../../tokens';
 
 @Component({
-  selector: 'kc-lib-grid',
+  selector: 'kc-grid',
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: KC_GRID,
+      useFactory: (component: GridComponent) => component.grid,
+      deps: [forwardRef(() => GridComponent)],
+    },
+  ],
 })
-export class GridComponent implements OnInit {
+export class GridComponent<T = void> implements OnInit {
   @Input() scale = 1;
   @Input() cols = 0;
   @Input() rows = 0;
   @Input() autoWidth = true;
-  @Input() items: { col: number; row: number; cols: number; rows: number }[] = [];
+  @Input() items: KcGridItems<T> = [];
 
   @Input()
   set colsGaps(value: [number, ...number[]]) {
@@ -62,9 +71,9 @@ export class GridComponent implements OnInit {
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
-  @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective;
+  @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<T>;
 
-  grid!: Grid;
+  grid!: KcGrid;
 
   colsTotalGaps!: number;
   rowsTotalGaps!: number;
@@ -73,21 +82,11 @@ export class GridComponent implements OnInit {
   private _isMoving = false;
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
-  test(): void {
-    this.grid.event.next(GridEvent.BeforeAddRows);
-
-    this.grid.rows += 15;
-    this.rows += 15;
-
-    this.rowsGaps = [...this.rowsGaps, 0] as unknown as [number, ...number[]];
-    this.rowsTotalGaps = this._rowsTotalGaps();
-  }
-
   ngOnInit(): void {
     this.colsTotalGaps = this._colsTotalGaps();
     this.rowsTotalGaps = this._rowsTotalGaps();
 
-    this.grid = new Grid({
+    this.grid = new KcGrid({
       cols: this.cols,
       rows: this.rows,
       cellWidth: 100,
@@ -95,6 +94,7 @@ export class GridComponent implements OnInit {
       preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') }),
       scrollTop: this.gridRef.nativeElement.scrollTop,
       scrollLeft: this.gridRef.nativeElement.scrollLeft,
+      changeDetectorRef: this._cdr,
     });
 
     this.items.forEach((item, i) => {
@@ -105,6 +105,8 @@ export class GridComponent implements OnInit {
         ...item,
         id: Symbol(`item-${i}`),
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (chart.context as any).$implicit.template = chart;
 
       this.grid.add({
@@ -222,7 +224,7 @@ export class GridComponent implements OnInit {
 
     // add new row if scroll is at the bottom
     if (scrollHeight + increaseY > contentHeight - 500) {
-      const remainingHeight = contentHeight - scrollHeight;
+      // const remainingHeight = contentHeight - scrollHeight;
 
       // if (remainingHeight > 0) {
       //   temp = increaseY;

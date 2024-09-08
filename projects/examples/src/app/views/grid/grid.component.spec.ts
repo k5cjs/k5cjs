@@ -8,7 +8,7 @@ describe('GridComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [GridComponent]
+      declarations: [GridComponent],
     });
     fixture = TestBed.createComponent(GridComponent);
     component = fixture.componentInstance;

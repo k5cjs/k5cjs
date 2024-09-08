@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResizeTopComponent } from './resize-top.component';
+import { ResizeBottomComponent } from './resize-bottom.component';
 
-describe('ResizeComponent', () => {
-  let component: ResizeTopComponent;
-  let fixture: ComponentFixture<ResizeTopComponent>;
+describe('ResizeBottomComponent', () => {
+  let component: ResizeBottomComponent;
+  let fixture: ComponentFixture<ResizeBottomComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [ResizeTopComponent],
+      declarations: [ResizeBottomComponent],
     });
-    fixture = TestBed.createComponent(ResizeTopComponent);
+    fixture = TestBed.createComponent(ResizeBottomComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

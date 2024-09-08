@@ -1,3 +1,5 @@
+import { KcGridItem } from './item.type';
+
 export const enum GridEvent {
   Capture = 'capture',
   Release = 'release',
@@ -6,11 +8,7 @@ export const enum GridEvent {
   AfterAddRows = 'after-add-rows',
 }
 
-export interface Cell {
+export type Cell<T = void> = {
   id: symbol;
-  col: number;
-  row: number;
-  cols: number;
-  rows: number;
   event?: GridEvent;
-}
+} & KcGridItem<T>;

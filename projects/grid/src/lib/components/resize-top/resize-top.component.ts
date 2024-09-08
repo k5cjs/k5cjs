@@ -1,6 +1,6 @@
 import { Component, ElementRef, EmbeddedViewRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
-import { Grid } from '../../helpers';
+import { KcGrid } from '../../helpers';
 import { Cell } from '../../types';
 
 @Component({
@@ -13,7 +13,7 @@ export class ResizeTopComponent {
   @Input({ required: true }) row!: number;
   @Input({ required: true }) cols!: number;
   @Input({ required: true }) rows!: number;
-  @Input({ required: true }) grid!: Grid;
+  @Input({ required: true }) grid!: KcGrid;
   @Input({ required: true }) id!: symbol;
   @Input({ required: true }) template!: EmbeddedViewRef<{ $implicit: Cell }>;
   @Input({ required: true }) colsGaps!: number[];
@@ -21,6 +21,7 @@ export class ResizeTopComponent {
   @Input({ required: true }) gridRef!: HTMLElement;
   @Input({ required: true }) itemRef!: ElementRef<HTMLElement>;
 
+  // eslint-disable-next-line @angular-eslint/no-output-native
   @Output() resize = new EventEmitter<boolean>();
   @Output() update = new EventEmitter<{ x: number; y: number; width: number; height: number }>();
 

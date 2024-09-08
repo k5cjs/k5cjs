@@ -20,7 +20,7 @@
         "@angular-eslint/directive-selector": [
           "error",
           {
-            "prefix": "kc-grid",
+            "prefix": "kcGrid",
             "style": "camelCase",
             "type": "attribute"
           }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
 
-import { Grid } from '../../helpers';
+import { KcGrid } from '../../helpers';
 
 @Component({
   selector: 'kc-grid-lines',
@@ -15,7 +15,7 @@ export class LinesComponent implements OnChanges {
   @Input({ required: true }) colsGaps!: number[];
   @Input({ required: true }) rowsGaps!: number[];
 
-  @Input() grid!: Grid;
+  @Input() grid!: KcGrid;
 
   @Input() scale!: number;
 

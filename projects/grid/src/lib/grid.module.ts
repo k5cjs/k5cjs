@@ -38,4 +38,4 @@ import { GridDirective, GridItemDirective, PreviewDirective } from './directives
   imports: [CommonModule],
   exports: [GridComponent, GridItemDirective],
 })
-export class GridModule {}
+export class KcGridModule {}

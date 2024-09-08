@@ -4,9 +4,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PreviewDirective } from './preview.directive';
 
 @Component({
-  selector: 'kc-dummy',
+  selector: 'kc-grid-dummy',
   template: `
-    <div *preview>Test</div>
+    <div *kcGridPreview>Test</div>
   `,
 })
 class DumpyComponent {

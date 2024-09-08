@@ -31,6 +31,7 @@ const commands = [
     { name: Libs.Cal, needs: [] },
     { name: Libs.Animations, needs: [] },
     { name: Libs.Router, needs: [] },
+    { name: Libs.Grid, needs: [] },
   ],
   [
     { name: Libs.Store, needs: [Libs.Types] },
