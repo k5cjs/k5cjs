@@ -46,6 +46,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   }
 
   getByQuery(options: Options<Params>): Observable<{ items: T[] } & Params> {
+    // TODO add url is query if url exists
     const query = this._query({ params: options.params });
 
     return this._dispatch(

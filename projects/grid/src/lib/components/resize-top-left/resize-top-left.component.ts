@@ -81,8 +81,13 @@ export class ResizeTopLeftComponent {
 
     e.preventDefault();
 
-    const x = e.clientX - this.gridRef.offsetLeft + this.grid.scrollLeft;
-    const y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+    let x = e.clientX - this.gridRef.offsetLeft + this.grid.scrollLeft;
+    let y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+
+    // if y is in the last row, then we equate y to the start of the last row plus one pixel
+    if (y > this.y + this.height - this._cellHeight()) y = this.y + this.height - this._cellHeight() + 1;
+    // if x is in the last column, then we equate x to the start of the last column plus one pixel
+    if (x > this.x + this.width - this._cellWidth()) x = this.x + this.width - this._cellWidth() + 1;
 
     const col = this._col(x);
     const row = this._row(y);
