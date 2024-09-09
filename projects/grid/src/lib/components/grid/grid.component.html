@@ -1,0 +1,56 @@
+<div #gridRef class="grid">
+  <div #content>
+    <ng-content select="[header]"></ng-content>
+    <!-- [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
+    <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
+      <kc-grid-lines
+        [cols]="grid.cols"
+        [rows]="grid.rows"
+        [grid]="grid"
+        [scale]="scale"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+      />
+
+      <kc-grid-preview
+        *kcGridPreview="let item"
+        [col]="item.col"
+        [row]="item.row"
+        [cols]="item.cols"
+        [rows]="item.rows"
+        [event]="item.event"
+        [scale]="scale"
+        [grid]="grid"
+        [gridRef]="items"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+      >
+        <div>id: {{ item.id }}</div>
+        <div>col: {{ item.col }}</div>
+        <div>row: {{ item.row }}</div>
+      </kc-grid-preview>
+
+      <kc-grid-item
+        *kcGrid="let item"
+        [col]="item.col"
+        [row]="item.row"
+        [cols]="item.cols"
+        [rows]="item.rows"
+        [grid]="item.grid"
+        [id]="item.id"
+        [template]="item.template"
+        [scale]="scale"
+        [gridRef]="items"
+        [colsGaps]="colsGaps"
+        [rowsGaps]="rowsGaps"
+        (move)="move($event)"
+        (stop)="stop()"
+        class="grid__item"
+      >
+        <ng-container *ngTemplateOutlet="gridItem.template; context: { $implicit: item }" />
+      </kc-grid-item>
+    </div>
+
+    <ng-content select="[footer]"></ng-content>
+  </div>
+</div>

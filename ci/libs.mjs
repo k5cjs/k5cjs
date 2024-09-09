@@ -18,4 +18,5 @@ export const Libs = {
   Toggle: 'toggle',
   FakeProgressBar: 'fake-progress-bar',
   Router: 'router',
+  Grid: 'grid',
 };

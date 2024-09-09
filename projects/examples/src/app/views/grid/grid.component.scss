@@ -1,0 +1,20 @@
+:host {
+  @apply
+    flex
+    flex-col
+    h-screen;
+}
+
+.grid {
+  @apply
+    flex-1;
+
+  &__item {
+    @apply
+      w-full
+      h-full
+      p-6
+      overflow-auto
+      text-xs;
+  }
+}
