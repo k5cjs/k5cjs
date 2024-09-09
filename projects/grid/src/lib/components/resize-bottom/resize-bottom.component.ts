@@ -81,7 +81,10 @@ export class ResizeBottomComponent {
 
     e.preventDefault();
 
-    const y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+    let y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+
+    // if y is in the first row, then we equate y to the end of the first row minus one pixel
+    if (y < this.y + this._cellHeight()) y = this.y + this._cellHeight() - 1;
 
     const row = this._row(y);
 

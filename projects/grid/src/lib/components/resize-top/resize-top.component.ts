@@ -81,7 +81,10 @@ export class ResizeTopComponent {
 
     e.preventDefault();
 
-    const y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+    let y = e.clientY - this.gridRef.offsetTop + this.grid.scrollTop;
+
+    // if y is in thle last row then equal th y to the last row
+    if (y > this.y + this.height - this._cellHeight()) y = this.y + this.height - this._cellHeight() + 1;
 
     const row = this._row(y);
 

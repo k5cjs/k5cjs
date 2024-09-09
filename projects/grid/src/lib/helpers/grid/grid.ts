@@ -174,6 +174,9 @@ export class KcGrid {
     )
       return false;
 
+    if (item.rows === 0) return false;
+    if (item.cols === 0) return false;
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const last = this._lastResizeItem || this._items.get(item.id)!;
 

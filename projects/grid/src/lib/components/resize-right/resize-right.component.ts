@@ -81,7 +81,10 @@ export class ResizeRightComponent {
 
     e.preventDefault();
 
-    const x = e.clientX - this.gridRef.offsetLeft + this.grid.scrollLeft;
+    let x = e.clientX - this.gridRef.offsetLeft + this.grid.scrollLeft;
+
+    // if x is in the first column, then we equate x to the end of the first column minus one pixel
+    if (x < this.x + this._cellWidth()) x = this.x + this._cellWidth() - 1;
 
     const col = this._col(x);
 
