@@ -5,24 +5,35 @@ import {
   EmbeddedViewRef,
   EventEmitter,
   HostListener,
+  Injector,
   Input,
   OnChanges,
   OnInit,
   Output,
   SimpleChanges,
+  forwardRef,
   inject,
 } from '@angular/core';
 
 import { KcGrid } from '../../helpers';
 import { Cell } from '../../types';
+import { GridItemTemplate, ITEM_COMPONENT } from '../../tokens';
+import { GridItemDirective } from '../../directives';
 
 @Component({
   selector: 'kc-grid-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: ITEM_COMPONENT,
+      useFactory: (component: ItemComponent) => component,
+      deps: [forwardRef(() => ItemComponent)],
+    },
+  ],
 })
-export class ItemComponent implements OnInit, OnChanges {
+export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTemplate {
   @Input({ required: true }) col!: number;
   @Input({ required: true }) row!: number;
   @Input({ required: true }) cols!: number;
@@ -35,6 +46,9 @@ export class ItemComponent implements OnInit, OnChanges {
 
   @Input({ required: true }) colsGaps!: number[];
   @Input({ required: true }) rowsGaps!: number[];
+
+  @Input({ required: true }) item!: Cell<T>;
+  @Input({ required: true }) gridItem!: GridItemDirective<T>;
 
   @Output() move = new EventEmitter<{
     x: number;
@@ -51,6 +65,7 @@ export class ItemComponent implements OnInit, OnChanges {
   width!: number;
   height!: number;
 
+  injector = inject(Injector);
   private _animation: Animation | null = null;
 
   private _isInitialized = false;
@@ -188,7 +203,7 @@ export class ItemComponent implements OnInit, OnChanges {
       y: itemOffsetTop,
       width: this.elementRef.nativeElement.offsetWidth,
       height: this.elementRef.nativeElement.offsetHeight,
-      item: this,
+      item: this as ItemComponent,
     });
 
     const allowToMove = this.grid.move({

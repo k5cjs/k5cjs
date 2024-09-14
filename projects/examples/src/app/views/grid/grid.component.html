@@ -18,6 +18,10 @@
   </div>
 
   <div *kcGridItem="let item; type: data" class="grid__item">
+    <div kcGridResizeTopLeft [cell]="item" class="grid__resize grid__resize--top-left">TL</div>
+    <div kcGridResizeTop [cell]="item" class="grid__resize grid__resize--top">T</div>
+    <div kcGridResizeTopRight [cell]="item" class="grid__resize grid__resize--top-right">TR</div>
+
     <div>id: {{ item.id }}</div>
     <div>col: {{ item.col }}</div>
     <div>cols: {{ item.cols }}</div>
@@ -28,6 +32,13 @@
       <span>data:</span>
       <pre>{{ item.data | json }}</pre>
     </div>
+
+    <div kcGridResizeRight [cell]="item" class="grid__resize grid__resize--right">R</div>
+    <div kcGridResizeLeft [cell]="item" class="grid__resize grid__resize--left">L</div>
+
+    <div kcGridResizeBottomLeft [cell]="item" class="grid__resize grid__resize--bottom-left">BL</div>
+    <div kcGridResizeBottom [cell]="item" class="grid__resize grid__resize--bottom">B</div>
+    <div kcGridResizeBottomRight [cell]="item" class="grid__resize grid__resize--bottom-right">BR</div>
   </div>
 
   <div footer>Footer content (optional)</div>

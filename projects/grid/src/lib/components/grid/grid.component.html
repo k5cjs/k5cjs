@@ -43,12 +43,12 @@
         [gridRef]="items"
         [colsGaps]="colsGaps"
         [rowsGaps]="rowsGaps"
+        [gridItem]="gridItem"
+        [item]="item"
         (move)="move($event)"
         (stop)="stop()"
         class="grid__item"
-      >
-        <ng-container *ngTemplateOutlet="gridItem.template; context: { $implicit: item }" />
-      </kc-grid-item>
+      ></kc-grid-item>
     </div>
 
     <ng-content select="[footer]"></ng-content>

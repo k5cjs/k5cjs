@@ -15,7 +15,7 @@ import { GridDirective, GridItemDirective, PreviewDirective } from '../../direct
 import { KcGrid } from '../../helpers';
 import { GridEvent, KcGridItems } from '../../types';
 import { ItemComponent } from '../item/item.component';
-import { KC_GRID } from '../../tokens';
+import { GRID_TEMPLATE, GridTemplate, KC_GRID } from '../../tokens';
 
 @Component({
   selector: 'kc-grid',
@@ -28,9 +28,14 @@ import { KC_GRID } from '../../tokens';
       useFactory: (component: GridComponent) => component.grid,
       deps: [forwardRef(() => GridComponent)],
     },
+    {
+      provide: GRID_TEMPLATE,
+      useFactory: (component: GridComponent) => component,
+      deps: [forwardRef(() => GridComponent)],
+    },
   ],
 })
-export class GridComponent<T = void> implements OnInit {
+export class GridComponent<T = void> implements OnInit, GridTemplate {
   @Input() scale = 1;
   @Input() cols = 0;
   @Input() rows = 0;
@@ -66,8 +71,10 @@ export class GridComponent<T = void> implements OnInit {
   }
   _rowsGaps: number[] = [10];
 
-  @ViewChild('gridRef', { static: true }) gridRef!: ElementRef<HTMLElement>;
-  @ViewChild('content', { static: true }) content!: ElementRef<HTMLElement>;
+  @ViewChild('gridRef', { static: true }) containerElementRef!: ElementRef<HTMLElement>;
+  @ViewChild('content', { static: true }) contentElementRef!: ElementRef<HTMLElement>;
+  @ViewChild('items', { static: true }) itemsElementRef!: ElementRef<HTMLElement>;
+
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
@@ -89,11 +96,13 @@ export class GridComponent<T = void> implements OnInit {
     this.grid = new KcGrid({
       cols: this.cols,
       rows: this.rows,
+      colsGaps: this.colsGaps,
+      rowsGaps: this.rowsGaps,
       cellWidth: 100,
       cellHeight: 100,
       preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') }),
-      scrollTop: this.gridRef.nativeElement.scrollTop,
-      scrollLeft: this.gridRef.nativeElement.scrollLeft,
+      scrollTop: this.containerElementRef.nativeElement.scrollTop,
+      scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
       changeDetectorRef: this._cdr,
     });
 
@@ -124,15 +133,15 @@ export class GridComponent<T = void> implements OnInit {
   }
 
   scroll(): void {
-    this.gridRef.nativeElement.addEventListener('wheel', (event) => {
+    this.containerElementRef.nativeElement.addEventListener('wheel', (event) => {
       if (this._isMoving) event.preventDefault();
     });
 
-    this.gridRef.nativeElement.addEventListener('scroll', () => {
+    this.containerElementRef.nativeElement.addEventListener('scroll', () => {
       if (this._isMoving) return;
 
-      this.grid.scrollTop = this.gridRef.nativeElement.scrollTop;
-      this.grid.scrollLeft = this.gridRef.nativeElement.scrollLeft;
+      this.grid.scrollTop = this.containerElementRef.nativeElement.scrollTop;
+      this.grid.scrollLeft = this.containerElementRef.nativeElement.scrollLeft;
     });
   }
 
@@ -164,8 +173,8 @@ export class GridComponent<T = void> implements OnInit {
       const speed = Math.round(20 * percent);
 
       increaseY = -speed;
-    } else if (mouseYContainer > this.gridRef.nativeElement.clientHeight) {
-      const offset = mouseYContainer - this.gridRef.nativeElement.clientHeight;
+    } else if (mouseYContainer > this.containerElementRef.nativeElement.clientHeight) {
+      const offset = mouseYContainer - this.containerElementRef.nativeElement.clientHeight;
       const percent = offset / (height * item.rows);
 
       const speed = Math.round(20 * percent);
@@ -179,8 +188,8 @@ export class GridComponent<T = void> implements OnInit {
       const speed = Math.round(20 * percent);
 
       increaseX = -speed;
-    } else if (mouseXContainer > this.gridRef.nativeElement.clientWidth) {
-      const offset = mouseXContainer - this.gridRef.nativeElement.clientWidth;
+    } else if (mouseXContainer > this.containerElementRef.nativeElement.clientWidth) {
+      const offset = mouseXContainer - this.containerElementRef.nativeElement.clientWidth;
       const percent = offset / (width * item.cols);
 
       const speed = Math.round(20 * percent);
@@ -198,8 +207,8 @@ export class GridComponent<T = void> implements OnInit {
 
     if (this.grid.scrollTop + increaseY <= 0) increaseY = 0;
 
-    const scrollWidth = this.gridRef.nativeElement.clientWidth + this.grid.scrollLeft;
-    const contentWidth = this.content.nativeElement.offsetWidth;
+    const scrollWidth = this.containerElementRef.nativeElement.clientWidth + this.grid.scrollLeft;
+    const contentWidth = this.contentElementRef.nativeElement.offsetWidth;
 
     // add new column if scroll is at the right
     if (scrollWidth + increaseX > contentWidth) {
@@ -217,8 +226,8 @@ export class GridComponent<T = void> implements OnInit {
       }
     }
 
-    const scrollHeight = this.gridRef.nativeElement.clientHeight + this.grid.scrollTop;
-    const contentHeight = this.content.nativeElement.offsetHeight;
+    const scrollHeight = this.containerElementRef.nativeElement.clientHeight + this.grid.scrollTop;
+    const contentHeight = this.contentElementRef.nativeElement.offsetHeight;
 
     let temp: number | undefined;
 
@@ -257,7 +266,7 @@ export class GridComponent<T = void> implements OnInit {
 
       this._isMoving = true;
 
-      this.gridRef.nativeElement.scrollTo({
+      this.containerElementRef.nativeElement.scrollTo({
         left: this.grid.scrollLeft,
         top: this.grid.scrollTop,
         behavior: 'instant',

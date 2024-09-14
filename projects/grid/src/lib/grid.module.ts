@@ -1,21 +1,32 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
+import { GridComponent, ItemComponent, LinesComponent, PreviewComponent } from './components';
 import {
-  GridComponent,
-  ItemComponent,
-  LinesComponent,
-  PreviewComponent,
-  ResizeBottomComponent,
-  ResizeBottomLeftComponent,
-  ResizeBottomRightComponent,
-  ResizeLeftComponent,
-  ResizeRightComponent,
-  ResizeTopComponent,
-  ResizeTopLeftComponent,
-  ResizeTopRightComponent,
-} from './components';
-import { GridDirective, GridItemDirective, PreviewDirective } from './directives';
+  GridDirective,
+  GridItemDirective,
+  PreviewDirective,
+  ResizeBottomDirective,
+  ResizeBottomLeftDirective,
+  ResizeBottomRightDirective,
+  ResizeLeftDirective,
+  ResizeRightDirective,
+  ResizeTopDirective,
+  ResizeTopLeftDirective,
+  ResizeTopRightDirective,
+} from './directives';
+
+const externalDirectives = [
+  ResizeTopDirective,
+  ResizeTopDirective,
+  ResizeTopLeftDirective,
+  ResizeTopRightDirective,
+  ResizeRightDirective,
+  ResizeLeftDirective,
+  ResizeBottomDirective,
+  ResizeBottomLeftDirective,
+  ResizeBottomRightDirective,
+];
 
 @NgModule({
   declarations: [
@@ -26,16 +37,9 @@ import { GridDirective, GridItemDirective, PreviewDirective } from './directives
     PreviewComponent,
     PreviewDirective,
     LinesComponent,
-    ResizeTopComponent,
-    ResizeTopRightComponent,
-    ResizeRightComponent,
-    ResizeBottomComponent,
-    ResizeLeftComponent,
-    ResizeBottomRightComponent,
-    ResizeBottomLeftComponent,
-    ResizeTopLeftComponent,
+    ...externalDirectives,
   ],
   imports: [CommonModule],
-  exports: [GridComponent, GridItemDirective],
+  exports: [GridComponent, GridItemDirective, ...externalDirectives],
 })
 export class KcGridModule {}

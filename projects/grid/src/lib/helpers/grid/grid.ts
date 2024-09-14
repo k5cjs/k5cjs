@@ -21,6 +21,8 @@ export class KcGrid {
   /**
    * cellWidth is the width of each cell in the grid
    */
+  public colsGaps: number[];
+  public rowsGaps: number[];
   public cellWidth: number;
   /**
    * cellHeight is the height of each cell in the grid
@@ -53,6 +55,8 @@ export class KcGrid {
   constructor(configs: {
     cols: number;
     rows: number;
+    colsGaps: number[];
+    rowsGaps: number[];
     cellWidth: number;
     cellHeight: number;
     preview: EmbeddedViewRef<{ $implicit: Cell }>;
@@ -68,6 +72,8 @@ export class KcGrid {
   }) {
     this.cols = configs.cols;
     this.rows = configs.rows;
+    this.colsGaps = configs.colsGaps;
+    this.rowsGaps = configs.rowsGaps;
     this.cellWidth = configs.cellWidth;
     this.cellHeight = configs.cellHeight;
     this.preview = configs.preview;
