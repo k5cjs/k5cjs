@@ -2,12 +2,10 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  EventEmitter,
   Injector,
   Input,
   OnChanges,
   OnInit,
-  Output,
   SimpleChanges,
   forwardRef,
   inject,
@@ -38,15 +36,6 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
   @Input({ required: true }) scale!: number;
 
   @Input({ required: true }) gridItem!: GridItemDirective<T>;
-
-  @Output() move = new EventEmitter<{
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    item: ItemComponent;
-  }>();
-  @Output() stop = new EventEmitter<void>();
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 

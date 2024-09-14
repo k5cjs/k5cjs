@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { NgModule, Type } from '@angular/core';
 
 import { GridComponent, ItemComponent, LinesComponent, PreviewComponent } from './components';
 import {
@@ -17,7 +17,7 @@ import {
   ResizeTopRightDirective,
 } from './directives';
 
-const externalDirectives = [
+const externalDirectives: Type<unknown>[] = [
   MoveDirective,
   ResizeTopDirective,
   ResizeTopDirective,
@@ -30,6 +30,8 @@ const externalDirectives = [
   ResizeBottomRightDirective,
 ];
 
+const internalDirectives: Type<unknown>[] = [];
+
 @NgModule({
   declarations: [
     GridComponent,
@@ -39,6 +41,7 @@ const externalDirectives = [
     PreviewComponent,
     PreviewDirective,
     LinesComponent,
+    ...internalDirectives,
     ...externalDirectives,
   ],
   imports: [CommonModule],

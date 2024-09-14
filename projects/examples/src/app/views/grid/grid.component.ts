@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { KcGridItems, KcGridService } from '@k5cjs/grid';
+import { KcGridItem, KcGridItems, KcGridService } from '@k5cjs/grid';
 
 interface Data {
   name: string;
@@ -35,5 +35,9 @@ export class GridComponent {
 
   back(): void {
     this.grid.back();
+  }
+
+  changes(items: KcGridItem[]): void {
+    console.log(items);
   }
 }

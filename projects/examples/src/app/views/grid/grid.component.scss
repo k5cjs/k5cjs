@@ -18,6 +18,11 @@
       text-xs;
   }
 
+  &__item:hover &__move {
+    @apply
+      opacity-100;
+  }
+
   &__move {
     @apply
       absolute
@@ -28,15 +33,19 @@
       -ml-5
       top-1/2
       left-1/2
-      cursor-move;
+      cursor-move
+      transition-opacity
+      duration-300
+      opacity-0;
   }
 
   &__resize {
     @apply
       absolute
       bg-blue-500
-      opacity-0
-      transition-opacity;
+      transition-opacity
+      duration-300
+      opacity-0;
 
     &:hover {
       @apply

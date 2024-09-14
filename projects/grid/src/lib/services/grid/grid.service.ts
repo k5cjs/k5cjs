@@ -43,6 +43,11 @@ export class KcGridService {
    */
   public preview!: EmbeddedViewRef<{ $implicit: Cell }>;
 
+  public isItemsMoving = false;
+
+  private _changes = new Subject<Item[]>();
+  public changes = this._changes.asObservable();
+
   // TODO: change to private
   _matrix!: (symbol | null)[][];
   // TODO: change to private
@@ -162,12 +167,12 @@ export class KcGridService {
     return true;
   }
 
-  drop(): boolean {
+  drop(): void {
     this.pushToHistory();
     this.updateGrid();
     this.render();
 
-    return true;
+    this._changes.next([...this._items.values()]);
   }
 
   private _lastResizeItem: Item | null = null;
