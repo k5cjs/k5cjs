@@ -28,7 +28,7 @@
         flex
         justify-center
         items-center
-        h-4
+        h-10
         left-0
         right-0
         opacity-0
@@ -45,7 +45,7 @@
         flex
         justify-center
         items-center
-        w-4
+        w-10
         top-0
         bottom-0
         opacity-0
@@ -57,50 +57,6 @@
       }
     }
 
-    &--top {
-      @apply
-        top-0;
-    }
-
-    &--top-left {
-      @apply
-        top-0
-        left-0;
-    }
-
-    &--top-right {
-      @apply
-        top-0
-        right-0;
-    }
-
-    &--right {
-      @apply
-        right-0;
-    }
-
-    &--left {
-      @apply
-        left-0;
-    }
-
-    &--bottom {
-      @apply
-        bottom-0;
-    }
-
-    &--bottom-left {
-      @apply
-        left-0
-        bottom-0;
-    }
-
-    &--bottom-right {
-      @apply
-        right-0
-        bottom-0;
-    }
-
     &--top-left,
     &--top-right,
     &--bottom-left,
@@ -109,8 +65,8 @@
         flex
         justify-center
         items-center
-        w-4
-        h-4
+        w-10
+        h-10
         z-10
         bg-green-500
         opacity-0
@@ -120,6 +76,50 @@
         @apply
           opacity-100;
       }
+    }
+
+    &--top {
+      @apply
+        top-1;
+    }
+
+    &--top-left {
+      @apply
+        top-1
+        left-1;
+    }
+
+    &--top-right {
+      @apply
+        top-1
+        right-1;
+    }
+
+    &--right {
+      @apply
+        right-1;
+    }
+
+    &--left {
+      @apply
+        left-1;
+    }
+
+    &--bottom {
+      @apply
+        bottom-1;
+    }
+
+    &--bottom-left {
+      @apply
+        left-1
+        bottom-1;
+    }
+
+    &--bottom-right {
+      @apply
+        right-1
+        bottom-1;
     }
   }
 }
