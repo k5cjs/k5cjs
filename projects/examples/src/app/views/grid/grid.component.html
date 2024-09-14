@@ -17,6 +17,7 @@
     </div>
   </div>
 
+  <!-- <div *kcGridItem="let item; type: data" class="grid__item" kcGridMove [cell]="item"> -->
   <div *kcGridItem="let item; type: data" class="grid__item">
     <div kcGridResizeTopLeft [cell]="item" class="grid__resize grid__resize--top-left">TL</div>
     <div kcGridResizeTop [cell]="item" class="grid__resize grid__resize--top">T</div>
@@ -32,6 +33,8 @@
       <span>data:</span>
       <pre>{{ item.data | json }}</pre>
     </div>
+
+    <div kcGridMove [cell]="item" class="grid__move">Move</div>
 
     <div kcGridResizeRight [cell]="item" class="grid__resize grid__resize--right">R</div>
     <div kcGridResizeLeft [cell]="item" class="grid__resize grid__resize--left">L</div>

@@ -18,10 +18,29 @@
       text-xs;
   }
 
+  &__move {
+    @apply
+      absolute
+      bg-red-500
+      w-10
+      h-10
+      -mt-5
+      -ml-5
+      top-1/2
+      left-1/2;
+  }
+
   &__resize {
     @apply
       absolute
-      bg-blue-500;
+      bg-blue-500
+      opacity-0
+      transition-opacity;
+
+    &:hover {
+      @apply
+        opacity-100;
+    }
 
     &--top, &--bottom {
       @apply
@@ -30,14 +49,7 @@
         items-center
         h-10
         left-0
-        right-0
-        opacity-0
-        transition-opacity;
-
-      &:hover {
-        @apply
-          opacity-100;
-      }
+        right-0;
     }
 
     &--right, &--left {
@@ -47,14 +59,7 @@
         items-center
         w-10
         top-0
-        bottom-0
-        opacity-0
-        transition-opacity;
-
-      &:hover {
-        @apply
-          opacity-100;
-      }
+        bottom-0;
     }
 
     &--top-left,
@@ -68,14 +73,7 @@
         w-10
         h-10
         z-10
-        bg-green-500
-        opacity-0
-        transition-opacity;
-
-      &:hover {
-        @apply
-          opacity-100;
-      }
+        bg-green-500;
     }
 
     &--top {

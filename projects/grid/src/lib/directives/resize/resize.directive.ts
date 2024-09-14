@@ -8,11 +8,6 @@ import { Cell } from '../../types';
 export abstract class ResizeDirective {
   @Input({ required: true }) cell!: Cell;
 
-  x = 0;
-  y = 0;
-  width = 0;
-  height = 0;
-
   mouseOffsetTop = 0;
   mouseOffsetBottom = 0;
   mouseOffsetLeft = 0;
@@ -36,6 +31,7 @@ export abstract class ResizeDirective {
     this._item.resizing(true);
 
     this.isMouseDown = true;
+    this._item.skip = true;
 
     this._setCellPositionAndSize();
     this._setMouseOffset(e);
@@ -52,6 +48,7 @@ export abstract class ResizeDirective {
     this._item.resizing(false);
 
     this.isMouseDown = false;
+    this._item.skip = false;
     document.removeEventListener('mousemove', this.onMouseMove);
 
     this._grid.drop();
@@ -71,11 +68,11 @@ export abstract class ResizeDirective {
   protected _setCellPositionAndSize(): void {
     const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
-    this.x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
-    this.y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
+    this._item.x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
+    this._item.y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
 
-    this.width = width;
-    this.height = height;
+    this._item.width = width;
+    this._item.height = height;
   }
 
   protected _setMouseOffset(e: MouseEvent): void {

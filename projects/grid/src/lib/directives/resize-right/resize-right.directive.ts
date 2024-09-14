@@ -13,19 +13,19 @@ export class ResizeRightDirective extends ResizeDirective {
     let x = this._x(e) + this.mouseOffsetRight;
 
     // if x is in the first column, then we equate x to the end of the first column minus one pixel
-    if (x < this.x + this._cellWidth()) x = this.x + this._cellWidth() - 1;
+    if (x < this._item.x + this._cellWidth()) x = this._item.x + this._cellWidth() - 1;
 
     const col = this._col(x);
 
     const cols = col - this.cell.col + 1;
 
-    const width = x - this.x;
+    const width = x - this._item.x;
 
     this._item.update({
-      x: this.x,
-      y: this.y,
+      x: this._item.x,
+      y: this._item.y,
       width: width,
-      height: this.height,
+      height: this._item.height,
     });
 
     const allowToResize = this._grid.resize({
@@ -38,6 +38,8 @@ export class ResizeRightDirective extends ResizeDirective {
     });
 
     if (!allowToResize) return;
+
+    this._item.width = width;
 
     this.cell.cols = cols;
   }

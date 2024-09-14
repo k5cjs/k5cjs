@@ -13,19 +13,20 @@ export class ResizeLeftDirective extends ResizeDirective {
     let x = this._x(e) - this.mouseOffsetLeft;
 
     // if x is in the last column, then we equate x to the start of the last column plus one pixel
-    if (x > this.x + this.width - this._cellWidth()) x = this.x + this.width - this._cellWidth() + 1;
+    if (x > this._item.x + this._item.width - this._cellWidth())
+      x = this._item.x + this._item.width - this._cellWidth() + 1;
 
     const col = this._col(x);
 
     const cols = this.cell.cols + (this.cell.col - col);
 
-    const width = this.width + (this.x - x);
+    const width = this._item.width + (this._item.x - x);
 
     this._item.update({
       x: x,
-      y: this.y,
+      y: this._item.y,
       width: width,
-      height: this.height,
+      height: this._item.height,
     });
 
     const allowToResize = this._grid.resize({
@@ -38,6 +39,9 @@ export class ResizeLeftDirective extends ResizeDirective {
     });
 
     if (!allowToResize) return;
+
+    this._item.x = x;
+    this._item.width = width;
 
     this.cell.col = col;
     this.cell.cols = cols;

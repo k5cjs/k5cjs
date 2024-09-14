@@ -120,7 +120,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
       this.grid.add({
         ...chart.context.$implicit,
-        template: chart,
+        template: chart as any,
       });
     });
 
@@ -168,14 +168,14 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     let increaseY = 0;
 
     if (y < 0) {
-      const percent = Math.abs(y) / (height * item.rows);
+      const percent = Math.abs(y) / (height * item.cell.rows);
 
       const speed = Math.round(20 * percent);
 
       increaseY = -speed;
     } else if (mouseYContainer > this.containerElementRef.nativeElement.clientHeight) {
       const offset = mouseYContainer - this.containerElementRef.nativeElement.clientHeight;
-      const percent = offset / (height * item.rows);
+      const percent = offset / (height * item.cell.rows);
 
       const speed = Math.round(20 * percent);
 
@@ -183,14 +183,14 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     }
 
     if (x < 0) {
-      const percent = Math.abs(x) / (width * item.cols);
+      const percent = Math.abs(x) / (width * item.cell.cols);
 
       const speed = Math.round(20 * percent);
 
       increaseX = -speed;
     } else if (mouseXContainer > this.containerElementRef.nativeElement.clientWidth) {
       const offset = mouseXContainer - this.containerElementRef.nativeElement.clientWidth;
-      const percent = offset / (width * item.cols);
+      const percent = offset / (width * item.cell.cols);
 
       const speed = Math.round(20 * percent);
 

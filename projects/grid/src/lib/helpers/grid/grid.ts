@@ -482,7 +482,7 @@ export class KcGrid {
     this.preview.context.$implicit.id = item.id;
     this.preview.context.$implicit.event = event;
 
-    this._rerenderItem(this.preview, item);
+    this._rerenderItem(this.preview as any, item);
   }
 
   back() {
@@ -499,10 +499,18 @@ export class KcGrid {
   }
 
   private _rerenderItem(template: Item['template'], { col, row, cols, rows }: Partial<Omit<Item, 'template'>>) {
-    if (col !== undefined) template.context.$implicit.col = col;
-    if (row !== undefined) template.context.$implicit.row = row;
-    if (cols !== undefined) template.context.$implicit.cols = cols;
-    if (rows !== undefined) template.context.$implicit.rows = rows;
+    // if (col !== undefined) template.context.$implicit.col = col;
+    // if (row !== undefined) template.context.$implicit.row = row;
+    // if (cols !== undefined) template.context.$implicit.cols = cols;
+    // if (rows !== undefined) template.context.$implicit.rows = rows;
+
+    template.context.$implicit = {
+      ...template.context.$implicit,
+      ...(col && { col }),
+      ...(row && { row }),
+      ...(cols && { cols }),
+      ...(rows && { rows }),
+    };
 
     template.detectChanges();
   }

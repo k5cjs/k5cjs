@@ -14,9 +14,10 @@ export class ResizeTopRightDirective extends ResizeDirective {
     let y = this._y(e) - this.mouseOffsetTop;
 
     // if y is in the last row, then we equate y to the start of the last row plus one pixel
-    if (y > this.y + this.height - this._cellHeight()) y = this.y + this.height - this._cellHeight() + 1;
+    if (y > this._item.y + this._item.height - this._cellHeight())
+      y = this._item.y + this._item.height - this._cellHeight() + 1;
     // if x is in the first column, then we equate x to the end of the first column minus one pixel
-    if (x < this.x + this._cellWidth()) x = this.x + this._cellWidth() - 1;
+    if (x < this._item.x + this._cellWidth()) x = this._item.x + this._cellWidth() - 1;
 
     const col = this._col(x);
     const row = this._row(y);
@@ -24,11 +25,11 @@ export class ResizeTopRightDirective extends ResizeDirective {
     const cols = col - this.cell.col + 1;
     const rows = this.cell.rows + (this.cell.row - row);
 
-    const width = x - this.x;
-    const height = this.height + (this.y - y);
+    const width = x - this._item.x;
+    const height = this._item.height + (this._item.y - y);
 
     this._item.update({
-      x: this.x,
+      x: this._item.x,
       y: y,
       width: width,
       height: height,
@@ -44,6 +45,10 @@ export class ResizeTopRightDirective extends ResizeDirective {
     });
 
     if (!allowToResize) return;
+
+    this._item.y = y;
+    this._item.width = width;
+    this._item.height = height;
 
     this.cell.row = row;
     this.cell.cols = cols;

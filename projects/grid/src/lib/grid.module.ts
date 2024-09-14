@@ -6,6 +6,7 @@ import {
   GridDirective,
   GridItemDirective,
   PreviewDirective,
+  MoveDirective,
   ResizeBottomDirective,
   ResizeBottomLeftDirective,
   ResizeBottomRightDirective,
@@ -17,6 +18,7 @@ import {
 } from './directives';
 
 const externalDirectives = [
+  MoveDirective,
   ResizeTopDirective,
   ResizeTopDirective,
   ResizeTopLeftDirective,

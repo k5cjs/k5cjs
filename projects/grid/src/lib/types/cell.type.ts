@@ -1,3 +1,4 @@
+import { EmbeddedViewRef, TemplateRef } from '@angular/core';
 import { KcGridItem } from './item.type';
 
 export const enum GridEvent {
@@ -11,4 +12,5 @@ export const enum GridEvent {
 export type Cell<T = void> = {
   id: symbol;
   event?: GridEvent;
+  template?: EmbeddedViewRef<{ $implicit: Cell }> & TemplateRef<unknown>;
 } & KcGridItem<T>;

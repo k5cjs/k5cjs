@@ -14,9 +14,11 @@ export class ResizeTopLeftDirective extends ResizeDirective {
     let y = this._y(e) - this.mouseOffsetTop;
 
     // if y is in the last row, then we equate y to the start of the last row plus one pixel
-    if (y > this.y + this.height - this._cellHeight()) y = this.y + this.height - this._cellHeight() + 1;
+    if (y > this._item.y + this._item.height - this._cellHeight())
+      y = this._item.y + this._item.height - this._cellHeight() + 1;
     // if x is in the last column, then we equate x to the start of the last column plus one pixel
-    if (x > this.x + this.width - this._cellWidth()) x = this.x + this.width - this._cellWidth() + 1;
+    if (x > this._item.x + this._item.width - this._cellWidth())
+      x = this._item.x + this._item.width - this._cellWidth() + 1;
 
     const col = this._col(x);
     const row = this._row(y);
@@ -24,8 +26,8 @@ export class ResizeTopLeftDirective extends ResizeDirective {
     const cols = this.cell.cols + (this.cell.col - col);
     const rows = this.cell.rows + (this.cell.row - row);
 
-    const width = this.width + (this.x - x);
-    const height = this.height + (this.y - y);
+    const width = this._item.width + (this._item.x - x);
+    const height = this._item.height + (this._item.y - y);
 
     this._item.update({
       x: x,
@@ -44,6 +46,11 @@ export class ResizeTopLeftDirective extends ResizeDirective {
     });
 
     if (!allowToResize) return;
+
+    this._item.x = x;
+    this._item.y = y;
+    this._item.width = width;
+    this._item.height = height;
 
     this.cell.col = col;
     this.cell.row = row;
