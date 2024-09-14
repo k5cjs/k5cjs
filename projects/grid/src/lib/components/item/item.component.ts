@@ -14,8 +14,9 @@ import {
 } from '@angular/core';
 
 import { Cell } from '../../types';
-import { GRID_TEMPLATE, GridItemTemplate, ITEM_COMPONENT, KC_GRID } from '../../tokens';
+import { GRID_TEMPLATE, GridItemTemplate, ITEM_COMPONENT } from '../../tokens';
 import { GridItemDirective } from '../../directives';
+import { KcGridService } from '../../services';
 
 @Component({
   selector: 'kc-grid-item',
@@ -76,7 +77,7 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
 
   skip = false;
 
-  protected _grid = inject(KC_GRID);
+  protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
 
   ngOnInit(): void {

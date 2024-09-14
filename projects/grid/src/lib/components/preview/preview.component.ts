@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { KcGrid } from '../../helpers';
-import { GridEvent } from '../../types';
+import { Cell, GridEvent } from '../../types';
+import { KcGridService } from '../../services';
 
 @Component({
   selector: 'kc-grid-preview',
@@ -10,20 +10,11 @@ import { GridEvent } from '../../types';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewComponent implements OnChanges, OnDestroy {
-  @Input({ required: true }) col!: number;
-  @Input({ required: true }) row!: number;
-  @Input({ required: true }) cols!: number;
-  @Input({ required: true }) rows!: number;
+  @Input({ required: true }) cell!: Cell;
+
   @Input({ required: true }) event!: GridEvent;
 
-  @Input({ required: true }) colsGaps!: number[];
-  @Input({ required: true }) rowsGaps!: number[];
-
   @Input({ required: true }) scale!: number;
-
-  @Input({ required: true }) gridRef!: HTMLElement;
-
-  @Input() grid!: KcGrid;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
 
@@ -31,6 +22,8 @@ export class PreviewComponent implements OnChanges, OnDestroy {
 
   private _transitionstart = () => (this._isAnimating = true);
   private _transitionend = () => (this._isAnimating = false);
+
+  protected _grid = inject(KcGridService);
 
   constructor() {
     this.elementRef.nativeElement.addEventListener('transitionstart', this._transitionstart, false);
@@ -71,7 +64,7 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   private _updateStyle(): void {
-    if (this.rows === 0 || this.cols === 0) return;
+    if (this.cell.rows === 0 || this.cell.cols === 0) return;
 
     this.elementRef.nativeElement.style.width = this._widthValue();
     this.elementRef.nativeElement.style.height = this._heightValue();
@@ -79,29 +72,33 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   private _transformValue(): string {
-    const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
 
-    const colGaps = this.colsGaps.slice(0, this.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this.rowsGaps.slice(0, this.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.cell.col).reduce((acc, gap) => acc + gap, 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.cell.row).reduce((acc, gap) => acc + gap, 0);
 
-    const xx = this.col / this.grid.cols;
-    const yy = this.row / this.grid.rows;
+    const xx = this.cell.col / this._grid.cols;
+    const yy = this.cell.row / this._grid.rows;
 
     return `translate3d(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px), 0)`;
   }
 
   private _widthValue(): string {
-    const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gapsInCols = this.colsGaps.slice(this.col, this.col + this.cols - 1).reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsInCols = this._grid.colsGaps
+      .slice(this.cell.col, this.cell.col + this.cell.cols - 1)
+      .reduce((acc, gap) => acc + gap, 0);
 
-    return `calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols} * ${this.cols} + ${gapsInCols}px)`;
+    return `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.cell.cols} + ${gapsInCols}px)`;
   }
 
   private _heightValue(): string {
-    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gapsInRows = this.rowsGaps.slice(this.row, this.row + this.rows - 1).reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsInRows = this._grid.rowsGaps
+      .slice(this.cell.row, this.cell.row + this.cell.rows - 1)
+      .reduce((acc, gap) => acc + gap, 0);
 
-    return `calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows} * ${this.rows} + ${gapsInRows}px)`;
+    return `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.cell.rows} + ${gapsInRows}px)`;
   }
 }

@@ -1,7 +1,7 @@
 import { Component, EmbeddedViewRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { KcGrid } from '../../helpers/grid/grid';
+import { KcGridService } from '../../services';
 import { Cell } from '../../types/cell.type';
 
 import { ItemComponent } from './item.component';
@@ -31,7 +31,7 @@ class DumpyComponent {
   cols = 3;
   rows = 3;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  grid: KcGrid = new KcGrid({} as any);
+  grid: KcGridService = new KcGridService({} as any);
   id = Symbol();
   template!: EmbeddedViewRef<{ $implicit: Cell }>;
   gridRef!: HTMLElement;

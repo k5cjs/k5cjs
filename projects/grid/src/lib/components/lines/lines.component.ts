@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewChild, inject } from '@angular/core';
 
-import { KcGrid } from '../../helpers';
+import { KcGridService } from '../../services';
 
 @Component({
   selector: 'kc-grid-lines',
@@ -9,17 +9,11 @@ import { KcGrid } from '../../helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LinesComponent implements OnChanges {
-  @Input({ required: true }) cols!: number;
-  @Input({ required: true }) rows!: number;
-
-  @Input({ required: true }) colsGaps!: number[];
-  @Input({ required: true }) rowsGaps!: number[];
-
-  @Input() grid!: KcGrid;
-
   @Input() scale!: number;
 
   @ViewChild('grid', { static: true }) gridRef!: ElementRef<HTMLElement>;
+
+  protected grid = inject(KcGridService);
 
   ngOnChanges(): void {
     this._lines();
@@ -38,25 +32,25 @@ export class LinesComponent implements OnChanges {
       height: 100%;
     `;
 
-    const totalColsGaps = this.colsGaps.reduce((acc, gap) => acc + gap);
-    const totalRowsGaps = this.rowsGaps.reduce((acc, gap) => acc + gap);
+    const totalColsGaps = this.grid.colsGaps.reduce((acc, gap) => acc + gap);
+    const totalRowsGaps = this.grid.rowsGaps.reduce((acc, gap) => acc + gap);
 
     let rowGap = 0;
 
-    for (let y = 0; y < this.rows; y++) {
+    for (let y = 0; y < this.grid.rows; y++) {
       let colGap = 0;
 
-      for (let x = 0; x < this.cols; x++) {
+      for (let x = 0; x < this.grid.cols; x++) {
         const cell = document.createElement('div');
         cell.innerHTML = `${x}, ${y}`;
 
-        const xx = x / this.cols;
-        const yy = y / this.rows;
+        const xx = x / this.grid.cols;
+        const yy = y / this.grid.rows;
 
         const cssText = `
           position: absolute;
-          width: calc((100cqw - ${totalColsGaps}px) / ${this.cols});
-          height: calc((100cqh - ${totalRowsGaps}px) / ${this.rows});
+          width: calc((100cqw - ${totalColsGaps}px) / ${this.grid.cols});
+          height: calc((100cqh - ${totalRowsGaps}px) / ${this.grid.rows});
           border: 1px solid #000;
           transform: translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGap}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGap}px));
         `;
@@ -65,10 +59,10 @@ export class LinesComponent implements OnChanges {
 
         girdLines.appendChild(cell);
 
-        colGap += this.colsGaps[x];
+        colGap += this.grid.colsGaps[x];
       }
 
-      rowGap += this.rowsGaps[y];
+      rowGap += this.grid.rowsGaps[y];
     }
 
     this.gridRef.nativeElement.appendChild(girdLines);

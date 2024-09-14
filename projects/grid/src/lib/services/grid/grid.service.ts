@@ -1,46 +1,53 @@
-import { ChangeDetectorRef, EmbeddedViewRef } from '@angular/core';
+import { ChangeDetectorRef, EmbeddedViewRef, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
 import { Cell, Direction, GridEvent } from '../../types';
-import { getDirection } from '../get-direction/get-direction.helper';
-import { Position, getPosition } from '../get-position/get-position';
-import { shiftToBottom, shiftToLeft, shiftToRight, shiftToTop } from '../shirt-to/shift-to.helper';
-import { shrink } from '../shrink/shrink.helper';
+import {
+  getDirection,
+  Position,
+  getPosition,
+  shiftToBottom,
+  shiftToLeft,
+  shiftToRight,
+  shiftToTop,
+  shrink,
+} from '../../helpers';
 
 type Item = { template: EmbeddedViewRef<{ $implicit: Cell }> } & Cell;
 
-export class KcGrid {
+@Injectable()
+export class KcGridService {
   /**
    * cols are the number of columns in the grid
    */
-  public cols: number;
+  public cols!: number;
   /**
    * rows are the number of rows in the grid
    */
-  public rows: number;
+  public rows!: number;
   /**
    * cellWidth is the width of each cell in the grid
    */
-  public colsGaps: number[];
-  public rowsGaps: number[];
-  public cellWidth: number;
+  public colsGaps!: number[];
+  public rowsGaps!: number[];
+  public cellWidth!: number;
   /**
    * cellHeight is the height of each cell in the grid
    */
-  public cellHeight: number;
+  public cellHeight!: number;
 
   public scrollTop = 0;
   public scrollLeft = 0;
   /**
    * preview is the preview of the item that is being dragged
    */
-  public preview: EmbeddedViewRef<{ $implicit: Cell }>;
+  public preview!: EmbeddedViewRef<{ $implicit: Cell }>;
 
   // TODO: change to private
-  _matrix: (symbol | null)[][];
+  _matrix!: (symbol | null)[][];
   // TODO: change to private
   _items: Map<symbol, Item> = new Map();
-  private _history: Map<symbol, Item>[];
+  private _history: Map<symbol, Item>[] = [];
 
   event = new Subject<GridEvent>();
 
@@ -50,9 +57,9 @@ export class KcGrid {
 
   private _lastDirection = new Map<symbol, Direction>();
 
-  private _cdr: ChangeDetectorRef;
+  private _cdr!: ChangeDetectorRef;
 
-  constructor(configs: {
+  init(configs: {
     cols: number;
     rows: number;
     colsGaps: number[];
@@ -82,7 +89,6 @@ export class KcGrid {
     this._cdr = configs.changeDetectorRef;
 
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
-    this._history = [];
   }
 
   add(item: Item) {
@@ -148,12 +154,8 @@ export class KcGrid {
     this.renderPreview(item, GridEvent.Move);
 
     this._items.set(item.id, item);
-    item.template.context.$implicit.col = item.col;
-    item.template.context.$implicit.row = item.row;
-    item.template.context.$implicit.cols = item.cols;
-    item.template.context.$implicit.rows = item.rows;
 
-    item.template.detectChanges();
+    this._rerenderItem(item.template, item);
 
     this.render();
 
@@ -217,12 +219,8 @@ export class KcGrid {
     this.renderPreview(item, GridEvent.Move);
 
     this._items.set(item.id, item);
-    item.template.context.$implicit.col = item.col;
-    item.template.context.$implicit.row = item.row;
-    item.template.context.$implicit.cols = item.cols;
-    item.template.context.$implicit.rows = item.rows;
 
-    item.template.detectChanges();
+    this._rerenderItem(item.template, item);
 
     this.render();
 
@@ -427,17 +425,9 @@ export class KcGrid {
     this.add(item1);
     this.add(item2);
 
-    item1.template.context.$implicit.col = item1.col;
-    item1.template.context.$implicit.row = item1.row;
-    item1.template.context.$implicit.cols = item1.cols;
-    item1.template.context.$implicit.rows = item1.rows;
-    item1.template.detectChanges();
+    this._rerenderItem(item1.template, item1);
 
-    item2.template.context.$implicit.col = item2.col;
-    item2.template.context.$implicit.row = item2.row;
-    item2.template.context.$implicit.cols = item2.cols;
-    item2.template.context.$implicit.rows = item2.rows;
-    item2.template.detectChanges();
+    this._rerenderItem(item2.template, item2);
   }
 
   remove(item: Item) {
@@ -499,17 +489,12 @@ export class KcGrid {
   }
 
   private _rerenderItem(template: Item['template'], { col, row, cols, rows }: Partial<Omit<Item, 'template'>>) {
-    // if (col !== undefined) template.context.$implicit.col = col;
-    // if (row !== undefined) template.context.$implicit.row = row;
-    // if (cols !== undefined) template.context.$implicit.cols = cols;
-    // if (rows !== undefined) template.context.$implicit.rows = rows;
-
     template.context.$implicit = {
       ...template.context.$implicit,
-      ...(col && { col }),
-      ...(row && { row }),
-      ...(cols && { cols }),
-      ...(rows && { rows }),
+      ...(col !== undefined && { col }),
+      ...(row !== undefined && { row }),
+      ...(cols !== undefined && { cols }),
+      ...(rows !== undefined && { rows }),
     };
 
     template.detectChanges();

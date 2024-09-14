@@ -12,10 +12,10 @@ import {
 } from '@angular/core';
 
 import { GridDirective, GridItemDirective, PreviewDirective } from '../../directives';
-import { KcGrid } from '../../helpers';
+import { KcGridService } from '../../services';
 import { GridEvent, KcGridItems } from '../../types';
 import { ItemComponent } from '../item/item.component';
-import { GRID_TEMPLATE, GridTemplate, KC_GRID } from '../../tokens';
+import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
 
 @Component({
   selector: 'kc-grid',
@@ -23,11 +23,7 @@ import { GRID_TEMPLATE, GridTemplate, KC_GRID } from '../../tokens';
   styleUrls: ['./grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
-    {
-      provide: KC_GRID,
-      useFactory: (component: GridComponent) => component.grid,
-      deps: [forwardRef(() => GridComponent)],
-    },
+    KcGridService,
     {
       provide: GRID_TEMPLATE,
       useFactory: (component: GridComponent) => component,
@@ -80,8 +76,6 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
   @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<T>;
 
-  grid!: KcGrid;
-
   colsTotalGaps!: number;
   rowsTotalGaps!: number;
 
@@ -89,26 +83,28 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   private _isMoving = false;
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
 
+  grid = inject(KcGridService);
+
   ngOnInit(): void {
     this.colsTotalGaps = this._colsTotalGaps();
     this.rowsTotalGaps = this._rowsTotalGaps();
 
-    this.grid = new KcGrid({
+    const preview = this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') });
+
+    this.grid.init({
       cols: this.cols,
       rows: this.rows,
       colsGaps: this.colsGaps,
       rowsGaps: this.rowsGaps,
       cellWidth: 100,
       cellHeight: 100,
-      preview: this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') }),
+      preview,
       scrollTop: this.containerElementRef.nativeElement.scrollTop,
       scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
       changeDetectorRef: this._cdr,
     });
 
     this.items.forEach((item, i) => {
-      // const test = this.gridItem.render({ ...item, id: Symbol(`item-${i}`) });
-
       const chart = this.gridElement.render({
         grid: this.grid,
         ...item,

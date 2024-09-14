@@ -27,7 +27,8 @@
       -mt-5
       -ml-5
       top-1/2
-      left-1/2;
+      left-1/2
+      cursor-move;
   }
 
   &__resize {
@@ -49,7 +50,8 @@
         items-center
         h-10
         left-0
-        right-0;
+        right-0
+        cursor-row-resize;
     }
 
     &--right, &--left {
@@ -59,7 +61,8 @@
         items-center
         w-10
         top-0
-        bottom-0;
+        bottom-0
+        cursor-col-resize;
     }
 
     &--top-left,
@@ -84,13 +87,15 @@
     &--top-left {
       @apply
         top-1
-        left-1;
+        left-1
+        cursor-nw-resize;
     }
 
     &--top-right {
       @apply
         top-1
-        right-1;
+        right-1
+        cursor-ne-resize;
     }
 
     &--right {
@@ -111,13 +116,15 @@
     &--bottom-left {
       @apply
         left-1
-        bottom-1;
+        bottom-1
+        cursor-sw-resize;
     }
 
     &--bottom-right {
       @apply
         right-1
-        bottom-1;
+        bottom-1
+        cursor-se-resize;
     }
   }
 }

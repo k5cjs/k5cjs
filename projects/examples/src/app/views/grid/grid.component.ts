@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { KC_GRID, KcGrid, KcGridItems } from '@k5cjs/grid';
+import { KcGridItems, KcGridService } from '@k5cjs/grid';
 
 interface Data {
   name: string;
@@ -15,7 +15,7 @@ interface Data {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GridComponent {
-  @ViewChild(KC_GRID) grid!: KcGrid;
+  @ViewChild(KcGridService) grid!: KcGridService;
 
   scale = new FormControl(1, { nonNullable: true });
   cols = 8;

@@ -1,6 +1,7 @@
 import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
-import { KC_GRID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
+import { GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
 import { Cell } from '../../types';
+import { KcGridService } from '../../services';
 
 @Directive({
   selector: '[kcGridResize]',
@@ -17,7 +18,7 @@ export abstract class ResizeDirective {
 
   onMouseMove = this._onMouseMove.bind(this);
 
-  protected _grid = inject(KC_GRID);
+  protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
   protected _item = inject(ITEM_COMPONENT);
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
