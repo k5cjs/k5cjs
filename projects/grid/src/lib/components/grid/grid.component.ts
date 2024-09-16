@@ -13,12 +13,12 @@ import {
   forwardRef,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { GridDirective, GridItemDirective, PreviewDirective, ScrollDirective } from '../../directives';
 import { KcGridService } from '../../services';
-import { KcGridItems } from '../../types';
+import { GridEvent, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'kc-grid',
@@ -102,7 +102,11 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     this.colsTotalGaps = this._colsTotalGaps();
     this.rowsTotalGaps = this._rowsTotalGaps();
 
-    const preview = this.preview.render({ col: 0, row: 0, cols: 0, rows: 0, id: Symbol('default') });
+    const preview = this.preview.render(
+      Symbol('default'),
+      { col: 0, row: 0, cols: 0, rows: 0 },
+      GridEvent.AfterAddRows,
+    );
 
     this.grid.init({
       cols: this.cols,
@@ -112,26 +116,13 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       cellWidth: 100,
       cellHeight: 100,
       preview,
+      itemDirective: this.gridElement,
       scrollTop: this.containerElementRef.nativeElement.scrollTop,
       scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
       changeDetectorRef: this._cdr,
     });
 
-    this.items.forEach((item, i) => {
-      const chart = this.gridElement.render({
-        grid: this.grid,
-        ...item,
-        id: Symbol(`item-${i}`),
-      });
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (chart.context as any).$implicit.template = chart;
-
-      this.grid.add({
-        ...chart.context.$implicit,
-        template: chart as any,
-      });
-    });
+    this.items.forEach((item) => this.grid.add(item));
   }
 
   private _colsTotalGaps(): number {

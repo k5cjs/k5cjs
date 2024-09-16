@@ -1,14 +1,15 @@
 import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
-import { GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { Cell, GridEvent } from '../../types';
-import { ItemComponent } from '../../components';
+import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
+import { GridEvent, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
   selector: '[kcGridMove]',
 })
 export class MoveDirective {
-  @Input({ required: true }) cell!: Cell;
+  @Input({ required: true }) item!: KcGridItem;
+
+  id = inject(GRID_ITEM_ID);
 
   isMouseDown = false;
 
@@ -38,14 +39,16 @@ export class MoveDirective {
 
   private _requestAnimationFrameId!: number;
 
+  // add variable to save cols when mouse is down
+  private _startCols = 0;
+  private _startRows = 0;
+
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
 
     // TODO: add logic in move to stop if is resizing
     e.stopPropagation();
-
-    console.log('mousedown');
 
     const { x, y } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
@@ -61,14 +64,15 @@ export class MoveDirective {
     this._setFixedSize(this._item.elementRef.nativeElement);
     this._animation?.cancel();
 
-    this._grid.capture({
-      id: this.cell.id,
-      col: this.cell.col,
-      row: this.cell.row,
-      cols: this.cell.cols,
-      rows: this.cell.rows,
-      template: this.cell.template!,
+    this._grid.capture(this.id, {
+      col: this.item.col,
+      row: this.item.row,
+      cols: this.item.cols,
+      rows: this.item.rows,
     });
+
+    this._startCols = this.item.cols;
+    this._startRows = this.item.rows;
 
     document.addEventListener('mousemove', this.onMouseMove);
   }
@@ -92,13 +96,11 @@ export class MoveDirective {
 
     this._renderByColAndRowAnimated();
 
-    this._grid.release({
-      id: this.cell.id,
-      col: this.cell.col,
-      row: this.cell.row,
-      cols: this.cell.cols,
-      rows: this.cell.rows,
-      template: this.cell.template!,
+    this._grid.release(this.id, {
+      col: this.item.col,
+      row: this.item.row,
+      cols: this.item.cols,
+      rows: this.item.rows,
     });
   }
 
@@ -124,16 +126,13 @@ export class MoveDirective {
       y: itemOffsetTop,
       width: this._item.elementRef.nativeElement.offsetWidth,
       height: this._item.elementRef.nativeElement.offsetHeight,
-      item: this._item as ItemComponent,
     });
 
-    const allowToMove = this._grid.move({
-      id: this.cell.id,
+    const allowToMove = this._grid.move(this.id, {
       col,
       row,
-      cols: this.cell.cols,
-      rows: this.cell.rows,
-      template: this.cell.template!,
+      cols: this._startCols,
+      rows: this._startRows,
     });
 
     /**
@@ -143,8 +142,8 @@ export class MoveDirective {
     /**
      * save the last position when the movement is possible
      */
-    this.cell.col = col;
-    this.cell.row = row;
+    this.item.col = col;
+    this.item.row = row;
   }
 
   private _render(color = 'yellow') {
@@ -240,11 +239,11 @@ export class MoveDirective {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
 
-    const colGaps = this._grid.colsGaps.slice(0, this.cell.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.cell.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
 
-    const xx = this.cell.col / this._grid.cols;
-    const yy = this.cell.row / this._grid.rows;
+    const xx = this.item.col / this._grid.cols;
+    const yy = this.item.row / this._grid.rows;
 
     // eslint-disable-next-line max-len
     element.style.transform = `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`;
@@ -253,34 +252,22 @@ export class MoveDirective {
   private _setWidthByCols(element: HTMLElement): void {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInCols = this._grid.colsGaps
-      .slice(this.cell.col, this.cell.col + this.cell.cols - 1)
+      .slice(this.item.col, this.item.col + this.item.cols - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.cell.cols} + ${gapsInCols}px)`;
+    element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
   }
 
   private _setHeightByRows(element: HTMLElement): void {
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInRows = this._grid.rowsGaps
-      .slice(this.cell.row, this.cell.row + this.cell.rows - 1)
+      .slice(this.item.row, this.item.row + this.item.rows - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.cell.rows} + ${gapsInRows}px)`;
+    element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }
 
-  private _move({
-    x,
-    y,
-    width,
-    height,
-    item,
-  }: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    item: ItemComponent;
-  }) {
+  private _move({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
     /**
      * cancel previous requestAnimationFrame
      * because we want to start new one that will to current position
@@ -294,14 +281,14 @@ export class MoveDirective {
     let increaseY = 0;
 
     if (y < 0) {
-      const percent = Math.abs(y) / (height * item.cell.rows);
+      const percent = Math.abs(y) / (height * this.item.rows);
 
       const speed = Math.round(20 * percent);
 
       increaseY = -speed;
     } else if (mouseYContainer > this._gridTemplate.containerElementRef.nativeElement.clientHeight) {
       const offset = mouseYContainer - this._gridTemplate.containerElementRef.nativeElement.clientHeight;
-      const percent = offset / (height * item.cell.rows);
+      const percent = offset / (height * this.item.rows);
 
       const speed = Math.round(20 * percent);
 
@@ -309,24 +296,24 @@ export class MoveDirective {
     }
 
     if (x < 0) {
-      const percent = Math.abs(x) / (width * item.cell.cols);
+      const percent = Math.abs(x) / (width * this.item.cols);
 
       const speed = Math.round(20 * percent);
 
       increaseX = -speed;
     } else if (mouseXContainer > this._gridTemplate.containerElementRef.nativeElement.clientWidth) {
       const offset = mouseXContainer - this._gridTemplate.containerElementRef.nativeElement.clientWidth;
-      const percent = offset / (width * item.cell.cols);
+      const percent = offset / (width * this.item.cols);
 
       const speed = Math.round(20 * percent);
 
       increaseX = speed;
     }
 
-    this._scroll(item, increaseX, increaseY);
+    this._scroll(increaseX, increaseY);
   }
 
-  private _scroll(item: ItemComponent, increaseX: number, increaseY: number): void {
+  private _scroll(increaseX: number, increaseY: number): void {
     if (increaseX === 0 && increaseY === 0) return;
 
     if (this._grid.scrollLeft + increaseX <= 0) increaseX = 0;
@@ -376,7 +363,7 @@ export class MoveDirective {
 
       // this._cdr.detectChanges();
 
-      this._scroll(item, increaseX, temp || increaseY);
+      this._scroll(increaseX, temp || increaseY);
       return;
       // }
     }
@@ -385,10 +372,10 @@ export class MoveDirective {
       this._grid.scrollLeft += increaseX;
       this._grid.scrollTop += increaseY;
 
-      item.x += increaseX;
-      item.y += increaseY;
+      this._item.x += increaseX;
+      this._item.y += increaseY;
 
-      item.renderMove('green');
+      this._item.renderMove('green');
 
       this._grid.isItemsMoving = true;
 
@@ -398,7 +385,7 @@ export class MoveDirective {
         behavior: 'instant',
       });
 
-      this._scroll(item, increaseX, temp || increaseY);
+      this._scroll(increaseX, temp || increaseY);
     });
   }
 }

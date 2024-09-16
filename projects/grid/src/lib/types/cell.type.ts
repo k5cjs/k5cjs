@@ -1,4 +1,4 @@
-import { EmbeddedViewRef, TemplateRef } from '@angular/core';
+import { EmbeddedViewRef } from '@angular/core';
 import { KcGridItem } from './item.type';
 
 export const enum GridEvent {
@@ -9,8 +9,7 @@ export const enum GridEvent {
   AfterAddRows = 'after-add-rows',
 }
 
-export type Cell<T = void> = {
-  id: symbol;
-  event?: GridEvent;
-  template?: EmbeddedViewRef<{ $implicit: Cell }> & TemplateRef<unknown>;
-} & KcGridItem<T>;
+export interface KcGridItemContext<T = void> {
+  context: KcGridItem<T>;
+  template: EmbeddedViewRef<{ $implicit: KcGridItem<T>; id: symbol }>;
+}

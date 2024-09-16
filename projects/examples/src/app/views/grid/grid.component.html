@@ -19,30 +19,33 @@
   </div>
 
   <!-- <div *kcGridItem="let item; type: data" class="grid__item" kcGridMove [cell]="item"> -->
-  <div *kcGridItem="let item; type: data" class="grid__item">
-    <div kcGridResizeTopLeft [cell]="item" class="grid__resize grid__resize--top-left">TL</div>
-    <div kcGridResizeTop [cell]="item" class="grid__resize grid__resize--top">T</div>
-    <div kcGridResizeTopRight [cell]="item" class="grid__resize grid__resize--top-right">TR</div>
+  <div *kcGridItem="let item; id as id type: data" class="grid__item">
+    <div kcGridResizeTopLeft [item]="item" class="grid__resize grid__resize--top-left">TL</div>
+    <div kcGridResizeTop [item]="item" class="grid__resize grid__resize--top">T</div>
+    <div kcGridResizeTopRight [item]="item" class="grid__resize grid__resize--top-right">TR</div>
 
-    <div>id: {{ item.id }}</div>
-    <div>col: {{ item.col }}</div>
-    <div>cols: {{ item.cols }}</div>
-    <div>row: {{ item.row }}</div>
-    <div>rows: {{ item.rows }}</div>
-    <div>rows: {{ item.rows }}</div>
-    <div>
-      <span>data:</span>
-      <pre>{{ item.data | json }}</pre>
+    <app-test-injector>
+      <div>id: {{ id }}</div>
+      <div>col: {{ item.col }}</div>
+      <div>row: {{ item.row }}</div>
+      <div>cols: {{ item.cols }}</div>
+      <div>rows: {{ item.rows }}</div>
+      <div>
+        <span>data:</span>
+        <pre>{{ item.data | json }}</pre>
+      </div>
+    </app-test-injector>
+
+    <div kcGridMove [item]="item" class="grid__move">Move</div>
+
+    <div kcGridResizeRight [item]="item" class="grid__resize grid__resize--right">
+      <app-test-injector>R</app-test-injector>
     </div>
+    <div kcGridResizeLeft [item]="item" class="grid__resize grid__resize--left">L</div>
 
-    <div kcGridMove [cell]="item" class="grid__move">Move</div>
-
-    <div kcGridResizeRight [cell]="item" class="grid__resize grid__resize--right">R</div>
-    <div kcGridResizeLeft [cell]="item" class="grid__resize grid__resize--left">L</div>
-
-    <div kcGridResizeBottomLeft [cell]="item" class="grid__resize grid__resize--bottom-left">BL</div>
-    <div kcGridResizeBottom [cell]="item" class="grid__resize grid__resize--bottom">B</div>
-    <div kcGridResizeBottomRight [cell]="item" class="grid__resize grid__resize--bottom-right">BR</div>
+    <div kcGridResizeBottomLeft [item]="item" class="grid__resize grid__resize--bottom-left">BL</div>
+    <div kcGridResizeBottom [item]="item" class="grid__resize grid__resize--bottom">B</div>
+    <div kcGridResizeBottomRight [item]="item" class="grid__resize grid__resize--bottom-right">BR</div>
   </div>
 
   <div footer>Footer content (optional)</div>

@@ -22,8 +22,8 @@ export class ResizeBottomLeftDirective extends ResizeDirective {
     const col = this._col(x);
     const row = this._row(y);
 
-    const cols = this.cell.cols + (this.cell.col - col);
-    const rows = row - this.cell.row + 1;
+    const cols = this.item.cols + (this.item.col - col);
+    const rows = row - this.item.row + 1;
 
     const width = this._item.width + (this._item.x - x);
     const height = y - this._item.y;
@@ -35,13 +35,11 @@ export class ResizeBottomLeftDirective extends ResizeDirective {
       height: height,
     });
 
-    const allowToResize = this._grid.resize({
-      id: this.cell.id,
+    const allowToResize = this._grid.resize(this.id, {
       col: col,
-      row: this.cell.row,
+      row: this.item.row,
       cols: cols,
       rows: rows,
-      template: (this.cell as any).template,
     });
 
     if (!allowToResize) return;
@@ -50,8 +48,8 @@ export class ResizeBottomLeftDirective extends ResizeDirective {
     this._item.width = width;
     this._item.height = height;
 
-    this.cell.col = col;
-    this.cell.cols = cols;
-    this.cell.rows = rows;
+    this.item.col = col;
+    this.item.cols = cols;
+    this.item.rows = rows;
   }
 }

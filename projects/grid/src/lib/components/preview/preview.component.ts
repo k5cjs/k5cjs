@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { Cell, GridEvent } from '../../types';
+import { GridEvent, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Component({
@@ -10,10 +10,8 @@ import { KcGridService } from '../../services';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PreviewComponent implements OnChanges, OnDestroy {
-  @Input({ required: true }) cell!: Cell;
-
+  @Input({ required: true }) item!: KcGridItem;
   @Input({ required: true }) event!: GridEvent;
-
   @Input({ required: true }) scale!: number;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
@@ -64,7 +62,7 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   private _updateStyle(): void {
-    if (this.cell.rows === 0 || this.cell.cols === 0) return;
+    if (this.item.rows === 0 || this.item.cols === 0) return;
 
     this.elementRef.nativeElement.style.width = this._widthValue();
     this.elementRef.nativeElement.style.height = this._heightValue();
@@ -75,11 +73,11 @@ export class PreviewComponent implements OnChanges, OnDestroy {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
 
-    const colGaps = this._grid.colsGaps.slice(0, this.cell.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.cell.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
 
-    const xx = this.cell.col / this._grid.cols;
-    const yy = this.cell.row / this._grid.rows;
+    const xx = this.item.col / this._grid.cols;
+    const yy = this.item.row / this._grid.rows;
 
     return `translate3d(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px), 0)`;
   }
@@ -87,18 +85,18 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   private _widthValue(): string {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInCols = this._grid.colsGaps
-      .slice(this.cell.col, this.cell.col + this.cell.cols - 1)
+      .slice(this.item.col, this.item.col + this.item.cols - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    return `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.cell.cols} + ${gapsInCols}px)`;
+    return `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
   }
 
   private _heightValue(): string {
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInRows = this._grid.rowsGaps
-      .slice(this.cell.row, this.cell.row + this.cell.rows - 1)
+      .slice(this.item.row, this.item.row + this.item.rows - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    return `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.cell.rows} + ${gapsInRows}px)`;
+    return `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }
 }

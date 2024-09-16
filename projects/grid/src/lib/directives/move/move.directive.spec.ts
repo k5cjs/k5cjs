@@ -1,4 +1,4 @@
-import { MoveDirective } from './move/move.directive';
+import { MoveDirective } from './move.directive';
 
 describe('MoveDirective', () => {
   it('should create an instance', () => {

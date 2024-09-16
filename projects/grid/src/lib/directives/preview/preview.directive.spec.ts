@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PreviewDirective } from './preview.directive';
+import { GridEvent } from '../../types';
 
 @Component({
   selector: 'kc-grid-dummy',
@@ -30,7 +31,11 @@ describe('PreviewDirective', () => {
   });
 
   it('should create an instance', () => {
-    const embeddedViewRef = component.gridItem.render({ id: Symbol('id'), col: 0, row: 0, cols: 1, rows: 1 });
+    const embeddedViewRef = component.gridItem.render(
+      Symbol('id'),
+      { col: 0, row: 0, cols: 1, rows: 1 },
+      GridEvent.AfterAddRows,
+    );
 
     expect(embeddedViewRef).toBeTruthy();
   });

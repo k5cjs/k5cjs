@@ -1,6 +1,9 @@
-import { Cell, Direction } from '../../types';
+import { Direction, KcGridItemContext } from '../../types';
 
-export const getDirection = (previousPosition: Cell, currentPosition: Cell): Direction | null => {
+export const getDirection = (
+  previousPosition: KcGridItemContext['context'],
+  currentPosition: KcGridItemContext['context'],
+): Direction | null => {
   if (currentPosition.row === previousPosition.row && currentPosition.rows > previousPosition.rows)
     return Direction.South;
   if (currentPosition.row === previousPosition.row && currentPosition.rows < previousPosition.rows)

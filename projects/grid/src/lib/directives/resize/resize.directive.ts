@@ -1,13 +1,16 @@
-import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
-import { GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { Cell } from '../../types';
+import { Directive, ElementRef, HostListener, Injector, Input, inject } from '@angular/core';
+import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
+import { KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
   selector: '[kcGridResize]',
 })
 export abstract class ResizeDirective {
-  @Input({ required: true }) cell!: Cell;
+  // @Input({ required: true }) id!: symbol;
+  @Input({ required: true }) item!: KcGridItem;
+
+  id = inject(GRID_ITEM_ID);
 
   mouseOffsetTop = 0;
   mouseOffsetBottom = 0;
@@ -54,13 +57,11 @@ export abstract class ResizeDirective {
 
     this._grid.drop();
 
-    this._grid.release({
-      id: this.cell.id,
-      col: this.cell.col,
-      row: this.cell.row,
-      cols: this.cell.cols,
-      rows: this.cell.rows,
-      template: (this.cell as any).template,
+    this._grid.release(this.id, {
+      col: this.item.col,
+      row: this.item.row,
+      cols: this.item.cols,
+      rows: this.item.rows,
     });
   }
 

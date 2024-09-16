@@ -2,10 +2,10 @@ import { Component, EmbeddedViewRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { KcGridService } from '../../services';
-import { Cell } from '../../types/cell.type';
 
 import { ItemComponent } from './item.component';
 import { KcGridModule } from '../../grid.module';
+import { KcGridItem } from '../../types';
 
 @Component({
   selector: 'kc-grid-test',
@@ -31,9 +31,9 @@ class DumpyComponent {
   cols = 3;
   rows = 3;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  grid: KcGridService = new KcGridService({} as any);
+  grid: KcGridService = new KcGridService();
   id = Symbol();
-  template!: EmbeddedViewRef<{ $implicit: Cell }>;
+  template!: EmbeddedViewRef<{ $implicit: KcGridItem }>;
   gridRef!: HTMLElement;
   scale = 1;
 

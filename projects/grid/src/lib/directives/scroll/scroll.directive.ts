@@ -15,8 +15,6 @@ export class ScrollDirective implements OnInit {
   }
 
   private _scroll(): void {
-    console.log('scroll');
-
     this._gridTemplate.containerElementRef.nativeElement.addEventListener('wheel', (event) => {
       if (this._grid.isItemsMoving) event.preventDefault();
     });

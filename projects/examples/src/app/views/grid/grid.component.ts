@@ -3,6 +3,8 @@ import { FormControl } from '@angular/forms';
 
 import { KcGridItem, KcGridItems, KcGridService } from '@k5cjs/grid';
 
+import { TEST_INJECTOR } from './tokens';
+
 interface Data {
   name: string;
   value: number;
@@ -13,6 +15,12 @@ interface Data {
   templateUrl: './grid.component.html',
   styleUrls: ['./grid.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: TEST_INJECTOR,
+      useValue: 'test-injector',
+    },
+  ],
 })
 export class GridComponent {
   @ViewChild(KcGridService) grid!: KcGridService;

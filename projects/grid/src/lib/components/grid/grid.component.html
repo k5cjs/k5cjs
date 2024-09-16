@@ -5,15 +5,16 @@
     <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
       <kc-grid-lines [scale]="scale" />
 
-      <kc-grid-preview *kcGridPreview="let item" [cell]="item" [event]="item.event" [scale]="scale">
+      <kc-grid-preview *kcGridPreview="let item; event as event" [item]="item" [event]="event" [scale]="scale">
         <div>id: {{ item.id }}</div>
         <div>col: {{ item.col }}</div>
         <div>row: {{ item.row }}</div>
       </kc-grid-preview>
 
       <kc-grid-item
-        *kcGrid="let item"
-        [cell]="item"
+        *kcGrid="let item; id as id"
+        [id]="id"
+        [item]="item"
         [scale]="scale"
         [gridRef]="items"
         [gridItem]="gridItem"

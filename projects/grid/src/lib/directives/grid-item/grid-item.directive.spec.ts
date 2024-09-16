@@ -30,7 +30,10 @@ describe('GridItemDirective', () => {
   });
 
   it('should create an instance', () => {
-    const embeddedViewRef = component.gridItem.render({ id: Symbol('id'), col: 0, row: 0, cols: 1, rows: 1 });
+    const embeddedViewRef = component.gridItem.viewContainer.createEmbeddedView(component.gridItem.template, {
+      id: Symbol('id'),
+      $implicit: { col: 0, row: 0, cols: 1, rows: 1 },
+    });
 
     expect(embeddedViewRef).toBeTruthy();
   });

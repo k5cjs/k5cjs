@@ -11,8 +11,8 @@ import {
   inject,
 } from '@angular/core';
 
-import { Cell } from '../../types';
-import { GRID_TEMPLATE, GridItemTemplate, ITEM_COMPONENT } from '../../tokens';
+import { KcGridItem } from '../../types';
+import { GRID_ITEM_ID, GRID_TEMPLATE, GridItemTemplate, ITEM_COMPONENT } from '../../tokens';
 import { GridItemDirective } from '../../directives';
 import { KcGridService } from '../../services';
 
@@ -30,7 +30,8 @@ import { KcGridService } from '../../services';
   ],
 })
 export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTemplate {
-  @Input({ required: true }) cell!: Cell;
+  @Input({ required: true }) id!: symbol;
+  @Input({ required: true }) item!: KcGridItem<T>;
 
   @Input({ required: true }) gridRef!: HTMLElement;
   @Input({ required: true }) scale!: number;
@@ -43,7 +44,8 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
   width!: number;
   height!: number;
 
-  injector = inject(Injector);
+  injector!: Injector;
+  private _injector = inject(Injector);
 
   private _isInitialized = false;
   /**
@@ -70,6 +72,11 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
   protected _gridTemplate = inject(GRID_TEMPLATE);
 
   ngOnInit(): void {
+    this.injector = Injector.create({
+      parent: this._injector,
+      providers: [{ provide: GRID_ITEM_ID, useValue: this.id }],
+    });
+
     this._isInitialized = true;
 
     this._renderByColAndRow();
@@ -116,13 +123,11 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
     const col = this._col();
     const row = this._row();
 
-    const allowToMove = this._grid.move({
-      id: this.cell.id,
+    const allowToMove = this._grid.move(this.id, {
       col,
       row,
-      cols: this.cell.cols,
-      rows: this.cell.rows,
-      template: this.cell.template!,
+      cols: this.item.cols,
+      rows: this.item.rows,
     });
     /**
      * skip if movement is not possible
@@ -131,8 +136,8 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
     /**
      * save the last position when the movement is possible
      */
-    this.cell.col = col;
-    this.cell.row = row;
+    this.item.col = col;
+    this.item.row = row;
   }
 
   private _render(color = 'yellow') {
@@ -214,11 +219,11 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
 
-    const colGaps = this._grid.colsGaps.slice(0, this.cell.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.cell.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
 
-    const xx = this.cell.col / this._grid.cols;
-    const yy = this.cell.row / this._grid.rows;
+    const xx = this.item.col / this._grid.cols;
+    const yy = this.item.row / this._grid.rows;
 
     // eslint-disable-next-line max-len
     element.style.transform = `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`;
@@ -227,18 +232,18 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
   private _setWidthByCols(element: HTMLElement): void {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInCols = this._grid.colsGaps
-      .slice(this.cell.col, this.cell.col + this.cell.cols - 1)
+      .slice(this.item.col, this.item.col + this.item.cols - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.cell.cols} + ${gapsInCols}px)`;
+    element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
   }
 
   private _setHeightByRows(element: HTMLElement): void {
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
     const gapsInRows = this._grid.rowsGaps
-      .slice(this.cell.row, this.cell.row + this.cell.rows - 1)
+      .slice(this.item.row, this.item.row + this.item.rows - 1)
       .reduce((acc, gap) => acc + gap, 0);
 
-    element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.cell.rows} + ${gapsInRows}px)`;
+    element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }
 }

@@ -1,6 +1,10 @@
-import { Cell, Direction } from '../../types';
+import { Direction, KcGridItemContext } from '../../types';
 
-export const shrink = (over: Cell, item: Cell, direction: Direction): boolean => {
+export const shrink = (
+  over: KcGridItemContext['context'],
+  item: KcGridItemContext['context'],
+  direction: Direction,
+): boolean => {
   /**
    *  ┌───────┐
    *  │       │

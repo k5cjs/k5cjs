@@ -1,9 +1,8 @@
 import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 
-import { KcGridService } from '../../services';
-import { Cell } from '../../types';
+import { KcGridItem } from '../../types';
 
-type Context = { $implicit: Cell & { grid: KcGridService } };
+type Context = { $implicit: KcGridItem; id: symbol };
 
 @Directive({
   selector: '[kcGrid]',
@@ -11,7 +10,9 @@ type Context = { $implicit: Cell & { grid: KcGridService } };
 export class GridDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(context: Cell & { grid: KcGridService }): EmbeddedViewRef<Context> {
-    return this.viewContainer.createEmbeddedView<Context>(this.template, { $implicit: { ...context } });
+  render(id: symbol, context: KcGridItem): EmbeddedViewRef<Context> {
+    const embedded = this.viewContainer.createEmbeddedView<Context>(this.template, { $implicit: { ...context }, id });
+
+    return embedded;
   }
 }
