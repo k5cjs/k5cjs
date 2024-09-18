@@ -5,7 +5,6 @@ import {
   Injector,
   Input,
   OnChanges,
-  OnInit,
   SimpleChanges,
   forwardRef,
   inject,
@@ -27,9 +26,14 @@ import { KcGridService } from '../../services';
       useFactory: (component: ItemComponent) => component,
       deps: [forwardRef(() => ItemComponent)],
     },
+    {
+      provide: GRID_ITEM_ID,
+      useFactory: (component: ItemComponent) => component.id,
+      deps: [forwardRef(() => ItemComponent)],
+    },
   ],
 })
-export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTemplate {
+export class ItemComponent<T = void> implements OnChanges, GridItemTemplate {
   @Input({ required: true }) id!: symbol;
   @Input({ required: true }) item!: KcGridItem<T>;
 
@@ -40,179 +44,47 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  //
-  width!: number;
-  height!: number;
-
-  injector!: Injector;
-  private _injector = inject(Injector);
-
-  private _isInitialized = false;
-  /**
-   * actual position in grid (x, y) in pixels
-   */
-  x = 0;
-  /*
-   * actual position in grid (x, y) in pixels
-   */
-  y = 0;
-  mouseOffsetLeft = 0;
-  /**
-   * distance from mouse to top corner of the item
-   */
-  mouseOffsetTop = 0;
-
-  isMouseDown = false;
-
-  isResizing = false;
+  injector = inject(Injector);
 
   skip = false;
 
   protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
 
-  ngOnInit(): void {
-    this.injector = Injector.create({
-      parent: this._injector,
-      providers: [{ provide: GRID_ITEM_ID, useValue: this.id }],
-    });
-
-    this._isInitialized = true;
-
-    this._renderByColAndRow();
-  }
-
-  ngOnChanges({ rowsGaps }: SimpleChanges): void {
-    if (!this._isInitialized) return;
-    if (this.isMouseDown) return;
-
+  ngOnChanges({ item }: SimpleChanges): void {
+    // don't render if the item is changed from outside of the component
+    // example: when the item is changed by the move directive or resize directive
     if (this.skip) return;
 
-    if (rowsGaps) {
-      this._renderByColAndRow();
-    } else {
-      this._renderByColAndRowAnimated();
-    }
+    // animate the item when it's not the first change
+    if (item && !item.firstChange) this._renderWithAnimations();
+    // don't animate the item when it's the first render
+    else this._render();
   }
 
-  update({ x, y, width, height }: { x: number; y: number; width: number; height: number }): void {
-    const element = this.elementRef.nativeElement;
-
-    element.style.width = `${width}px`;
-    element.style.height = `${height}px`;
-
-    element.style.transform = `translate(${x}px, ${y}px)`;
-  }
-
-  resizing(value: boolean): void {
-    this.isResizing = value;
-
-    if (!value) this.releaseResizing();
-  }
-
-  releaseResizing(): void {
-    this._renderByColAndRowAnimated();
-  }
-
-  /**
-   * is used to move by grid
-   */
-  renderMove(color = 'green'): void {
-    this._render(color);
-
-    const col = this._col();
-    const row = this._row();
-
-    const allowToMove = this._grid.move(this.id, {
-      col,
-      row,
-      cols: this.item.cols,
-      rows: this.item.rows,
-    });
-    /**
-     * skip if movement is not possible
-     */
-    if (!allowToMove) return;
-    /**
-     * save the last position when the movement is possible
-     */
-    this.item.col = col;
-    this.item.row = row;
-  }
-
-  private _render(color = 'yellow') {
-    const zIndex = color === 'green' ? 999 : 1;
-
-    const element = this.elementRef.nativeElement;
-
-    element.style.transition = '';
-
-    element.style.transform = `translate(${this.x}px, ${this.y}px)`;
-    element.style.zIndex = `${zIndex}`;
-    element.style.backgroundColor = color;
-  }
-
-  private _col(): number {
-    let width = 0;
-
-    for (let i = 0; i < this._grid.cols; i++) {
-      width += this._grid.colsGaps[i];
-      width += this._cellWidth();
-
-      if (width > this.x) return i;
-    }
-
-    return this._grid.cols - 1;
-  }
-
-  private _row(): number {
-    let height = 0;
-
-    for (let i = 0; i < this._grid.rows; i++) {
-      height += this._grid.rowsGaps[i];
-      height += this._cellHeight();
-
-      if (height > this.y) return i;
-    }
-
-    return this._grid.rows - 1;
-  }
-
-  private _cellWidth(): number {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gridWidth = this.gridRef.offsetWidth - totalColsGaps;
-
-    const cellWidth = gridWidth / this._grid.cols;
-
-    return cellWidth;
-  }
-
-  private _cellHeight(): number {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gridHeight = this.gridRef.offsetHeight - totalRowsGaps;
-
-    const cellHeight = gridHeight / this._grid.rows;
-
-    return cellHeight;
-  }
-
-  private _renderByColAndRowAnimated() {
+  private _renderWithAnimations() {
+    // add transition time to animate the item
     this.elementRef.nativeElement.style.transition = '300ms';
-    this._renderByColAndRow();
 
+    this._render();
+
+    // remove transition time after animation is finished
     this.elementRef.nativeElement.addEventListener(
       'transitionend',
       () => (this.elementRef.nativeElement.style.transition = ''),
-      false,
+      { once: true },
     );
   }
 
-  private _renderByColAndRow() {
-    this._setWidthByCols(this.elementRef.nativeElement);
-    this._setHeightByRows(this.elementRef.nativeElement);
-    this._setTransform(this.elementRef.nativeElement);
+  private _render() {
+    const element = this.elementRef.nativeElement;
 
-    this.elementRef.nativeElement.style.zIndex = '';
+    this._setWidthByCols(element);
+    this._setHeightByRows(element);
+    this._setTransform(element);
+
+    element.style.background = '';
+    element.style.zIndex = '';
   }
 
   private _setTransform(element: HTMLElement): void {
@@ -231,6 +103,8 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
 
   private _setWidthByCols(element: HTMLElement): void {
     const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+
+    // gaps between start column and end column of the item
     const gapsInCols = this._grid.colsGaps
       .slice(this.item.col, this.item.col + this.item.cols - 1)
       .reduce((acc, gap) => acc + gap, 0);
@@ -240,6 +114,8 @@ export class ItemComponent<T = void> implements OnInit, OnChanges, GridItemTempl
 
   private _setHeightByRows(element: HTMLElement): void {
     const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+
+    // gaps between start row and end row of the item
     const gapsInRows = this._grid.rowsGaps
       .slice(this.item.row, this.item.row + this.item.rows - 1)
       .reduce((acc, gap) => acc + gap, 0);

@@ -46,6 +46,7 @@ export class GridComponent {
   }
 
   changes(items: KcGridItem[]): void {
+    // eslint-disable-next-line no-console
     console.log(items);
   }
 }

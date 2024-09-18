@@ -1,7 +1,6 @@
-import { Directive, EmbeddedViewRef, Injector, Input, TemplateRef, ViewContainerRef, inject } from '@angular/core';
+import { Directive, Input, TemplateRef, ViewContainerRef, inject } from '@angular/core';
 
 import { KcGridItem } from '../../types';
-import { GRID_ITEM_ID } from '../../tokens';
 
 type Context<T = void> = { $implicit: KcGridItem<T>; id: symbol };
 

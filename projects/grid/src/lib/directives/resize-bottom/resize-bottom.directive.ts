@@ -6,25 +6,25 @@ import { ResizeDirective } from '../resize/resize.directive';
 })
 export class ResizeBottomDirective extends ResizeDirective {
   protected _onMouseMove(e: MouseEvent): void {
-    if (!this.isMouseDown) return;
+    if (!this._isMouseDown) return;
 
     e.preventDefault();
 
-    let y = this._y(e) + this.mouseOffsetBottom;
+    let y = this._calcY(e) + this._mouseOffsetBottom;
 
     // if y is in the first row, then we equate y to the end of the first row minus one pixel
-    if (y < this._item.y + this._cellHeight()) y = this._item.y + this._cellHeight() - 1;
+    if (y < this._y + this._cellHeight()) y = this._y + this._cellHeight() - 1;
 
     const row = this._row(y);
 
     const rows = row - this.item.row + 1;
 
-    const height = y - this._item.y;
+    const height = y - this._y;
 
-    this._item.update({
-      x: this._item.x,
-      y: this._item.y,
-      width: this._item.width,
+    this._render({
+      x: this._x,
+      y: this._y,
+      width: this._width,
       height: height,
     });
 
@@ -37,7 +37,7 @@ export class ResizeBottomDirective extends ResizeDirective {
 
     if (!allowToResize) return;
 
-    this._item.height = height;
+    this._height = height;
 
     this.item.rows = rows;
   }

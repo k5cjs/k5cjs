@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { GridEvent, KcGridItem } from '../../types';
+import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
@@ -29,6 +29,9 @@ export class MoveDirective {
   mouseOffsetTop = 0;
 
   onMouseMove = this._onMouseMove.bind(this);
+
+  protected _x = 0;
+  protected _y = 0;
 
   protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
@@ -64,12 +67,16 @@ export class MoveDirective {
     this._setFixedSize(this._item.elementRef.nativeElement);
     this._animation?.cancel();
 
-    this._grid.capture(this.id, {
-      col: this.item.col,
-      row: this.item.row,
-      cols: this.item.cols,
-      rows: this.item.rows,
-    });
+    this._grid.emit(
+      this.id,
+      {
+        col: this.item.col,
+        row: this.item.row,
+        cols: this.item.cols,
+        rows: this.item.rows,
+      },
+      GridEventType.Capture,
+    );
 
     this._startCols = this.item.cols;
     this._startRows = this.item.rows;
@@ -94,14 +101,16 @@ export class MoveDirective {
     this._grid.isItemsMoving = false;
     this._grid.drop();
 
-    this._renderByColAndRowAnimated();
-
-    this._grid.release(this.id, {
-      col: this.item.col,
-      row: this.item.row,
-      cols: this.item.cols,
-      rows: this.item.rows,
-    });
+    this._grid.emit(
+      this.id,
+      {
+        col: this.item.col,
+        row: this.item.row,
+        cols: this.item.cols,
+        rows: this.item.rows,
+      },
+      GridEventType.Release,
+    );
   }
 
   protected _onMouseMove(e: MouseEvent): void {
@@ -111,15 +120,15 @@ export class MoveDirective {
 
     const itemOffsetLeft =
       e.clientX - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft - this.mouseOffsetLeft; // px
-    this._item.x = itemOffsetLeft + this._grid.scrollLeft;
+    this._x = itemOffsetLeft + this._grid.scrollLeft;
 
     const itemOffsetTop = e.clientY - this._gridTemplate.itemsElementRef.nativeElement.offsetTop - this.mouseOffsetTop; // px
-    this._item.y = itemOffsetTop + this._grid.scrollTop;
+    this._y = itemOffsetTop + this._grid.scrollTop;
 
     const col = this._col();
     const row = this._row();
 
-    this._render('green');
+    this._render();
 
     this._move({
       x: itemOffsetLeft,
@@ -146,14 +155,14 @@ export class MoveDirective {
     this.item.row = row;
   }
 
-  private _render(color = 'yellow') {
-    const zIndex = color === 'green' ? 999 : 1;
+  private _render() {
+    const element = this._item.elementRef.nativeElement;
 
-    this._item.elementRef.nativeElement.style.transition = '';
+    element.style.transition = '';
 
-    this._item.elementRef.nativeElement.style.transform = `translate(${this._item.x}px, ${this._item.y}px)`;
-    this._item.elementRef.nativeElement.style.zIndex = `${zIndex}`;
-    this._item.elementRef.nativeElement.style.backgroundColor = color;
+    element.style.transform = `translate(${this._x}px, ${this._y}px)`;
+    element.style.zIndex = `999`;
+    element.style.backgroundColor = 'green';
   }
 
   private _col(): number {
@@ -163,7 +172,7 @@ export class MoveDirective {
       width += this._grid.colsGaps[i];
       width += this._cellWidth();
 
-      if (width > this._item.x) return i;
+      if (width > this._x) return i;
     }
 
     return this._grid.cols - 1;
@@ -176,7 +185,7 @@ export class MoveDirective {
       height += this._grid.rowsGaps[i];
       height += this._cellHeight();
 
-      if (height > this._item.y) return i;
+      if (height > this._y) return i;
     }
 
     return this._grid.rows - 1;
@@ -200,17 +209,6 @@ export class MoveDirective {
     return cellHeight;
   }
 
-  private _renderByColAndRowAnimated() {
-    this._item.elementRef.nativeElement.style.transition = '300ms';
-    this._renderByColAndRow();
-
-    this._item.elementRef.nativeElement.addEventListener(
-      'transitionend',
-      () => (this._item.elementRef.nativeElement.style.transition = ''),
-      false,
-    );
-  }
-
   private _setFixedSize(element: HTMLElement): void {
     const width = element.offsetWidth;
     const height = element.offsetHeight;
@@ -225,46 +223,6 @@ export class MoveDirective {
     element.style.height = `${height}px`;
 
     element.style.transform = `translate(${left}px, ${top}px)`;
-  }
-
-  private _renderByColAndRow() {
-    this._setWidthByCols(this._item.elementRef.nativeElement);
-    this._setHeightByRows(this._item.elementRef.nativeElement);
-    this._setTransform(this._item.elementRef.nativeElement);
-
-    this._item.elementRef.nativeElement.style.zIndex = '';
-  }
-
-  private _setTransform(element: HTMLElement): void {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-
-    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
-
-    const xx = this.item.col / this._grid.cols;
-    const yy = this.item.row / this._grid.rows;
-
-    // eslint-disable-next-line max-len
-    element.style.transform = `translate(calc((100cqw - ${totalColsGaps}px) * ${xx} + ${colGaps}px), calc((100cqh - ${totalRowsGaps}px) * ${yy} + ${rowGaps}px))`;
-  }
-
-  private _setWidthByCols(element: HTMLElement): void {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gapsInCols = this._grid.colsGaps
-      .slice(this.item.col, this.item.col + this.item.cols - 1)
-      .reduce((acc, gap) => acc + gap, 0);
-
-    element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
-  }
-
-  private _setHeightByRows(element: HTMLElement): void {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gapsInRows = this._grid.rowsGaps
-      .slice(this.item.row, this.item.row + this.item.rows - 1)
-      .reduce((acc, gap) => acc + gap, 0);
-
-    element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }
 
   private _move({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
@@ -354,7 +312,7 @@ export class MoveDirective {
       // } else {
       console.warn('add new row');
 
-      this._grid.event.next(GridEvent.BeforeAddRows);
+      this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
 
       this._grid.rows += 8;
       this._grid.rows += 8;
@@ -372,10 +330,10 @@ export class MoveDirective {
       this._grid.scrollLeft += increaseX;
       this._grid.scrollTop += increaseY;
 
-      this._item.x += increaseX;
-      this._item.y += increaseY;
+      this._x += increaseX;
+      this._y += increaseY;
 
-      this._item.renderMove('green');
+      this._render();
 
       this._grid.isItemsMoving = true;
 

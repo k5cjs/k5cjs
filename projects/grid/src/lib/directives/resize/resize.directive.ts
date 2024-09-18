@@ -1,25 +1,29 @@
-import { Directive, ElementRef, HostListener, Injector, Input, inject } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { KcGridItem } from '../../types';
+import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
   selector: '[kcGridResize]',
 })
 export abstract class ResizeDirective {
-  // @Input({ required: true }) id!: symbol;
   @Input({ required: true }) item!: KcGridItem;
 
   id = inject(GRID_ITEM_ID);
 
-  mouseOffsetTop = 0;
-  mouseOffsetBottom = 0;
-  mouseOffsetLeft = 0;
-  mouseOffsetRight = 0;
+  protected _x = 0;
+  protected _y = 0;
+  protected _width = 0;
+  protected _height = 0;
 
-  isMouseDown = false;
+  protected _mouseOffsetTop = 0;
+  protected _mouseOffsetBottom = 0;
+  protected _mouseOffsetLeft = 0;
+  protected _mouseOffsetRight = 0;
 
-  onMouseMove = this._onMouseMove.bind(this);
+  protected _isMouseDown = false;
+
+  protected _onMouseMoveRef = this._onMouseMove.bind(this);
 
   protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
@@ -32,37 +36,48 @@ export abstract class ResizeDirective {
     // TODO: add logic in move to stop if is resizing
     e.stopPropagation();
 
-    this._item.resizing(true);
-
-    this.isMouseDown = true;
+    this._isMouseDown = true;
     this._item.skip = true;
 
     this._setCellPositionAndSize();
     this._setMouseOffset(e);
 
-    document.addEventListener('mousemove', this.onMouseMove);
+    this._grid.emit(
+      this.id,
+      {
+        col: this.item.col,
+        row: this.item.row,
+        cols: this.item.cols,
+        rows: this.item.rows,
+      },
+      GridEventType.Capture,
+    );
+
+    document.addEventListener('mousemove', this._onMouseMoveRef);
   }
 
   @HostListener('window:mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
-    if (!this.isMouseDown) return;
+    if (!this._isMouseDown) return;
 
     e.preventDefault();
 
-    this._item.resizing(false);
-
-    this.isMouseDown = false;
+    this._isMouseDown = false;
     this._item.skip = false;
-    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mousemove', this._onMouseMoveRef);
 
     this._grid.drop();
 
-    this._grid.release(this.id, {
-      col: this.item.col,
-      row: this.item.row,
-      cols: this.item.cols,
-      rows: this.item.rows,
-    });
+    this._grid.emit(
+      this.id,
+      {
+        col: this.item.col,
+        row: this.item.row,
+        cols: this.item.cols,
+        rows: this.item.rows,
+      },
+      GridEventType.Release,
+    );
   }
 
   protected abstract _onMouseMove(e: MouseEvent): void;
@@ -70,28 +85,28 @@ export abstract class ResizeDirective {
   protected _setCellPositionAndSize(): void {
     const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
-    this._item.x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
-    this._item.y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
+    this._x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
+    this._y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
 
-    this._item.width = width;
-    this._item.height = height;
+    this._width = width;
+    this._height = height;
   }
 
   protected _setMouseOffset(e: MouseEvent): void {
     const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
-    this.mouseOffsetLeft = e.clientX - x;
-    this.mouseOffsetRight = x + width - e.clientX;
+    this._mouseOffsetLeft = e.clientX - x;
+    this._mouseOffsetRight = x + width - e.clientX;
 
-    this.mouseOffsetTop = e.clientY - y;
-    this.mouseOffsetBottom = y + height - e.clientY;
+    this._mouseOffsetTop = e.clientY - y;
+    this._mouseOffsetBottom = y + height - e.clientY;
   }
 
-  protected _y(e: MouseEvent): number {
+  protected _calcY(e: MouseEvent): number {
     return e.clientY - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
   }
 
-  protected _x(e: MouseEvent): number {
+  protected _calcX(e: MouseEvent): number {
     return e.clientX - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
   }
 
@@ -137,5 +152,16 @@ export abstract class ResizeDirective {
     const cellHeight = gridHeight / this._grid.rows;
 
     return cellHeight;
+  }
+
+  protected _render({ x, y, width, height }: { x: number; y: number; width: number; height: number }): void {
+    const element = this._item.elementRef.nativeElement;
+
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
+
+    element.style.transform = `translate(${x}px, ${y}px)`;
+    element.style.zIndex = `999`;
+    element.style.background = 'pink';
   }
 }

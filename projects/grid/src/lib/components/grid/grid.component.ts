@@ -17,7 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { GridDirective, GridItemDirective, PreviewDirective, ScrollDirective } from '../../directives';
 import { KcGridService } from '../../services';
-import { GridEvent, KcGridItems } from '../../types';
+import { GridEventType, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
 
 @Component({
@@ -105,7 +105,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     const preview = this.preview.render(
       Symbol('default'),
       { col: 0, row: 0, cols: 0, rows: 0 },
-      GridEvent.AfterAddRows,
+      GridEventType.AfterAddRows,
     );
 
     this.grid.init({

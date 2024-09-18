@@ -1,8 +1,8 @@
 import { Directive, EmbeddedViewRef, TemplateRef, ViewContainerRef } from '@angular/core';
 
-import { GridEvent, KcGridItem } from '../../types';
+import { GridEventType, KcGridItem } from '../../types';
 
-type Context = { $implicit: KcGridItem; id: symbol; event: GridEvent };
+type Context = { $implicit: KcGridItem; id: symbol; event: GridEventType };
 
 @Directive({
   selector: '[kcGridPreview]',
@@ -10,7 +10,7 @@ type Context = { $implicit: KcGridItem; id: symbol; event: GridEvent };
 export class PreviewDirective {
   constructor(public template: TemplateRef<Context>, public viewContainer: ViewContainerRef) {}
 
-  render(id: symbol, item: KcGridItem, event: GridEvent): EmbeddedViewRef<Context> {
+  render(id: symbol, item: KcGridItem, event: GridEventType): EmbeddedViewRef<Context> {
     return this.viewContainer.createEmbeddedView(this.template, { $implicit: { ...item }, id, event });
   }
 }

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDestroy, inject } from '@angular/core';
 
-import { GridEvent, KcGridItem } from '../../types';
+import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Component({
@@ -11,7 +11,7 @@ import { KcGridService } from '../../services';
 })
 export class PreviewComponent implements OnChanges, OnDestroy {
   @Input({ required: true }) item!: KcGridItem;
-  @Input({ required: true }) event!: GridEvent;
+  @Input({ required: true }) event!: GridEventType;
   @Input({ required: true }) scale!: number;
 
   elementRef = inject<ElementRef<HTMLElement>>(ElementRef<HTMLElement>);
@@ -29,10 +29,10 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   ngOnChanges(): void {
-    if (this.event === GridEvent.Capture) {
+    if (this.event === GridEventType.Capture) {
       this._updateStyle();
       requestAnimationFrame(() => this._addAnimation());
-    } else if (this.event === GridEvent.Release) {
+    } else if (this.event === GridEventType.Release) {
       if (this._isAnimating) this._removeAnimationAfterFinished();
       else this._removeAnimation();
     } else {

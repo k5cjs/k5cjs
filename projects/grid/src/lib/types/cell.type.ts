@@ -1,7 +1,7 @@
 import { EmbeddedViewRef } from '@angular/core';
 import { KcGridItem } from './item.type';
 
-export const enum GridEvent {
+export const enum GridEventType {
   Capture = 'capture',
   Release = 'release',
   Move = 'move',

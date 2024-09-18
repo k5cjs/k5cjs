@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, inject } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GridEvent, KcGridItems } from '../../types';
+import { GridEventType, KcGridItems } from '../../types';
 import { KcGridService } from './grid.service';
 import { GridDirective, PreviewDirective } from '../../directives';
 
@@ -38,7 +38,7 @@ const mock = (component: PreviewComponent, size: { cols: number; rows: number },
     preview: component.previewDirective.render(
       Symbol('default'),
       { col: 0, row: 0, cols: 0, rows: 0 },
-      GridEvent.AfterAddRows,
+      GridEventType.AfterAddRows,
     ),
     itemDirective: component.itemDirective,
     colsGaps: [],
@@ -57,7 +57,7 @@ const mock = (component: PreviewComponent, size: { cols: number; rows: number },
   return { grid, items };
 };
 
-fdescribe('grid', () => {
+describe('grid', () => {
   let component: PreviewComponent;
   let fixture: ComponentFixture<PreviewComponent>;
 
@@ -352,7 +352,7 @@ fdescribe('grid', () => {
     expect(grid.items.get(items.get(1)!)!.context.row).toEqual(1);
   });
 
-  fit('cancel swap', () => {
+  it('cancel swap', () => {
     const { grid, items } = mock(component, { cols: 8, rows: 5 }, [
       { col: 1, row: 1, cols: 2, rows: 2 },
       { col: 3, row: 1, cols: 4, rows: 4 },

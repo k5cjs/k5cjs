@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, EmbeddedViewRef, Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { Direction, GridEvent, KcGridItem, KcGridItemContext } from '../../types';
+import { Direction, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
 import {
   getDirection,
   Position,
@@ -40,7 +40,7 @@ export class KcGridService {
   /**
    * preview is the preview of the item that is being dragged
    */
-  public preview!: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEvent }>;
+  public preview!: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEventType }>;
 
   public isItemsMoving = false;
 
@@ -55,8 +55,6 @@ export class KcGridService {
   protected _items: Map<symbol, KcGridItemContext> = new Map();
   private _history: Map<symbol, KcGridItemContext>[] = [];
 
-  event = new Subject<GridEvent>();
-
   private _lastMoveCol = 0;
   private _lastMoveRow = 0;
   private _preventTooMuchRecursion = 0;
@@ -67,6 +65,10 @@ export class KcGridService {
 
   private _cdr!: ChangeDetectorRef;
 
+  emit(id: symbol, item: KcGridItem, type: GridEventType): void {
+    this.renderPreview(id, item, type);
+  }
+
   init(configs: {
     cols: number;
     rows: number;
@@ -74,7 +76,7 @@ export class KcGridService {
     rowsGaps: number[];
     cellWidth: number;
     cellHeight: number;
-    preview: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEvent }>;
+    preview: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEventType }>;
     /**
      * scrollTop is the scroll top of the grid
      */
@@ -121,14 +123,6 @@ export class KcGridService {
     return id;
   }
 
-  capture(id: symbol, item: KcGridItem): void {
-    this.renderPreview(id, item, GridEvent.Capture);
-  }
-
-  release(id: symbol, item: KcGridItem): void {
-    this.renderPreview(id, item, GridEvent.Release);
-  }
-
   move(id: symbol, item: KcGridItem): boolean {
     /**
      * skip if the item is out of the grid
@@ -166,7 +160,7 @@ export class KcGridService {
       return false;
     }
 
-    this.renderPreview(id, change, GridEvent.Move);
+    this.renderPreview(id, change, GridEventType.Move);
 
     // TODO: change this
     const itemM = this._items.get(id);
@@ -222,7 +216,7 @@ export class KcGridService {
     this._removeFromMatrix(id);
 
     if (!direction) {
-      this.renderPreview(id, item, GridEvent.Move);
+      this.renderPreview(id, item, GridEventType.Move);
       return false;
     }
 
@@ -236,7 +230,7 @@ export class KcGridService {
       return false;
     }
 
-    this.renderPreview(id, item, GridEvent.Move);
+    this.renderPreview(id, item, GridEventType.Move);
 
     // TODO: change this
     const itemM = this._items.get(id);
@@ -511,7 +505,7 @@ export class KcGridService {
     this._cdr.detectChanges();
   }
 
-  renderPreview(id: symbol, item: KcGridItem, event: GridEvent) {
+  renderPreview(id: symbol, item: KcGridItem, event: GridEventType) {
     this.preview.context.id = id;
     this.preview.context.$implicit = item;
     this.preview.context.event = event;

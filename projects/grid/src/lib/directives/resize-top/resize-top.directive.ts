@@ -6,26 +6,25 @@ import { ResizeDirective } from '../resize/resize.directive';
 })
 export class ResizeTopDirective extends ResizeDirective {
   protected _onMouseMove(e: MouseEvent): void {
-    if (!this.isMouseDown) return;
+    if (!this._isMouseDown) return;
 
     e.preventDefault();
 
-    let y = this._y(e) - this.mouseOffsetTop;
+    let y = this._calcY(e) - this._mouseOffsetTop;
 
     // if y is in the last row then equal th y to the last row
-    if (y > this._item.y + this._item.height - this._cellHeight())
-      y = this._item.y + this._item.height - this._cellHeight() + 1;
+    if (y > this._y + this._height - this._cellHeight()) y = this._y + this._height - this._cellHeight() + 1;
 
     const row = this._row(y);
 
     const rows = this.item.rows + (this.item.row - row);
 
-    const height = this._item.height + (this._item.y - y);
+    const height = this._height + (this._y - y);
 
-    this._item.update({
-      x: this._item.x,
+    this._render({
+      x: this._x,
       y: y,
-      width: this._item.width,
+      width: this._width,
       height: height,
     });
 
@@ -38,8 +37,8 @@ export class ResizeTopDirective extends ResizeDirective {
 
     if (!allowToResize) return;
 
-    this._item.y = y;
-    this._item.height = height;
+    this._y = y;
+    this._height = height;
 
     this.item.row = row;
     this.item.rows = rows;
