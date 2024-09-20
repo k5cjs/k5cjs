@@ -56,6 +56,8 @@ export abstract class ResizeDirective {
     document.addEventListener('mousemove', this._onMouseMoveRef);
   }
 
+  // use the global mouseup event to prevent when the mouse is outside the element
+  // while the user is quickly resizing the element
   @HostListener('window:mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
     if (!this._isMouseDown) return;
@@ -82,26 +84,6 @@ export abstract class ResizeDirective {
 
   protected abstract _onMouseMove(e: MouseEvent): void;
 
-  protected _setCellPositionAndSize(): void {
-    const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
-
-    this._x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
-    this._y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
-
-    this._width = width;
-    this._height = height;
-  }
-
-  protected _setMouseOffset(e: MouseEvent): void {
-    const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
-
-    this._mouseOffsetLeft = e.clientX - x;
-    this._mouseOffsetRight = x + width - e.clientX;
-
-    this._mouseOffsetTop = e.clientY - y;
-    this._mouseOffsetBottom = y + height - e.clientY;
-  }
-
   protected _calcY(e: MouseEvent): number {
     return e.clientY - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
   }
@@ -111,10 +93,12 @@ export abstract class ResizeDirective {
   }
 
   protected _col(x: number): number {
+    // calculate the width till the x position
     let width = 0;
 
     for (let i = 0; i < this._grid.cols; i++) {
       width += this._grid.colsGaps[i];
+      // TODO: implement memoization function to prevent to calculate every time
       width += this._cellWidth();
 
       if (width > x) return i;
@@ -124,10 +108,12 @@ export abstract class ResizeDirective {
   }
 
   protected _row(y: number): number {
+    // calculate the height till the y position
     let height = 0;
 
     for (let i = 0; i < this._grid.rows; i++) {
       height += this._grid.rowsGaps[i];
+      // TODO: implement memoization function to prevent to calculate every time
       height += this._cellHeight();
 
       if (height > y) return i;
@@ -163,5 +149,25 @@ export abstract class ResizeDirective {
     element.style.transform = `translate(${x}px, ${y}px)`;
     element.style.zIndex = `999`;
     element.style.background = 'pink';
+  }
+
+  private _setCellPositionAndSize(): void {
+    const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
+
+    this._x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
+    this._y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
+
+    this._width = width;
+    this._height = height;
+  }
+
+  private _setMouseOffset(e: MouseEvent): void {
+    const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
+
+    this._mouseOffsetLeft = e.clientX - x;
+    this._mouseOffsetRight = x + width - e.clientX;
+
+    this._mouseOffsetTop = e.clientY - y;
+    this._mouseOffsetBottom = y + height - e.clientY;
   }
 }

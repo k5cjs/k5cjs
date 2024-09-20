@@ -7,7 +7,7 @@ module.exports = function (config) {
     ...baseConfig,
     coverageReporter: {
       ...baseConfig.coverageReporter,
-      dir: require('path').join(__dirname, '../../coverage/select'),
+      dir: require('path').join(__dirname, '../../coverage/grid'),
     },
   });
 };
