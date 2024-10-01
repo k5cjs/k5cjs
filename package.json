@@ -57,13 +57,13 @@
     "@k5cjs/selection-model": "file:projects/selection-model",
     "@ngrx/effects": "^18.0.1",
     "@ngrx/entity": "^18.0.1",
+    "@ngrx/operators": "^18.0.0",
     "@ngrx/store": "^18.0.1",
     "object-hash": "^3.0.0",
     "patch-package": "^8.0.0",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.4",
-    "@ngrx/operators": "^18.0.0"
+    "zone.js": "~0.14.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.0.7",

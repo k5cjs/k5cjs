@@ -12,11 +12,28 @@ import {
   throwError,
 } from 'rxjs';
 
+function hashObject(obj: Record<string, unknown>) {
+  // Convert object to string
+  const stringifiedObject = JSON.stringify(obj);
+
+  // Initialize a simple hash value
+  let hash = 0;
+
+  // Generate a basic hash from the stringified object
+  for (let i = 0; i < stringifiedObject.length; i++) {
+    const char = stringifiedObject.charCodeAt(i);
+    hash = (hash << 5) - hash + char; // Equivalent to hash * 31 + char
+    hash |= 0; // Convert to a 32-bit integer
+  }
+
+  // Return the hash as a string
+  return hash.toString(16);
+}
+
 import { AtLeastDeep, isNotUndefined } from '@k5cjs/types';
 import { Actions, ofType } from '@ngrx/effects';
 import { IdSelector } from '@ngrx/entity';
 import { Action, Store } from '@ngrx/store';
-import { sha1 } from 'object-hash';
 
 import { ActionsBase } from './store.actions';
 import { SelectorsBase } from './store.selectors';
@@ -257,7 +274,7 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   }
 
   protected _query(param: Record<PropertyKey, unknown>): string {
-    return sha1(param);
+    return hashObject(param);
   }
 
   private _isPartialT(item: unknown): item is Partial<T> {
