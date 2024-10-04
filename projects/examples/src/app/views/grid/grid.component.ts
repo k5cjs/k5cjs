@@ -45,6 +45,10 @@ export class GridComponent {
     this.grid.back();
   }
 
+  add(): void {
+    this.grid.add<Data>({ rows: 2, cols: 2, data: { name: 'Item 5', value: 5 } });
+  }
+
   changes(items: KcGridItem[]): void {
     // eslint-disable-next-line no-console
     console.log(items);

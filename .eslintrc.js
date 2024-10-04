@@ -12,7 +12,6 @@ module.exports = {
         'prettier',
         'plugin:import/errors',
         'plugin:import/warnings',
-        'plugin:@ngrx/recommended-requiring-type-checking',
       ],
       plugins: ['unused-imports', 'sort-export-all'],
       rules: {

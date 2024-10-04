@@ -122,7 +122,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       changeDetectorRef: this._cdr,
     });
 
-    this.items.forEach((item) => this.grid.add(item));
+    this.items.forEach((item) => this.grid.add(item, { emitEvent: false }));
   }
 
   private _colsTotalGaps(): number {

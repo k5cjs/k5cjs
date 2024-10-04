@@ -103,24 +103,58 @@ export class KcGridService {
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
   }
 
-  add(context: KcGridItem): symbol | null {
+  add<T = void>(
+    item: Omit<KcGridItem<T>, 'col' | 'row' | 'rows' | 'cols'> & Partial<Pick<KcGridItem<T>, 'rows' | 'cols'>>,
+    options?: { emitEvent: boolean },
+  ): symbol | null;
+  add<T = void>(item: KcGridItem<T>, options?: { emitEvent: boolean }): symbol | null;
+  add<T = void>(
+    partialItem:
+      | KcGridItem<T>
+      | (Omit<KcGridItem<T>, 'col' | 'row' | 'rows' | 'cols'> & Partial<Pick<KcGridItem<T>, 'rows' | 'cols'>>),
+    options: { emitEvent: boolean } = { emitEvent: true },
+  ): symbol | null {
     const id = Symbol(this._idIndex++);
 
-    for (let y = context.row; y < context.row + context.rows; y++) {
-      for (let x = context.col; x < context.col + context.cols; x++) {
+    let item: KcGridItem;
+
+    if (this._checkIsKcGridItem(partialItem)) {
+      item = partialItem;
+    } else {
+      const cols = partialItem.cols || 2;
+      const rows = partialItem.rows || 2;
+
+      // find the fist empty space for the item
+      const space = this._searchEmptySpace(cols, rows);
+
+      if (!space) return null;
+
+      item = { ...partialItem, cols, rows, col: space.col, row: space.row } as KcGridItem;
+    }
+
+    for (let y = item.row; y < item.row + item.rows; y++) {
+      for (let x = item.col; x < item.col + item.cols; x++) {
         if (this._matrix[y]) this._matrix[y][x] = id;
       }
     }
 
-    const template = this._itemDirective.render(id, context);
+    const template = this._itemDirective.render(id, item);
 
-    this._items.set(id, { context, template: template });
+    this._items.set(id, { context: item, template: template });
 
     this._history = [];
     this.pushToHistory();
 
+    if (options?.emitEvent) this._changes.next([...this._items.values()]);
+
     // TODO: implement logic to check if the item is out of the grid
     return id;
+  }
+
+  private _checkIsKcGridItem(
+    item: KcGridItem | (Omit<KcGridItem, 'col' | 'row' | 'rows' | 'cols'> & Partial<Pick<KcGridItem, 'rows' | 'cols'>>),
+  ): item is KcGridItem {
+    return Object.prototype.hasOwnProperty.call(item, 'col') && Object.prototype.hasOwnProperty.call(item, 'row');
   }
 
   move(id: symbol, item: KcGridItem): boolean {
@@ -520,6 +554,29 @@ export class KcGridService {
     this.restoreFromHistory();
     this.updateGrid();
     this.render();
+  }
+
+  // search empty space for a new item with the given size rows and cols
+  private _searchEmptySpace(cols: number, rows: number): { col: number; row: number } | null {
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        if (this._matrix[y]?.[x]) continue;
+
+        let empty = true;
+
+        for (let yy = y; yy < y + rows; yy++) {
+          for (let xx = x; xx < x + cols; xx++) {
+            if (this._matrix[yy]?.[xx]) {
+              empty = false;
+              break;
+            }
+          }
+        }
+
+        if (empty) return { col: x, row: y };
+      }
+    }
+    return null;
   }
 
   private _cloneItems(items: Map<symbol, KcGridItemContext>): Map<symbol, KcGridItemContext> {
