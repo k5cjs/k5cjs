@@ -49,6 +49,10 @@ export class GridComponent {
     this.grid.add<Data>({ rows: 2, cols: 2, data: { name: 'Item 5', value: 5 } });
   }
 
+  delete(id: symbol): void {
+    this.grid.delete(id);
+  }
+
   changes(items: KcGridItem[]): void {
     // eslint-disable-next-line no-console
     console.log(items);

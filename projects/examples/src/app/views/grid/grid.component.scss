@@ -18,7 +18,7 @@
       text-xs;
   }
 
-  &__item:hover &__move {
+  &__item:hover &__move, &__item:hover &__delete {
     @apply
       opacity-100;
   }
@@ -36,6 +36,12 @@
       cursor-move
       transition-opacity
       duration-300
+      opacity-0;
+  }
+
+  &__delete {
+    @apply
+      bg-red-500
       opacity-0;
   }
 

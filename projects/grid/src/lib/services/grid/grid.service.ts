@@ -151,6 +151,18 @@ export class KcGridService {
     return id;
   }
 
+  delete(id: symbol): void {
+    const item = this._items.get(id);
+
+    if (!item) return;
+
+    this._removeFromMatrix(id);
+    this._items.delete(id);
+    this.pushToHistory();
+
+    item.template.destroy();
+  }
+
   private _checkIsKcGridItem(
     item: KcGridItem | (Omit<KcGridItem, 'col' | 'row' | 'rows' | 'cols'> & Partial<Pick<KcGridItem, 'rows' | 'cols'>>),
   ): item is KcGridItem {

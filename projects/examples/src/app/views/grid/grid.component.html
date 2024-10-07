@@ -41,6 +41,8 @@
 
     <div kcGridMove [item]="item" class="grid__move">Move</div>
 
+    <button (click)="delete(id)" class="grid__delete">Delete</button>
+
     <div kcGridResizeRight [item]="item" class="grid__resize grid__resize--right">
       <app-test-injector>R</app-test-injector>
     </div>
