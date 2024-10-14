@@ -11,3 +11,4 @@ export * from './resize-bottom-right/resize-bottom-right.directive';
 export * from './resize-left/resize-left.directive';
 export * from './resize-right/resize-right.directive';
 export * from './move/move.directive';
+export * from './background/background.directive';

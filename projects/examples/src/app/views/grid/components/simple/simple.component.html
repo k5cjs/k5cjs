@@ -1,0 +1,63 @@
+<app-bar [grid]="grid" [scale]="scale" />
+
+<kc-grid
+  [scale]="scale.value"
+  [cols]="cols"
+  [rows]="rows"
+  [colsGaps]="colsGaps"
+  [rowsGaps]="rowsGaps"
+  (changes)="changes($event)"
+  [items]="items"
+  class="grid"
+>
+  <div header class="header">
+    What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+    the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled
+    it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic
+    typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
+    containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including
+    versions of Lorem Ipsum.
+  </div>
+
+  <app-background *kcGridBackground="let data;" [data]="data" [grid]="grid" />
+
+  <div *kcGridItem="let item; id as id type: data" class="grid__item">
+    <div kcGridResizeTopLeft [item]="item" class="grid__resize grid__resize--top-left">TL</div>
+    <div kcGridResizeTop [item]="item" class="grid__resize grid__resize--top">T</div>
+    <div kcGridResizeTopRight [item]="item" class="grid__resize grid__resize--top-right">TR</div>
+
+    <app-test-injector>
+      <div>id: {{ id }}</div>
+      <div>col: {{ item.col }}</div>
+      <div>row: {{ item.row }}</div>
+      <div>cols: {{ item.cols }}</div>
+      <div>rows: {{ item.rows }}</div>
+      <div>
+        <span>data:</span>
+        <pre>{{ item.data | json }}</pre>
+      </div>
+    </app-test-injector>
+
+    <div kcGridMove [item]="item" class="grid__move">Move</div>
+
+    <button (click)="delete(id)" class="grid__delete">Delete</button>
+
+    <div kcGridResizeRight [item]="item" class="grid__resize grid__resize--right">
+      <app-test-injector>R</app-test-injector>
+    </div>
+    <div kcGridResizeLeft [item]="item" class="grid__resize grid__resize--left">L</div>
+
+    <div kcGridResizeBottomLeft [item]="item" class="grid__resize grid__resize--bottom-left">BL</div>
+    <div kcGridResizeBottom [item]="item" class="grid__resize grid__resize--bottom">B</div>
+    <div kcGridResizeBottomRight [item]="item" class="grid__resize grid__resize--bottom-right">BR</div>
+  </div>
+
+  <div footer class="footer">
+    What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
+    the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled
+    it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic
+    typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets
+    containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including
+    versions of Lorem Ipsum.
+  </div>
+</kc-grid>

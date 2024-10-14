@@ -43,6 +43,12 @@ export class MoveDirective {
   private _requestAnimationFrameId!: number;
 
   // add variable to save cols when mouse is down
+  // to test if the item is moved when the mouse is up
+  private _startCol = 0;
+  private _startRow = 0;
+
+  // add variable to save cols when mouse is down
+  // to prevent to change size when the item is swapped
   private _startCols = 0;
   private _startRows = 0;
 
@@ -78,8 +84,19 @@ export class MoveDirective {
       GridEventType.Capture,
     );
 
+    this._startCol = this.item.col;
+    this._startRow = this.item.row;
+
     this._startCols = this.item.cols;
     this._startRows = this.item.rows;
+
+    this._grid.editing = true;
+
+    const { width, paddingLeft, paddingRight, height } = getComputedStyle(
+      this._gridTemplate.containerElementRef.nativeElement,
+    );
+
+    console.log({ width, paddingLeft, paddingRight, height });
 
     document.addEventListener('mousemove', this.onMouseMove);
   }
@@ -98,8 +115,9 @@ export class MoveDirective {
 
     document.removeEventListener('mousemove', this.onMouseMove);
 
-    this._grid.isItemsMoving = false;
-    this._grid.drop();
+    this._grid.isItemScrolling = false;
+
+    this._grid.drop(this._startCol !== this.item.col || this._startRow !== this.item.row);
 
     this._grid.emit(
       this.id,
@@ -111,6 +129,8 @@ export class MoveDirective {
       },
       GridEventType.Release,
     );
+
+    this._grid.editing = false;
   }
 
   protected _onMouseMove(e: MouseEvent): void {
@@ -241,14 +261,14 @@ export class MoveDirective {
     if (y < 0) {
       const percent = Math.abs(y) / (height * this.item.rows);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseY = -speed;
     } else if (mouseYContainer > this._gridTemplate.containerElementRef.nativeElement.clientHeight) {
       const offset = mouseYContainer - this._gridTemplate.containerElementRef.nativeElement.clientHeight;
       const percent = offset / (height * this.item.rows);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseY = speed;
     }
@@ -256,14 +276,14 @@ export class MoveDirective {
     if (x < 0) {
       const percent = Math.abs(x) / (width * this.item.cols);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseX = -speed;
     } else if (mouseXContainer > this._gridTemplate.containerElementRef.nativeElement.clientWidth) {
       const offset = mouseXContainer - this._gridTemplate.containerElementRef.nativeElement.clientWidth;
       const percent = offset / (width * this.item.cols);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseX = speed;
     }
@@ -280,6 +300,13 @@ export class MoveDirective {
 
     const scrollWidth = this._gridTemplate.containerElementRef.nativeElement.clientWidth + this._grid.scrollLeft;
     const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
+
+    // console.log({
+    //   scrollWidth,
+    //   contentWidth,
+    //   increaseX,
+    //   scrollLeft: this._grid.scrollLeft,
+    // });
 
     // add new column if scroll is at the right
     if (scrollWidth + increaseX > contentWidth) {
@@ -300,30 +327,39 @@ export class MoveDirective {
     const scrollHeight = this._gridTemplate.containerElementRef.nativeElement.clientHeight + this._grid.scrollTop;
     const contentHeight = this._gridTemplate.contentElementRef.nativeElement.offsetHeight;
 
+    console.log({
+      scrollHeight,
+      contentHeight,
+      increaseY,
+      scrollTop: this._grid.scrollTop,
+    });
+
     let temp: number | undefined;
 
     // add new row if scroll is at the bottom
     if (scrollHeight + increaseY > contentHeight - 500) {
-      // const remainingHeight = contentHeight - scrollHeight;
+      const remainingHeight = contentHeight - scrollHeight;
 
-      // if (remainingHeight > 0) {
-      //   temp = increaseY;
-      //   increaseY = remainingHeight;
-      // } else {
-      console.warn('add new row');
+      if (remainingHeight > 0) {
+        temp = increaseY;
+        increaseY = remainingHeight;
+      } else {
+        console.error('add new row');
 
-      this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
+        return;
 
-      this._grid.rows += 8;
-      this._grid.rows += 8;
-      this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
-      // this._grid.rowsTotalGaps = this._rowsTotalGaps();
+        this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
 
-      // this._cdr.detectChanges();
+        this._grid.rows += 8;
+        this._grid.rows += 8;
+        this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
+        // this._grid.rowsTotalGaps = this._rowsTotalGaps();
 
-      this._scroll(increaseX, temp || increaseY);
-      return;
-      // }
+        // this._cdr.detectChanges();
+
+        this._scroll(increaseX, temp || increaseY);
+        return;
+      }
     }
 
     this._requestAnimationFrameId = requestAnimationFrame(() => {
@@ -335,7 +371,7 @@ export class MoveDirective {
 
       this._render();
 
-      this._grid.isItemsMoving = true;
+      this._grid.isItemScrolling = true;
 
       this._gridTemplate.containerElementRef.nativeElement.scrollTo({
         left: this._grid.scrollLeft,

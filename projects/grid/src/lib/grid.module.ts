@@ -15,6 +15,7 @@ import {
   ResizeTopDirective,
   ResizeTopLeftDirective,
   ResizeTopRightDirective,
+  BackgroundDirective,
 } from './directives';
 
 const externalDirectives: Type<unknown>[] = [
@@ -28,6 +29,7 @@ const externalDirectives: Type<unknown>[] = [
   ResizeBottomDirective,
   ResizeBottomLeftDirective,
   ResizeBottomRightDirective,
+  BackgroundDirective,
 ];
 
 const internalDirectives: Type<unknown>[] = [];

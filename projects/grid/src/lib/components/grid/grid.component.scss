@@ -1,18 +1,12 @@
 :host {
   @apply
-    flex
-    flex-col
-    p-5
-    overflow-hidden;
+    block
+    w-full
+    h-full
+    overflow-auto;
 }
 
 .grid {
-  @apply
-    w-full
-    h-full
-    overflow-auto
-    bg-sky-500;
-
   &__items {
     @apply
       relative
@@ -25,7 +19,6 @@
       absolute
       top-0
       left-0
-      z-10
-      bg-sky-900;
+      z-10;
   }
 }

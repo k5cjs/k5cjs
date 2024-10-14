@@ -30,6 +30,9 @@ export abstract class ResizeDirective {
   protected _item = inject(ITEM_COMPONENT);
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  private _startCols = 0;
+  private _startRows = 0;
+
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
@@ -53,6 +56,11 @@ export abstract class ResizeDirective {
       GridEventType.Capture,
     );
 
+    this._startCols = this.item.cols;
+    this._startRows = this.item.rows;
+
+    this._grid.editing = true;
+
     document.addEventListener('mousemove', this._onMouseMoveRef);
   }
 
@@ -68,7 +76,7 @@ export abstract class ResizeDirective {
     this._item.skip = false;
     document.removeEventListener('mousemove', this._onMouseMoveRef);
 
-    this._grid.drop();
+    this._grid.drop(this._startCols !== this.item.cols || this._startRows !== this.item.rows);
 
     this._grid.emit(
       this.id,
@@ -80,6 +88,8 @@ export abstract class ResizeDirective {
       },
       GridEventType.Release,
     );
+
+    this._grid.editing = false;
   }
 
   protected abstract _onMouseMove(e: MouseEvent): void;

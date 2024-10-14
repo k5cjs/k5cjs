@@ -15,7 +15,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { GridDirective, GridItemDirective, PreviewDirective, ScrollDirective } from '../../directives';
+import {
+  BackgroundDirective,
+  GridDirective,
+  GridItemDirective,
+  PreviewDirective,
+  ScrollDirective,
+} from '../../directives';
 import { KcGridService } from '../../services';
 import { GridEventType, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
@@ -77,7 +83,6 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
   @Output() readonly changes = new EventEmitter<KcGridItems<T>>();
 
-  @ViewChild('gridRef', { static: true }) containerElementRef!: ElementRef<HTMLElement>;
   @ViewChild('content', { static: true }) contentElementRef!: ElementRef<HTMLElement>;
   @ViewChild('items', { static: true }) itemsElementRef!: ElementRef<HTMLElement>;
 
@@ -85,10 +90,12 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
   @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<T>;
+  @ContentChild(BackgroundDirective, { static: true }) background?: GridItemDirective;
 
   colsTotalGaps!: number;
   rowsTotalGaps!: number;
 
+  containerElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   grid = inject(KcGridService);
 
   private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);

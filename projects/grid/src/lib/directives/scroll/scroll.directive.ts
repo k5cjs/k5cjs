@@ -16,11 +16,11 @@ export class ScrollDirective implements OnInit {
 
   private _scroll(): void {
     this._gridTemplate.containerElementRef.nativeElement.addEventListener('wheel', (event) => {
-      if (this._grid.isItemsMoving) event.preventDefault();
+      if (this._grid.isItemScrolling) event.preventDefault();
     });
 
     this._gridTemplate.containerElementRef.nativeElement.addEventListener('scroll', () => {
-      if (this._grid.isItemsMoving) return;
+      if (this._grid.isItemScrolling) return;
 
       this._grid.scrollTop = this._gridTemplate.containerElementRef.nativeElement.scrollTop;
       this._grid.scrollLeft = this._gridTemplate.containerElementRef.nativeElement.scrollLeft;

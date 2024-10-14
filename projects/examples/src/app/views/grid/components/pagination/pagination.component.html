@@ -1,0 +1,24 @@
+<kc-grid [cols]="cols" [rows]="rows" [colsGaps]="colsGaps" [rowsGaps]="rowsGaps" [items]="items" class="grid">
+  <app-background-pages *kcGridBackground="let data;" [config]="data" [pageRows]="5" />
+
+  <div *kcGridItem="let item; id as id type: itemType" class="grid__item">
+    <div>id: {{ id }}</div>
+    <div>col: {{ item.col }}</div>
+    <div>row: {{ item.row }}</div>
+    <div>cols: {{ item.cols }}</div>
+    <div>rows: {{ item.rows }}</div>
+
+    <div kcGridMove [item]="item" class="grid__move">Move</div>
+
+    <!-- <button (click)="delete(id)" class="grid__delete">Delete</button> -->
+
+    <!-- <div kcGridResizeTopLeft [item]="item" class="grid__resize grid__resize--top-left">TL</div> -->
+    <!-- <div kcGridResizeTop [item]="item" class="grid__resize grid__resize--top">T</div> -->
+    <!-- <div kcGridResizeTopRight [item]="item" class="grid__resize grid__resize--top-right">TR</div> -->
+    <!-- <div kcGridResizeRight [item]="item" class="grid__resize grid__resize--right">R</div> -->
+    <!-- <div kcGridResizeLeft [item]="item" class="grid__resize grid__resize--left">L</div> -->
+    <!-- <div kcGridResizeBottomLeft [item]="item" class="grid__resize grid__resize--bottom-left">BL</div> -->
+    <!-- <div kcGridResizeBottom [item]="item" class="grid__resize grid__resize--bottom">B</div> -->
+    <!-- <div kcGridResizeBottomRight [item]="item" class="grid__resize grid__resize--bottom-right">BR</div> -->
+  </div>
+</kc-grid>

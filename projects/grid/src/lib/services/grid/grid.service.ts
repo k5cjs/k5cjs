@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, EmbeddedViewRef, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject, distinctUntilChanged } from 'rxjs';
 
 import { Direction, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
 import {
@@ -42,7 +42,16 @@ export class KcGridService {
    */
   public preview!: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEventType }>;
 
-  public isItemsMoving = false;
+  private _editing = new BehaviorSubject<boolean>(false);
+  set editing(value: boolean) {
+    this._editing.next(value);
+  }
+  get editing() {
+    return this._editing.value;
+  }
+  editing$ = this._editing.asObservable().pipe(distinctUntilChanged());
+
+  public isItemScrolling = false;
 
   private _changes = new Subject<KcGridItemContext[]>();
   public changes = this._changes.asObservable();
@@ -54,6 +63,7 @@ export class KcGridService {
   // TODO: change to private
   protected _items: Map<symbol, KcGridItemContext> = new Map();
   private _history: Map<symbol, KcGridItemContext>[] = [];
+  private _redo: Map<symbol, KcGridItemContext>[] = [];
 
   private _lastMoveCol = 0;
   private _lastMoveRow = 0;
@@ -64,6 +74,12 @@ export class KcGridService {
   private _idIndex = 0;
 
   private _cdr!: ChangeDetectorRef;
+
+  private _hasUndo = new BehaviorSubject<boolean>(false);
+  private _hasRedo = new BehaviorSubject<boolean>(false);
+
+  hasUndo$ = this._hasUndo.asObservable().pipe(distinctUntilChanged());
+  hasRedo$ = this._hasRedo.asObservable().pipe(distinctUntilChanged());
 
   emit(id: symbol, item: KcGridItem, type: GridEventType): void {
     this.renderPreview(id, item, type);
@@ -221,12 +237,14 @@ export class KcGridService {
     return true;
   }
 
-  drop(): void {
-    this.pushToHistory();
-    this.updateGrid();
-    this.render();
+  drop(changed: boolean): void {
+    if (changed) {
+      this.pushToHistory();
+      this.updateGrid();
+      this._changes.next([...this._items.values()]);
+    }
 
-    this._changes.next([...this._items.values()]);
+    this.render();
   }
 
   private _lastResizeItem: ({ id: symbol } & KcGridItemContext) | null = null;
@@ -523,9 +541,49 @@ export class KcGridService {
     }
   }
 
+  get hasUndo(): boolean {
+    return this._hasUndo.value;
+  }
+
+  get hasRedo(): boolean {
+    return this._hasRedo.value;
+  }
+
+  undo() {
+    if (this._history.length === 1) return;
+
+    const item = this._history.pop();
+    this._redo.push(item!);
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
+
+    this.restoreFromHistory();
+    this.updateGrid();
+    this.render();
+  }
+
+  redo() {
+    if (this._redo.length === 0) return;
+
+    const item = this._redo.pop();
+    this._history.push(item!);
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
+
+    this.restoreFromHistory();
+    this.updateGrid();
+    this.render();
+  }
+
   pushToHistory(): void {
     const items = this._cloneItems(this._items);
     this._history.push(items);
+    this._redo = [];
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
   }
 
   restoreFromHistory(): void {
@@ -557,15 +615,6 @@ export class KcGridService {
     this.preview.context.event = event;
 
     this._rerenderItem(this.preview, item);
-  }
-
-  back() {
-    if (this._history.length === 1) return;
-
-    this._history.pop();
-    this.restoreFromHistory();
-    this.updateGrid();
-    this.render();
   }
 
   // search empty space for a new item with the given size rows and cols
