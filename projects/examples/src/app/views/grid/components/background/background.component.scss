@@ -1,0 +1,20 @@
+.cells {
+  @apply
+    absolute
+    inset-0
+    transition-opacity
+    opacity-0;
+
+  &--show {
+    @apply
+      opacity-100;
+  }
+
+  &__cell {
+    @apply
+      absolute
+      border
+      bg-slate-100
+      rounded-md;
+  }
+}

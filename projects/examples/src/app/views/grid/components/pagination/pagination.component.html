@@ -1,0 +1,42 @@
+<app-bar [grid]="grid" [scale]="scale" />
+
+<kc-grid
+  [scale]="scale.value"
+  [cols]="cols"
+  [rows]="rows"
+  [colsGaps]="colsGaps"
+  [rowsGaps]="rowsGaps"
+  [items]="items"
+  class="grid"
+>
+  <app-background-pages *kcGridBackground="let data;" [config]="data" [pageRows]="5" />
+
+  <div
+    *kcGridPreview="let item; event as event"
+    kcGridPreviewStyle
+    [item]="item"
+    [event]="event"
+    [scale]="scale.value"
+    class="grid__preview"
+  ></div>
+
+  <div *kcGridItem="let item; id as id type: itemType" class="grid__item">
+    <div>id: {{ id }}</div>
+    <div>col: {{ item.col }}</div>
+    <div>row: {{ item.row }}</div>
+    <div>cols: {{ item.cols }}</div>
+    <div>rows: {{ item.rows }}</div>
+
+    <app-move [item]="item" class="grid__move" />
+    <app-delete [grid]="grid" [id]="id" class="grid__delete" />
+
+    <app-resize-top-left [item]="item" class="grid__resize" />
+    <app-resize-top [item]="item" class="grid__resize" />
+    <app-resize-top-right [item]="item" class="grid__resize" />
+    <app-resize-right [item]="item" class="grid__resize" />
+    <app-resize-left [item]="item" class="grid__resize" />
+    <app-resize-bottom-left [item]="item" class="grid__resize" />
+    <app-resize-bottom [item]="item" class="grid__resize" />
+    <app-resize-bottom-right [item]="item" class="grid__resize" />
+  </div>
+</kc-grid>

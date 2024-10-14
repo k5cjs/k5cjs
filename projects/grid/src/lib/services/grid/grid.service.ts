@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, EmbeddedViewRef, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { EmbeddedViewRef, Injectable } from '@angular/core';
+import { BehaviorSubject, Subject, distinctUntilChanged } from 'rxjs';
 
 import { Direction, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
 import {
@@ -12,7 +12,7 @@ import {
   shiftToTop,
   shrink,
 } from '../../helpers';
-import { GridDirective } from '../../directives';
+import { GridDirective, PreviewDirective } from '../../directives';
 
 @Injectable()
 export class KcGridService {
@@ -40,9 +40,18 @@ export class KcGridService {
   /**
    * preview is the preview of the item that is being dragged
    */
-  public preview!: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEventType }>;
+  public preview!: PreviewDirective;
 
-  public isItemsMoving = false;
+  private _editing = new BehaviorSubject<boolean>(false);
+  set editing(value: boolean) {
+    this._editing.next(value);
+  }
+  get editing() {
+    return this._editing.value;
+  }
+  editing$ = this._editing.asObservable().pipe(distinctUntilChanged());
+
+  public isItemScrolling = false;
 
   private _changes = new Subject<KcGridItemContext[]>();
   public changes = this._changes.asObservable();
@@ -54,6 +63,7 @@ export class KcGridService {
   // TODO: change to private
   protected _items: Map<symbol, KcGridItemContext> = new Map();
   private _history: Map<symbol, KcGridItemContext>[] = [];
+  private _redo: Map<symbol, KcGridItemContext>[] = [];
 
   private _lastMoveCol = 0;
   private _lastMoveRow = 0;
@@ -63,11 +73,11 @@ export class KcGridService {
 
   private _idIndex = 0;
 
-  private _cdr!: ChangeDetectorRef;
+  private _hasUndo = new BehaviorSubject<boolean>(false);
+  private _hasRedo = new BehaviorSubject<boolean>(false);
 
-  emit(id: symbol, item: KcGridItem, type: GridEventType): void {
-    this.renderPreview(id, item, type);
-  }
+  hasUndo$ = this._hasUndo.asObservable().pipe(distinctUntilChanged());
+  hasRedo$ = this._hasRedo.asObservable().pipe(distinctUntilChanged());
 
   init(configs: {
     cols: number;
@@ -76,7 +86,7 @@ export class KcGridService {
     rowsGaps: number[];
     cellWidth: number;
     cellHeight: number;
-    preview: EmbeddedViewRef<{ $implicit: KcGridItem; id: symbol; event: GridEventType }>;
+    preview: PreviewDirective;
     /**
      * scrollTop is the scroll top of the grid
      */
@@ -85,7 +95,6 @@ export class KcGridService {
      * scrollLeft is the scroll left of the grid
      */
     scrollLeft: number;
-    changeDetectorRef: ChangeDetectorRef;
     itemDirective: GridDirective;
   }) {
     this.cols = configs.cols;
@@ -97,7 +106,6 @@ export class KcGridService {
     this.preview = configs.preview;
     this.scrollTop = configs.scrollTop;
     this.scrollLeft = configs.scrollLeft;
-    this._cdr = configs.changeDetectorRef;
     this._itemDirective = configs.itemDirective;
 
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
@@ -140,7 +148,15 @@ export class KcGridService {
 
     const template = this._itemDirective.render(id, item);
 
-    this._items.set(id, { context: item, template: template });
+    const tmpDetectChanges = template.detectChanges.bind(template);
+
+    template.detectChanges = () => {
+      tmpDetectChanges();
+
+      console.warn('detectChanges', id.toString());
+    };
+
+    this._items.set(id, { context: item, config: { template, handle: false } });
 
     this._history = [];
     this.pushToHistory();
@@ -149,6 +165,34 @@ export class KcGridService {
 
     // TODO: implement logic to check if the item is out of the grid
     return id;
+  }
+
+  handle(id: symbol): void {
+    const item = this._items.get(id);
+
+    if (!item) return;
+
+    item.config.handle = true;
+
+    this.preview.render(id, item.context, GridEventType.Capture);
+  }
+
+  release(id: symbol): void {
+    const item = this._items.get(id);
+
+    if (!item) return;
+
+    item.config.handle = false;
+
+    this.preview.render(id, item.context, GridEventType.Release);
+
+    this._rerenderItem(item!.config.template, item!.context);
+
+    this.pushToHistory();
+    this.updateGrid();
+    this._changes.next([...this._items.values()]);
+
+    this.render();
   }
 
   delete(id: symbol): void {
@@ -160,7 +204,7 @@ export class KcGridService {
     this._items.delete(id);
     this.pushToHistory();
 
-    item.template.destroy();
+    item.config.template.destroy();
   }
 
   private _checkIsKcGridItem(
@@ -206,7 +250,7 @@ export class KcGridService {
       return false;
     }
 
-    this.renderPreview(id, change, GridEventType.Move);
+    this.preview.render(id, change, GridEventType.Move);
 
     // TODO: change this
     const itemM = this._items.get(id);
@@ -214,19 +258,13 @@ export class KcGridService {
     // this._items.set(id, item);
     itemM!.context = change;
 
-    this._rerenderItem(itemM!.template, item);
+    this._addFromMatrix(id, change);
+
+    // this._rerenderItem(itemM!.config.template, item);
 
     this.render();
 
     return true;
-  }
-
-  drop(): void {
-    this.pushToHistory();
-    this.updateGrid();
-    this.render();
-
-    this._changes.next([...this._items.values()]);
   }
 
   private _lastResizeItem: ({ id: symbol } & KcGridItemContext) | null = null;
@@ -250,7 +288,7 @@ export class KcGridService {
     const direction = getDirection(last.context, item);
 
     // TODO: change this
-    this._lastResizeItem = { id, context: item, template: last.template };
+    this._lastResizeItem = { id, context: item, config: last.config };
 
     const tmpItems = this._cloneItems(this._items);
 
@@ -262,7 +300,7 @@ export class KcGridService {
     this._removeFromMatrix(id);
 
     if (!direction) {
-      this.renderPreview(id, item, GridEventType.Move);
+      this.preview.render(id, item, GridEventType.Move);
       return false;
     }
 
@@ -276,7 +314,7 @@ export class KcGridService {
       return false;
     }
 
-    this.renderPreview(id, item, GridEventType.Move);
+    this.preview.render(id, item, GridEventType.Move);
 
     // TODO: change this
     const itemM = this._items.get(id);
@@ -284,7 +322,10 @@ export class KcGridService {
     // this._items.set(id, item);
     itemM!.context = item;
 
-    this._rerenderItem(itemM!.template, item);
+    this.updateGrid();
+    this._addFromMatrix(id, item);
+
+    // this._rerenderItem(itemM!.config.template, item);
 
     this.render();
 
@@ -402,7 +443,7 @@ export class KcGridService {
 
     item.col -= shift;
 
-    const template = this._items.get(id)!.template;
+    const template = this._items.get(id)!.config.template;
 
     this._rerenderItem(template, item);
 
@@ -425,7 +466,7 @@ export class KcGridService {
 
     item.col += shift;
 
-    const template = this._items.get(id)!.template;
+    const template = this._items.get(id)!.config.template;
 
     this._rerenderItem(template, item);
 
@@ -448,7 +489,7 @@ export class KcGridService {
 
     item.row -= shift;
 
-    const template = this._items.get(id)!.template;
+    const template = this._items.get(id)!.config.template;
 
     this._rerenderItem(template, item);
 
@@ -471,7 +512,7 @@ export class KcGridService {
 
     item.row += shift;
 
-    const template = this._items.get(id)!.template;
+    const template = this._items.get(id)!.config.template;
 
     this._rerenderItem(template, item);
 
@@ -487,20 +528,20 @@ export class KcGridService {
 
     const context1 = { ...item1.context };
     const context2 = { ...item2.context };
-    const template1 = item1.template;
-    const template2 = item2.template;
+    const config1 = item1.config;
+    const config2 = item2.config;
 
-    this._items.set(id1, { context: context2, template: template1 });
-    this._items.set(id2, { context: context1, template: template2 });
+    this._items.set(id1, { context: context2, config: config1 });
+    this._items.set(id2, { context: context1, config: config2 });
 
     item1 = this._items.get(id1)!;
     item2 = this._items.get(id2)!;
 
-    // this._addFromMatrix(id1, item1.context);
+    this._addFromMatrix(id1, item1.context);
     this._addFromMatrix(id2, item2.context);
 
     // this._rerenderItem(item1.template, item1.context);
-    this._rerenderItem(item2.template, item2.context);
+    // this._rerenderItem(item2.config.template, item2.context);
 
     return item1.context;
   }
@@ -523,9 +564,57 @@ export class KcGridService {
     }
   }
 
+  get hasUndo(): boolean {
+    return this._hasUndo.value;
+  }
+
+  get hasRedo(): boolean {
+    return this._hasRedo.value;
+  }
+
+  undo() {
+    if (this._history.length === 1) return;
+
+    const item = this._history.pop();
+    this._redo.push(item!);
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
+
+    this.restoreFromHistory();
+    this.updateGrid();
+    this.render();
+  }
+
+  redo() {
+    if (this._redo.length === 0) return;
+
+    const item: Map<symbol, KcGridItemContext> = this._redo.pop()!;
+
+    this._history[this._history.length - 1].forEach((tst, id) => {
+      if (item.has(id)) return;
+      console.log('destory', id);
+
+      tst.config.template.destroy();
+    });
+
+    this._history.push(item!);
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
+
+    this.restoreFromHistory();
+    this.updateGrid();
+    this.render();
+  }
+
   pushToHistory(): void {
     const items = this._cloneItems(this._items);
     this._history.push(items);
+    this._redo = [];
+
+    this._hasUndo.next(this._history.length > 1);
+    this._hasRedo.next(this._redo.length > 0);
   }
 
   restoreFromHistory(): void {
@@ -547,25 +636,22 @@ export class KcGridService {
   }
 
   render() {
-    this._items.forEach((item) => this._rerenderItem(item.template, item.context));
-    this._cdr.detectChanges();
-  }
+    this._items.forEach((item, id) => {
+      // render the item in redo logic if the item is deleted
+      if (item.config.template.destroyed) {
+        console.log('render', id);
+        const template = this._itemDirective.render(id, item.context);
 
-  renderPreview(id: symbol, item: KcGridItem, event: GridEventType) {
-    this.preview.context.id = id;
-    this.preview.context.$implicit = item;
-    this.preview.context.event = event;
+        item.config.template = template;
+      }
 
-    this._rerenderItem(this.preview, item);
-  }
+      // skip rerendering the item if it's already rendered
+      if (item.config.handle || this._checkIsEqual(item.context, item.config.template.context.$implicit)) return;
 
-  back() {
-    if (this._history.length === 1) return;
+      this._rerenderItem(item.config.template, item.context);
+    });
 
-    this._history.pop();
-    this.restoreFromHistory();
-    this.updateGrid();
-    this.render();
+    // this._cdr.detectChanges();
   }
 
   // search empty space for a new item with the given size rows and cols
@@ -593,7 +679,7 @@ export class KcGridService {
 
   private _cloneItems(items: Map<symbol, KcGridItemContext>): Map<symbol, KcGridItemContext> {
     return new Map(
-      [...items.entries()].map(([key, item]) => [key, { context: { ...item.context }, template: item.template }]),
+      [...items.entries()].map(([key, item]) => [key, { context: { ...item.context }, config: item.config }]),
     );
   }
 
@@ -603,12 +689,16 @@ export class KcGridService {
   ) {
     template.context.$implicit = {
       ...template.context.$implicit,
-      ...(col !== undefined && { col }),
-      ...(row !== undefined && { row }),
-      ...(cols !== undefined && { cols }),
-      ...(rows !== undefined && { rows }),
+      col,
+      row,
+      cols,
+      rows,
     };
 
     template.detectChanges();
+  }
+
+  private _checkIsEqual(item1: KcGridItem, item2: KcGridItem): boolean {
+    return item1.col === item2.col && item1.row === item2.row && item1.cols === item2.cols && item1.rows === item2.rows;
   }
 }

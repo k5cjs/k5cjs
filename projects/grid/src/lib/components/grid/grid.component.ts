@@ -10,12 +10,19 @@ import {
   OnInit,
   Output,
   ViewChild,
+  ViewContainerRef,
   forwardRef,
   inject,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { GridDirective, GridItemDirective, PreviewDirective, ScrollDirective } from '../../directives';
+import {
+  BackgroundDirective,
+  GridDirective,
+  GridItemDirective,
+  PreviewDirective,
+  ScrollDirective,
+} from '../../directives';
 import { KcGridService } from '../../services';
 import { GridEventType, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
@@ -77,21 +84,21 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
   @Output() readonly changes = new EventEmitter<KcGridItems<T>>();
 
-  @ViewChild('gridRef', { static: true }) containerElementRef!: ElementRef<HTMLElement>;
   @ViewChild('content', { static: true }) contentElementRef!: ElementRef<HTMLElement>;
   @ViewChild('items', { static: true }) itemsElementRef!: ElementRef<HTMLElement>;
 
   @ViewChild(GridDirective, { static: true }) gridElement!: GridDirective;
-  @ViewChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
+  @ContentChild(PreviewDirective, { static: true }) preview!: PreviewDirective;
 
   @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<T>;
+  @ContentChild(BackgroundDirective, { static: true }) background?: GridItemDirective;
 
   colsTotalGaps!: number;
   rowsTotalGaps!: number;
 
+  containerElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   grid = inject(KcGridService);
 
-  private _cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
   private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
@@ -102,12 +109,6 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     this.colsTotalGaps = this._colsTotalGaps();
     this.rowsTotalGaps = this._rowsTotalGaps();
 
-    const preview = this.preview.render(
-      Symbol('default'),
-      { col: 0, row: 0, cols: 0, rows: 0 },
-      GridEventType.AfterAddRows,
-    );
-
     this.grid.init({
       cols: this.cols,
       rows: this.rows,
@@ -115,11 +116,10 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       rowsGaps: this.rowsGaps,
       cellWidth: 100,
       cellHeight: 100,
-      preview,
+      preview: this.preview,
       itemDirective: this.gridElement,
       scrollTop: this.containerElementRef.nativeElement.scrollTop,
       scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
-      changeDetectorRef: this._cdr,
     });
 
     this.items.forEach((item) => this.grid.add(item, { emitEvent: false }));

@@ -1,0 +1,17 @@
+.button {
+  @apply
+    p-1
+    bg-white
+    border-slate-300
+    text-slate-900
+    border
+    rounded
+    select-none
+    cursor-move;
+
+  &__icon {
+    @apply
+      w-5
+      h-5;
+  }
+}

@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, NgZone, inject } from '@angular/core';
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
 import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
@@ -30,56 +30,67 @@ export abstract class ResizeDirective {
   protected _item = inject(ITEM_COMPONENT);
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  private _ng = inject(NgZone);
+
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
     // TODO: add logic in move to stop if is resizing
     e.stopPropagation();
 
+    this._grid.handle(this.id);
+
     this._isMouseDown = true;
-    this._item.skip = true;
+    // this._item.skip = true;
 
     this._setCellPositionAndSize();
     this._setMouseOffset(e);
 
-    this._grid.emit(
-      this.id,
-      {
-        col: this.item.col,
-        row: this.item.row,
-        cols: this.item.cols,
-        rows: this.item.rows,
-      },
-      GridEventType.Capture,
-    );
+    // this._grid.emit(
+    //   this.id,
+    //   {
+    //     col: this.item.col,
+    //     row: this.item.row,
+    //     cols: this.item.cols,
+    //     rows: this.item.rows,
+    //   },
+    //   GridEventType.Capture,
+    // );
 
-    document.addEventListener('mousemove', this._onMouseMoveRef);
+    this._grid.editing = true;
+
+    this._ng.runOutsideAngular(() => {
+      document.addEventListener('mousemove', this._onMouseMoveRef);
+    });
   }
 
-  // use the global mouseup event to prevent when the mouse is outside the element
-  // while the user is quickly resizing the element
-  @HostListener('window:mouseup', ['$event'])
+  @HostListener('mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
     if (!this._isMouseDown) return;
 
     e.preventDefault();
 
     this._isMouseDown = false;
-    this._item.skip = false;
-    document.removeEventListener('mousemove', this._onMouseMoveRef);
+    // this._item.skip = false;
 
-    this._grid.drop();
+    this._grid.release(this.id);
 
-    this._grid.emit(
-      this.id,
-      {
-        col: this.item.col,
-        row: this.item.row,
-        cols: this.item.cols,
-        rows: this.item.rows,
-      },
-      GridEventType.Release,
-    );
+    this._ng.runOutsideAngular(() => {
+      document.removeEventListener('mousemove', this._onMouseMoveRef);
+    });
+
+    // this._grid.emit(
+    //   this.id,
+    //   {
+    //     col: this.item.col,
+    //     row: this.item.row,
+    //     cols: this.item.cols,
+    //     rows: this.item.rows,
+    //   },
+    //   GridEventType.Release,
+    // );
+
+    this._grid.editing = false;
   }
 
   protected abstract _onMouseMove(e: MouseEvent): void;

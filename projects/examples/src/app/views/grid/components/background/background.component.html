@@ -1,0 +1,9 @@
+<div class="cells" [class.cells--show]="isEditing$ | async">
+  <div
+    *ngFor="let cell of cells"
+    [style.width]="cell.width"
+    [style.height]="cell.height"
+    [style.transform]="cell.transform"
+    class="cells__cell"
+  ></div>
+</div>

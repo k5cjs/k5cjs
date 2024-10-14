@@ -1,0 +1,33 @@
+:host {
+  @apply
+    flex
+    justify-center
+    absolute
+    -bottom-1.5
+    right-0
+    left-0;
+
+  &::before {
+    @apply
+      content-['']
+      absolute
+      top-1.5
+      left-0
+      w-full
+      h-px
+      bg-blue-500
+      rounded-md;
+  }
+}
+
+.handle {
+  @apply
+    w-10
+    h-3
+    border-2
+    bg-white
+    border-blue-500
+    rounded-md
+    z-10
+    cursor-row-resize;
+}

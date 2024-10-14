@@ -1,0 +1,68 @@
+:host {
+  @apply
+    flex
+    flex-col
+    h-screen
+    overflow-hidden
+    bg-slate-200;
+}
+
+.grid {
+  @apply
+    px-5;
+
+  &__preview {
+    @apply
+      absolute
+      top-0
+      left-0
+      rounded-md
+      bg-red-500/25;
+  }
+
+  &__item {
+    @apply
+      w-full
+      h-full
+      p-2
+      rounded-md
+      shadow
+      bg-white
+      overflow-auto;
+  }
+
+  &__item:hover &__move,
+  &__item:hover &__delete,
+  &__item:hover &__resize {
+    @apply
+      opacity-100;
+  }
+
+  &__move,
+  &__delete,
+  &__resize {
+    @apply
+      transition-opacity
+      duration-300
+      opacity-0;
+  }
+
+  &__move {
+    @apply
+      absolute
+      top-3
+      right-3;
+  }
+
+  &__delete {
+    @apply
+      absolute
+      top-3
+      right-12;
+  }
+}
+
+.header, .footer {
+  @apply
+    p-5;
+}

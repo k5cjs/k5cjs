@@ -40,7 +40,7 @@ export class ResizeLeftDirective extends ResizeDirective {
     this._x = x;
     this._width = width;
 
-    this.item.col = col;
-    this.item.cols = cols;
+    // this.item.col = col;
+    // this.item.cols = cols;
   }
 }

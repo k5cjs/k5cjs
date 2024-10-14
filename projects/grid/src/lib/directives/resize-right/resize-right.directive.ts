@@ -39,6 +39,6 @@ export class ResizeRightDirective extends ResizeDirective {
 
     this._width = width;
 
-    this.item.cols = cols;
+    // this.item.cols = cols;
   }
 }

@@ -1,27 +1,41 @@
-<div #gridRef class="grid">
-  <div #content>
-    <ng-content select="[header]"></ng-content>
-    <!-- [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
-    <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
-      <kc-grid-lines [scale]="scale" />
+<div #content>
+  <ng-content select="[header]"></ng-content>
 
-      <kc-grid-preview *kcGridPreview="let item; event as event" [item]="item" [event]="event" [scale]="scale">
-        <div>id: {{ item.id }}</div>
-        <div>col: {{ item.col }}</div>
-        <div>row: {{ item.row }}</div>
-      </kc-grid-preview>
+  <div
+    #items
+    class="grid__items"
+    [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale"
+    [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale"
+  >
+    <!-- <div -->
+    <!--   #items -->
+    <!--   class="grid__items" -->
+    <!--   [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale" -->
+    <!-- > -->
+    <ng-container *ngIf="background">
+      <ng-container
+        *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows, cols, colsGaps, rowsGaps } }"
+      />
+    </ng-container>
 
-      <kc-grid-item
-        *kcGrid="let item; id as id"
-        [id]="id"
-        [item]="item"
-        [scale]="scale"
-        [gridRef]="items"
-        [gridItem]="gridItem"
-        class="grid__item"
-      ></kc-grid-item>
-    </div>
+    <ng-content></ng-content>
 
-    <ng-content select="[footer]"></ng-content>
+    <!-- <kc-grid-preview *kcGridPreview="let item; event as event" [item]="item" [event]="event" [scale]="scale"> -->
+    <!--   <div>id: {{ item.id }}</div> -->
+    <!--   <div>col: {{ item.col }}</div> -->
+    <!--   <div>row: {{ item.row }}</div> -->
+    <!-- </kc-grid-preview> -->
+
+    <kc-grid-item
+      *kcGrid="let item; id as id"
+      [id]="id"
+      [item]="item"
+      [scale]="scale"
+      [gridRef]="items"
+      [gridItem]="gridItem"
+      class="grid__item"
+    ></kc-grid-item>
   </div>
+
+  <ng-content select="[footer]"></ng-content>
 </div>

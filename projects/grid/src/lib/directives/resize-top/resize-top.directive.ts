@@ -40,7 +40,7 @@ export class ResizeTopDirective extends ResizeDirective {
     this._y = y;
     this._height = height;
 
-    this.item.row = row;
-    this.item.rows = rows;
+    // this.item.row = row;
+    // this.item.rows = rows;
   }
 }

@@ -46,7 +46,7 @@ export class ResizeBottomRightDirective extends ResizeDirective {
     this._width = width;
     this._height = height;
 
-    this.item.cols = cols;
-    this.item.rows = rows;
+    // this.item.cols = cols;
+    // this.item.rows = rows;
   }
 }

@@ -1,0 +1,37 @@
+:host {
+  @apply
+    flex
+    items-center
+    m-2
+    py-2
+    px-3
+    bg-white
+    shadow-md
+    rounded-md;
+}
+
+.button {
+  @apply
+    select-none;
+
+  &:disabled {
+    @apply
+      cursor-not-allowed
+      opacity-50;
+  }
+
+  &__icon {
+    @apply
+      w-6
+      h-6;
+  }
+}
+
+.bar {
+  @apply
+    w-px
+    h-6
+    mx-3
+    rounded
+    bg-slate-300;
+}

@@ -43,6 +43,7 @@ export class MoveDirective {
   private _requestAnimationFrameId!: number;
 
   // add variable to save cols when mouse is down
+  // to prevent to change size when the item is swapped
   private _startCols = 0;
   private _startRows = 0;
 
@@ -53,10 +54,12 @@ export class MoveDirective {
     // TODO: add logic in move to stop if is resizing
     e.stopPropagation();
 
+    this._grid.handle(this.id);
+
     const { x, y } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
     this.isMouseDown = true;
-    this._item.skip = true;
+    // this._item.skip = true;
 
     const mouseX = e.clientX;
     const mouseY = e.clientY;
@@ -67,50 +70,52 @@ export class MoveDirective {
     this._setFixedSize(this._item.elementRef.nativeElement);
     this._animation?.cancel();
 
-    this._grid.emit(
-      this.id,
-      {
-        col: this.item.col,
-        row: this.item.row,
-        cols: this.item.cols,
-        rows: this.item.rows,
-      },
-      GridEventType.Capture,
-    );
+    // this._grid.emit(
+    //   this.id,
+    //   {
+    //     col: this.item.col,
+    //     row: this.item.row,
+    //     cols: this.item.cols,
+    //     rows: this.item.rows,
+    //   },
+    //   GridEventType.Capture,
+    // );
 
     this._startCols = this.item.cols;
     this._startRows = this.item.rows;
 
+    this._grid.editing = true;
+
     document.addEventListener('mousemove', this.onMouseMove);
   }
 
-  /**
-   * use event from window to avoid losing the mouseup event when the mouse is out of the item
-   */
-  @HostListener('window:mouseup', ['$event'])
+  @HostListener('mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
     if (!this.isMouseDown) return;
 
     e.preventDefault();
 
     this.isMouseDown = false;
-    this._item.skip = false;
+    // this._item.skip = false;
+
+    this._grid.release(this.id);
 
     document.removeEventListener('mousemove', this.onMouseMove);
 
-    this._grid.isItemsMoving = false;
-    this._grid.drop();
+    this._grid.isItemScrolling = false;
 
-    this._grid.emit(
-      this.id,
-      {
-        col: this.item.col,
-        row: this.item.row,
-        cols: this.item.cols,
-        rows: this.item.rows,
-      },
-      GridEventType.Release,
-    );
+    // this._grid.emit(
+    //   this.id,
+    //   {
+    //     col: this.item.col,
+    //     row: this.item.row,
+    //     cols: this.item.cols,
+    //     rows: this.item.rows,
+    //   },
+    //   GridEventType.Release,
+    // );
+
+    this._grid.editing = false;
   }
 
   protected _onMouseMove(e: MouseEvent): void {
@@ -151,8 +156,8 @@ export class MoveDirective {
     /**
      * save the last position when the movement is possible
      */
-    this.item.col = col;
-    this.item.row = row;
+    // this.item.col = col;
+    // this.item.row = row;
   }
 
   private _render() {
@@ -241,14 +246,14 @@ export class MoveDirective {
     if (y < 0) {
       const percent = Math.abs(y) / (height * this.item.rows);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseY = -speed;
     } else if (mouseYContainer > this._gridTemplate.containerElementRef.nativeElement.clientHeight) {
       const offset = mouseYContainer - this._gridTemplate.containerElementRef.nativeElement.clientHeight;
       const percent = offset / (height * this.item.rows);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseY = speed;
     }
@@ -256,14 +261,14 @@ export class MoveDirective {
     if (x < 0) {
       const percent = Math.abs(x) / (width * this.item.cols);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseX = -speed;
     } else if (mouseXContainer > this._gridTemplate.containerElementRef.nativeElement.clientWidth) {
       const offset = mouseXContainer - this._gridTemplate.containerElementRef.nativeElement.clientWidth;
       const percent = offset / (width * this.item.cols);
 
-      const speed = Math.round(20 * percent);
+      const speed = Math.round(50 * percent);
 
       increaseX = speed;
     }
@@ -281,12 +286,19 @@ export class MoveDirective {
     const scrollWidth = this._gridTemplate.containerElementRef.nativeElement.clientWidth + this._grid.scrollLeft;
     const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
 
+    // console.log({
+    //   scrollWidth,
+    //   contentWidth,
+    //   increaseX,
+    //   scrollLeft: this._grid.scrollLeft,
+    // });
+
     // add new column if scroll is at the right
     if (scrollWidth + increaseX > contentWidth) {
       const remainingWidth = contentWidth - scrollWidth;
 
       if (remainingWidth > 0) {
-        increaseX = remainingWidth;
+        // increaseX = remainingWidth;
       } else {
         console.error('add new column');
         // this.grid.cols += 1;
@@ -300,30 +312,37 @@ export class MoveDirective {
     const scrollHeight = this._gridTemplate.containerElementRef.nativeElement.clientHeight + this._grid.scrollTop;
     const contentHeight = this._gridTemplate.contentElementRef.nativeElement.offsetHeight;
 
+    // console.log({
+    //   scrollHeight,
+    //   contentHeight,
+    //   increaseY,
+    //   scrollTop: this._grid.scrollTop,
+    // });
+
     let temp: number | undefined;
 
     // add new row if scroll is at the bottom
     if (scrollHeight + increaseY > contentHeight - 500) {
-      // const remainingHeight = contentHeight - scrollHeight;
+      const remainingHeight = contentHeight - scrollHeight;
 
-      // if (remainingHeight > 0) {
-      //   temp = increaseY;
-      //   increaseY = remainingHeight;
-      // } else {
-      console.warn('add new row');
+      if (remainingHeight > 0) {
+        // temp = increaseY;
+        // increaseY = remainingHeight;
+      } else {
+        console.error('add new row');
 
-      this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
-
-      this._grid.rows += 8;
-      this._grid.rows += 8;
-      this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
-      // this._grid.rowsTotalGaps = this._rowsTotalGaps();
-
-      // this._cdr.detectChanges();
-
-      this._scroll(increaseX, temp || increaseY);
-      return;
-      // }
+        // this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
+        //
+        // this._grid.rows += 8;
+        // this._grid.rows += 8;
+        // this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
+        // // this._grid.rowsTotalGaps = this._rowsTotalGaps();
+        //
+        // // this._cdr.detectChanges();
+        //
+        // this._scroll(increaseX, temp || increaseY);
+        return;
+      }
     }
 
     this._requestAnimationFrameId = requestAnimationFrame(() => {
@@ -335,7 +354,7 @@ export class MoveDirective {
 
       this._render();
 
-      this._grid.isItemsMoving = true;
+      this._grid.isItemScrolling = true;
 
       this._gridTemplate.containerElementRef.nativeElement.scrollTo({
         left: this._grid.scrollLeft,

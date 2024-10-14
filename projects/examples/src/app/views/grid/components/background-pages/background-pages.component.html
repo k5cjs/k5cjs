@@ -1,0 +1,15 @@
+<div
+  *ngFor="let page of pages;"
+  [style.height]="page.height"
+  [style.width]="page.width"
+  [style.transform]="page.transform"
+  class="page"
+></div>
+
+<div
+  *ngFor="let cell of cells"
+  [style.width]="cell.width"
+  [style.height]="cell.height"
+  [style.transform]="cell.transform"
+  class="cell"
+></div>

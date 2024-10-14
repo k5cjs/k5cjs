@@ -6,6 +6,7 @@ import {
   GridDirective,
   GridItemDirective,
   PreviewDirective,
+  PreviewStyleDirective,
   MoveDirective,
   ResizeBottomDirective,
   ResizeBottomLeftDirective,
@@ -15,6 +16,7 @@ import {
   ResizeTopDirective,
   ResizeTopLeftDirective,
   ResizeTopRightDirective,
+  BackgroundDirective,
 } from './directives';
 
 const externalDirectives: Type<unknown>[] = [
@@ -28,6 +30,9 @@ const externalDirectives: Type<unknown>[] = [
   ResizeBottomDirective,
   ResizeBottomLeftDirective,
   ResizeBottomRightDirective,
+  BackgroundDirective,
+  PreviewDirective,
+  PreviewStyleDirective,
 ];
 
 const internalDirectives: Type<unknown>[] = [];
@@ -39,7 +44,6 @@ const internalDirectives: Type<unknown>[] = [];
     GridItemDirective,
     ItemComponent,
     PreviewComponent,
-    PreviewDirective,
     LinesComponent,
     ...internalDirectives,
     ...externalDirectives,

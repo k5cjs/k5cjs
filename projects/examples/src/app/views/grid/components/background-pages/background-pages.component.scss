@@ -1,0 +1,22 @@
+:host {
+  @apply
+    absolute
+    inset-0;
+}
+
+.cell {
+  @apply
+    absolute
+    border
+    bg-slate-100
+    rounded-md;
+}
+
+.page {
+  @apply
+    absolute
+    w-full
+    rounded
+    shadow-md
+    bg-white;
+}

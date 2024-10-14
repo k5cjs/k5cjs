@@ -1,0 +1,20 @@
+:host {
+  @apply
+    flex
+    items-center
+    absolute
+    -bottom-1.5
+    -left-1.5;
+}
+
+.handle {
+  @apply
+    w-3
+    h-3
+    border-2
+    bg-white
+    border-blue-500
+    rounded
+    z-10
+    cursor-sw-resize;
+}

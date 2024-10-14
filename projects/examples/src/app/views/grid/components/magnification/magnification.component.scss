@@ -1,0 +1,18 @@
+:host {
+  @apply
+    flex
+    items-center
+    gap-2
+    text-slate-900;
+}
+
+.button {
+  @apply
+    select-none;
+
+  &__icon {
+    @apply
+      w-6
+      h-6;
+  }
+}

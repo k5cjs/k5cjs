@@ -11,5 +11,8 @@ export const enum GridEventType {
 
 export interface KcGridItemContext<T = void> {
   context: KcGridItem<T>;
-  template: EmbeddedViewRef<{ $implicit: KcGridItem<T>; id: symbol }>;
+  config: {
+    template: EmbeddedViewRef<{ $implicit: KcGridItem<T>; id: symbol }>;
+    handle: boolean;
+  };
 }
