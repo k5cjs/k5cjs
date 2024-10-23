@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/grid",
-  "version": "1.0.0-alpha.6",
+  "version": "1.0.0-alpha.7",
   "peerDependencies": {
     "@angular/common": "^16.2.0",
     "@angular/core": "^16.2.0"
