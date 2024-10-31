@@ -1,4 +1,4 @@
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
   ChangeDetectionStrategy,
@@ -6,6 +6,7 @@ import {
   ContentChild,
   ElementRef,
   EventEmitter,
+  Input,
   OnDestroy,
   Output,
   ViewChild,
@@ -34,6 +35,7 @@ export class KcInternalDropdownComponent implements OnDestroy {
     backdropClass: 'cdk-overlay-transparent-backdrop',
   };
 
+  @Input() positions: ConnectedPosition[] = POSITIONS;
   @Output() dialogClosed = new EventEmitter<void>();
 
   constructor(private _overlay: Overlay) {}
@@ -56,7 +58,7 @@ export class KcInternalDropdownComponent implements OnDestroy {
       positionStrategy: this._overlay
         .position()
         .flexibleConnectedTo(this.icon)
-        .withPositions(POSITIONS)
+        .withPositions(this.positions)
         .withPush(false),
       ...this.cdkOverlayConfig,
     });
