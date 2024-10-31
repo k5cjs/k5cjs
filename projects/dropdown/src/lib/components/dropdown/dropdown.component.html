@@ -1,4 +1,4 @@
-<kc-internal-dropdown (dialogClosed)="emitClose()">
+<kc-internal-dropdown (dialogClosed)="emitClose()" [positions]="positions">
   <ng-container ngProjectAs="[icon]">
     <kc-dropdown-option-base>
       <ng-content select="[icon]"></ng-content>
