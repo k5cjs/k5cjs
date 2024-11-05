@@ -11,6 +11,7 @@ export class TestInjectorChildComponent {
   testInjector = inject(TEST_INJECTOR);
 
   constructor() {
+    // eslint-disable-next-line no-console
     console.log(this.testInjector);
   }
 }

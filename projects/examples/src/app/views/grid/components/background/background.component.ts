@@ -50,6 +50,7 @@ export class BackgroundComponent implements OnInit, OnChanges {
         cells.push({
           width: `calc((100cqw - ${gapsWidth}px) / ${this.data.cols})`,
           height: `calc((100cqh - ${gapsHeight}px) / ${this.data.rows})`,
+          // eslint-disable-next-line max-len
           transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
         });
 

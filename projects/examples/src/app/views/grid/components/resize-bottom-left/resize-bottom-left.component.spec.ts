@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResizeBottomRightComponent } from './resize-bottom-right.component';
+import { ResizeBottomLeftComponent } from './resize-bottom-left.component';
 
-describe('ResizeBottomRightComponent', () => {
-  let component: ResizeBottomRightComponent;
-  let fixture: ComponentFixture<ResizeBottomRightComponent>;
+describe('ResizeBottomLeftComponent', () => {
+  let component: ResizeBottomLeftComponent;
+  let fixture: ComponentFixture<ResizeBottomLeftComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ResizeBottomRightComponent],
+      imports: [ResizeBottomLeftComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ResizeBottomRightComponent);
+    fixture = TestBed.createComponent(ResizeBottomLeftComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

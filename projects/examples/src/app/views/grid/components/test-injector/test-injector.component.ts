@@ -1,4 +1,4 @@
-import { Component, InjectionToken, Injector, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
+import { Component, Injector, OnInit, ViewChild, ViewContainerRef, inject } from '@angular/core';
 
 import { TEST_INJECTOR } from '../../tokens';
 import { TestInjectorChildComponent } from '../test-injector-child/test-injector-child.component';

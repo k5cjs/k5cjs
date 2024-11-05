@@ -1,4 +1,3 @@
-/* eslint-disable @ngrx/good-action-hygiene */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
@@ -85,7 +84,7 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
 
     this.test += 1;
 
-    return throwError(() => 'errror');
+    return throwError(() => new Error('error'));
   }
 
   delete(
@@ -150,7 +149,6 @@ class StoreService extends StoreServiceBase<FeatureStoreType> {
 describe('Store', () => {
   let service: StoreService;
   let http: HttpService;
-  // eslint-disable-next-line @ngrx/no-typed-global-store
   let store: Store<{ [key]: StateBase<FeatureStoreType> }>;
 
   beforeEach(() => {

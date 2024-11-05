@@ -10,8 +10,8 @@ export class ResizeTopLeftDirective extends ResizeDirective {
 
     e.preventDefault();
 
-    let x = this._calcX(e) - this._mouseOffsetLeft;
-    let y = this._calcY(e) - this._mouseOffsetTop;
+    let x: number = this._calcX(e) - this._mouseOffsetLeft;
+    let y: number = this._calcY(e) - this._mouseOffsetTop;
 
     // if y is in the last row, then we equate y to the start of the last row plus one pixel
     if (y > this._y + this._height - this._cellHeight()) y = this._y + this._height - this._cellHeight() + 1;

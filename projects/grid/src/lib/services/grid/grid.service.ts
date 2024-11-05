@@ -186,7 +186,7 @@ export class KcGridService {
 
     this.preview.render(id, item.context, GridEventType.Release);
 
-    this._rerenderItem(item!.config.template, item!.context);
+    this._rerenderItem(item.config.template, item.context);
 
     this.pushToHistory();
     this.updateGrid();
@@ -202,7 +202,10 @@ export class KcGridService {
 
     this._removeFromMatrix(id);
     this._items.delete(id);
+
+    this._history = [];
     this.pushToHistory();
+    // this.pushToHistory();
 
     item.config.template.destroy();
   }
@@ -593,7 +596,6 @@ export class KcGridService {
 
     this._history[this._history.length - 1].forEach((tst, id) => {
       if (item.has(id)) return;
-      console.log('destory', id);
 
       tst.config.template.destroy();
     });
@@ -639,7 +641,6 @@ export class KcGridService {
     this._items.forEach((item, id) => {
       // render the item in redo logic if the item is deleted
       if (item.config.template.destroyed) {
-        console.log('render', id);
         const template = this._itemDirective.render(id, item.context);
 
         item.config.template = template;

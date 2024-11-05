@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { GridEventType, KcGridItem } from '../../types';
+import { KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
@@ -10,9 +10,6 @@ export class MoveDirective {
   @Input({ required: true }) item!: KcGridItem;
 
   id = inject(GRID_ITEM_ID);
-
-  isMouseDown = false;
-
   /**
    * actual position in grid (x, y) in pixels
    */
@@ -29,6 +26,7 @@ export class MoveDirective {
   mouseOffsetTop = 0;
 
   onMouseMove = this._onMouseMove.bind(this);
+  onMouseUp = this._onMouseUp.bind(this);
 
   protected _x = 0;
   protected _y = 0;
@@ -47,6 +45,14 @@ export class MoveDirective {
   private _startCols = 0;
   private _startRows = 0;
 
+  private _offsetLeft = 0;
+  private _offsetTop = 0;
+
+  private _parentOffsetLeft = 0;
+  private _parentOffsetTop = 0;
+
+  padding = { top: 0, right: 0, bottom: 0, left: 0 };
+
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
     e.preventDefault();
@@ -58,9 +64,6 @@ export class MoveDirective {
 
     const { x, y } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
-    this.isMouseDown = true;
-    // this._item.skip = true;
-
     const mouseX = e.clientX;
     const mouseY = e.clientY;
 
@@ -70,85 +73,62 @@ export class MoveDirective {
     this._setFixedSize(this._item.elementRef.nativeElement);
     this._animation?.cancel();
 
-    // this._grid.emit(
-    //   this.id,
-    //   {
-    //     col: this.item.col,
-    //     row: this.item.row,
-    //     cols: this.item.cols,
-    //     rows: this.item.rows,
-    //   },
-    //   GridEventType.Capture,
-    // );
-
     this._startCols = this.item.cols;
     this._startRows = this.item.rows;
 
+    this._offsetLeft = this._gridTemplate.itemsElementRef.nativeElement.offsetLeft;
+    this._offsetTop = this._gridTemplate.itemsElementRef.nativeElement.offsetTop;
+
+    this._parentOffsetLeft = this._calculateOffsetLeft(this._gridTemplate.itemsElementRef.nativeElement);
+    this._parentOffsetTop = this._calculateOffsetTop(this._gridTemplate.itemsElementRef.nativeElement);
+
     this._grid.editing = true;
 
+    const style = getComputedStyle(this._gridTemplate.containerElementRef.nativeElement);
+
+    this.padding.top = parseFloat(style.paddingTop);
+    this.padding.right = parseFloat(style.paddingRight);
+    this.padding.bottom = parseFloat(style.paddingBottom);
+    this.padding.left = parseFloat(style.paddingLeft);
+
     document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
   }
 
-  @HostListener('mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
-    if (!this.isMouseDown) return;
-
     e.preventDefault();
-
-    this.isMouseDown = false;
-    // this._item.skip = false;
 
     this._grid.release(this.id);
 
     document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
+
+    cancelAnimationFrame(this._requestAnimationFrameId);
 
     this._grid.isItemScrolling = false;
-
-    // this._grid.emit(
-    //   this.id,
-    //   {
-    //     col: this.item.col,
-    //     row: this.item.row,
-    //     cols: this.item.cols,
-    //     rows: this.item.rows,
-    //   },
-    //   GridEventType.Release,
-    // );
 
     this._grid.editing = false;
   }
 
   protected _onMouseMove(e: MouseEvent): void {
-    if (!this.isMouseDown) return;
-
     e.preventDefault();
 
-    const itemOffsetLeft =
-      e.clientX - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft - this.mouseOffsetLeft; // px
-    this._x = itemOffsetLeft + this._grid.scrollLeft;
+    const mouseX = e.clientX - this.mouseOffsetLeft - this._parentOffsetLeft;
+    this._x = mouseX - this._offsetLeft + this._grid.scrollLeft;
 
-    const itemOffsetTop = e.clientY - this._gridTemplate.itemsElementRef.nativeElement.offsetTop - this.mouseOffsetTop; // px
-    this._y = itemOffsetTop + this._grid.scrollTop;
-
-    const col = this._col();
-    const row = this._row();
+    const mouseY = e.clientY - this.mouseOffsetTop - this._parentOffsetTop;
+    this._y = mouseY - this._offsetTop + this._grid.scrollTop;
 
     this._render();
 
     this._move({
-      x: itemOffsetLeft,
-      y: itemOffsetTop,
+      x: mouseX,
+      y: mouseY,
       width: this._item.elementRef.nativeElement.offsetWidth,
       height: this._item.elementRef.nativeElement.offsetHeight,
     });
 
-    const allowToMove = this._grid.move(this.id, {
-      col,
-      row,
-      cols: this._startCols,
-      rows: this._startRows,
-    });
-
+    const allowToMove = this._updateGrid();
     /**
      * skip if movement is not possible
      */
@@ -168,6 +148,192 @@ export class MoveDirective {
     element.style.transform = `translate(${this._x}px, ${this._y}px)`;
     element.style.zIndex = `999`;
     element.style.backgroundColor = 'green';
+  }
+
+  private _setFixedSize(element: HTMLElement): void {
+    const width = element.offsetWidth;
+    const height = element.offsetHeight;
+    const style = getComputedStyle(element).transform;
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [, left] = /([-\d.]+), [-\d.]+\)/.exec(style)!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [, top] = /([-\d.]+)\)/.exec(style)!;
+
+    element.style.width = `${width}px`;
+    element.style.height = `${height}px`;
+
+    element.style.transform = `translate(${left}px, ${top}px)`;
+  }
+
+  private _move({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
+    /**
+     * cancel previous requestAnimationFrame
+     * because we want to start new one that will to current position
+     */
+    cancelAnimationFrame(this._requestAnimationFrameId);
+
+    const mouseXContainer = x + width;
+    const mouseYContainer = y + height;
+
+    let increaseX = 0;
+    let increaseY = 0;
+
+    if (x < 0) {
+      const percent = Math.abs(x) / (width * this.item.cols);
+
+      const speed = Math.round(10 * percent);
+
+      increaseX = -speed;
+    } else if (mouseXContainer > this._gridTemplate.containerElementRef.nativeElement.clientWidth) {
+      const offset = mouseXContainer - this._gridTemplate.containerElementRef.nativeElement.clientWidth;
+      const percent = offset / (width * this.item.cols);
+
+      const speed = Math.round(10 * percent);
+
+      increaseX = speed;
+    }
+
+    if (y < 0) {
+      const percent = Math.abs(y) / (height * this.item.rows);
+
+      const speed = Math.round(50 * percent);
+
+      increaseY = -speed;
+    } else if (mouseYContainer > this._gridTemplate.containerElementRef.nativeElement.clientHeight) {
+      const offset = mouseYContainer - this._gridTemplate.containerElementRef.nativeElement.clientHeight;
+      const percent = offset / (height * this.item.rows);
+
+      const speed = Math.round(50 * percent);
+
+      increaseY = speed;
+    }
+
+    this._scroll(increaseX, increaseY);
+  }
+
+  private _scroll(increaseX: number, increaseY: number): void {
+    if (increaseX === 0 && increaseY === 0) return;
+
+    if (this._grid.scrollLeft + increaseX <= 0) increaseX = 0;
+
+    if (this._grid.scrollTop + increaseY <= 0) increaseY = 0;
+
+    const scrollWidth =
+      this._gridTemplate.containerElementRef.nativeElement.clientWidth -
+      this.padding.left -
+      this.padding.right +
+      this._grid.scrollLeft;
+    const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
+
+    let temp: number | undefined;
+
+    // add new column if scroll is at the right
+    if (scrollWidth + increaseX > contentWidth) {
+      const remainingWidth = contentWidth - scrollWidth;
+
+      if (remainingWidth > 0) {
+        temp = increaseX;
+        increaseX = remainingWidth;
+      } else {
+        console.error('add new column');
+        // this.grid.cols += 1;
+        // this._cdr.detectChanges();
+        //
+        // this._scroll(temp || increaseX, increaseY)
+        return;
+      }
+    }
+
+    const scrollHeight =
+      this._gridTemplate.containerElementRef.nativeElement.clientHeight -
+      this.padding.top -
+      this.padding.bottom +
+      this._grid.scrollTop;
+    const contentHeight = this._gridTemplate.contentElementRef.nativeElement.offsetHeight;
+
+    // add new row if scroll is at the bottom
+    if (scrollHeight + increaseY > contentHeight) {
+      const remainingHeight = contentHeight - scrollHeight;
+
+      if (remainingHeight > 0) {
+        temp = increaseY;
+        increaseY = remainingHeight;
+      } else {
+        console.error('add new row');
+
+        // this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
+        //
+        // this._grid.rows += 8;
+        // this._grid.rows += 8;
+        // this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
+        // // this._grid.rowsTotalGaps = this._rowsTotalGaps();
+        //
+        // // this._cdr.detectChanges();
+        //
+        // this._scroll(increaseX, temp || increaseY);
+        return;
+      }
+    }
+
+    this._requestAnimationFrameId = requestAnimationFrame(() => {
+      this._grid.scrollLeft += increaseX;
+      this._grid.scrollTop += increaseY;
+
+      this._x += increaseX;
+      this._y += increaseY;
+
+      this._render();
+      this._updateGrid();
+
+      this._grid.isItemScrolling = true;
+
+      this._gridTemplate.containerElementRef.nativeElement.scrollTo({
+        left: this._grid.scrollLeft,
+        top: this._grid.scrollTop,
+        behavior: 'instant',
+      });
+
+      this._scroll(increaseX, temp || increaseY);
+    });
+  }
+
+  private _calculateOffsetLeft(element: HTMLElement): number {
+    let offsetLeft = 0;
+
+    let parent: Element | null = element.offsetParent;
+
+    while (parent && parent instanceof HTMLElement) {
+      offsetLeft += parent.offsetLeft;
+      parent = parent.offsetParent;
+    }
+
+    return offsetLeft;
+  }
+
+  private _calculateOffsetTop(element: HTMLElement): number {
+    let offsetTop = 0;
+
+    let parent: Element | null = element.offsetParent;
+
+    while (parent && parent instanceof HTMLElement) {
+      offsetTop += parent.offsetTop;
+      parent = parent.offsetParent;
+    }
+
+    return offsetTop;
+  }
+
+  private _updateGrid() {
+    const col = this._col();
+    const row = this._row();
+
+    return this._grid.move(this.id, {
+      col,
+      row,
+      cols: this._startCols,
+      rows: this._startRows,
+    });
   }
 
   private _col(): number {
@@ -212,157 +378,5 @@ export class MoveDirective {
     const cellHeight = gridHeight / this._grid.rows;
 
     return cellHeight;
-  }
-
-  private _setFixedSize(element: HTMLElement): void {
-    const width = element.offsetWidth;
-    const height = element.offsetHeight;
-    const style = getComputedStyle(element).transform;
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [, left] = /([-\d.]+), [-\d.]+\)/.exec(style)!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [, top] = /([-\d.]+)\)/.exec(style)!;
-
-    element.style.width = `${width}px`;
-    element.style.height = `${height}px`;
-
-    element.style.transform = `translate(${left}px, ${top}px)`;
-  }
-
-  private _move({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
-    /**
-     * cancel previous requestAnimationFrame
-     * because we want to start new one that will to current position
-     */
-    cancelAnimationFrame(this._requestAnimationFrameId);
-
-    const mouseYContainer = y + height;
-    const mouseXContainer = x + width;
-
-    let increaseX = 0;
-    let increaseY = 0;
-
-    if (y < 0) {
-      const percent = Math.abs(y) / (height * this.item.rows);
-
-      const speed = Math.round(50 * percent);
-
-      increaseY = -speed;
-    } else if (mouseYContainer > this._gridTemplate.containerElementRef.nativeElement.clientHeight) {
-      const offset = mouseYContainer - this._gridTemplate.containerElementRef.nativeElement.clientHeight;
-      const percent = offset / (height * this.item.rows);
-
-      const speed = Math.round(50 * percent);
-
-      increaseY = speed;
-    }
-
-    if (x < 0) {
-      const percent = Math.abs(x) / (width * this.item.cols);
-
-      const speed = Math.round(50 * percent);
-
-      increaseX = -speed;
-    } else if (mouseXContainer > this._gridTemplate.containerElementRef.nativeElement.clientWidth) {
-      const offset = mouseXContainer - this._gridTemplate.containerElementRef.nativeElement.clientWidth;
-      const percent = offset / (width * this.item.cols);
-
-      const speed = Math.round(50 * percent);
-
-      increaseX = speed;
-    }
-
-    this._scroll(increaseX, increaseY);
-  }
-
-  private _scroll(increaseX: number, increaseY: number): void {
-    if (increaseX === 0 && increaseY === 0) return;
-
-    if (this._grid.scrollLeft + increaseX <= 0) increaseX = 0;
-
-    if (this._grid.scrollTop + increaseY <= 0) increaseY = 0;
-
-    const scrollWidth = this._gridTemplate.containerElementRef.nativeElement.clientWidth + this._grid.scrollLeft;
-    const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
-
-    // console.log({
-    //   scrollWidth,
-    //   contentWidth,
-    //   increaseX,
-    //   scrollLeft: this._grid.scrollLeft,
-    // });
-
-    // add new column if scroll is at the right
-    if (scrollWidth + increaseX > contentWidth) {
-      const remainingWidth = contentWidth - scrollWidth;
-
-      if (remainingWidth > 0) {
-        // increaseX = remainingWidth;
-      } else {
-        console.error('add new column');
-        // this.grid.cols += 1;
-        // this._cdr.detectChanges();
-        //
-        // this._scroll(item, increaseX, increaseY, increaseYPercentage, increaseXPercentage);
-        return;
-      }
-    }
-
-    const scrollHeight = this._gridTemplate.containerElementRef.nativeElement.clientHeight + this._grid.scrollTop;
-    const contentHeight = this._gridTemplate.contentElementRef.nativeElement.offsetHeight;
-
-    // console.log({
-    //   scrollHeight,
-    //   contentHeight,
-    //   increaseY,
-    //   scrollTop: this._grid.scrollTop,
-    // });
-
-    let temp: number | undefined;
-
-    // add new row if scroll is at the bottom
-    if (scrollHeight + increaseY > contentHeight - 500) {
-      const remainingHeight = contentHeight - scrollHeight;
-
-      if (remainingHeight > 0) {
-        // temp = increaseY;
-        // increaseY = remainingHeight;
-      } else {
-        console.error('add new row');
-
-        // this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
-        //
-        // this._grid.rows += 8;
-        // this._grid.rows += 8;
-        // this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
-        // // this._grid.rowsTotalGaps = this._rowsTotalGaps();
-        //
-        // // this._cdr.detectChanges();
-        //
-        // this._scroll(increaseX, temp || increaseY);
-        return;
-      }
-    }
-
-    this._requestAnimationFrameId = requestAnimationFrame(() => {
-      this._grid.scrollLeft += increaseX;
-      this._grid.scrollTop += increaseY;
-
-      this._x += increaseX;
-      this._y += increaseY;
-
-      this._render();
-
-      this._grid.isItemScrolling = true;
-
-      this._gridTemplate.containerElementRef.nativeElement.scrollTo({
-        left: this._grid.scrollLeft,
-        top: this._grid.scrollTop,
-        behavior: 'instant',
-      });
-
-      this._scroll(increaseX, temp || increaseY);
-    });
   }
 }

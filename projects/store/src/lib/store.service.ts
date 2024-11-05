@@ -29,7 +29,6 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
   queries: Observable<Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] } | undefined>>;
   errors: Observable<Record<PropertyKey, HttpErrorResponse | undefined>>;
 
-  // eslint-disable-next-line @ngrx/no-typed-global-store, @ngrx/use-consistent-global-store-name
   protected _store = inject(Store<T>);
   protected _actions$ = inject(Actions);
 

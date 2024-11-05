@@ -9,7 +9,7 @@
 
 .grid {
   @apply
-    px-5;
+    p-10;
 
   &__preview {
     @apply
@@ -65,4 +65,18 @@
 .header, .footer {
   @apply
     p-5;
+}
+
+.test {
+  @apply
+    relative
+    flex-grow
+    overflow-hidden
+    pt-20;
+}
+
+.test1 {
+  @apply
+    relative
+    h-full;
 }

@@ -19,7 +19,7 @@
 
 <div class="bar"></div>
 
-<button (click)="undo()" class="button" [disabled]="!(hasUndo | async)">
+<button (click)="undo()" class="button" [disabled]="!!!(hasUndo | async)">
   <svg stroke-width="2" viewBox="0 0 24 24" fill="none" class="button__icon">
     <path
       d="M4.5 8C8.5 8 11 8 15 8C15 8 15 8 15 8C15 8 20 8 20 12.7059C20 18 15 18 15 18C11.5714 18 9.71429 18 6.28571 18"
@@ -40,7 +40,7 @@
 
 <div class="bar"></div>
 
-<button (click)="redo()" class="button" [disabled]="!(hasRedo | async)">
+<button (click)="redo()" class="button" [disabled]="!!!(hasRedo | async)">
   <svg stroke-width="2" viewBox="0 0 24 24" fill="none" class="button__icon">
     <path
       d="M19.5 8C15.5 8 13 8 9 8C9 8 9 8 9 8C9 8 4 8 4 12.7059C4 18 9 18 9 18C12.4286 18 14.2857 18 17.7143 18"

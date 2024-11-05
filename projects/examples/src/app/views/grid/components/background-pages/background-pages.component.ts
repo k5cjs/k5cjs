@@ -62,6 +62,7 @@ export class BackgroundPagesComponent implements OnChanges {
         cells.push({
           width: `calc((100cqw - ${gapsWidth}px) / ${this.config.cols})`,
           height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows})`,
+          // eslint-disable-next-line max-len
           transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
         });
 

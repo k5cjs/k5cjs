@@ -15,7 +15,6 @@ export const isEqualCheck = <T extends { id: PropertyKey }>(a: StateBase<T>, b: 
   return a.reloadSelectors === b.reloadSelectors;
 };
 
-// eslint-disable-next-line @ngrx/prefix-selectors-with-select
 export const createSelectorFirstMemoized = createSelectorFactory((memoize) =>
   defaultMemoize(memoize, isEqualCheck),
 ) as typeof createSelector;

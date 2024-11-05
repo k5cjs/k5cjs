@@ -1,6 +1,5 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ContentChild,
   DestroyRef,
@@ -10,7 +9,6 @@ import {
   OnInit,
   Output,
   ViewChild,
-  ViewContainerRef,
   forwardRef,
   inject,
 } from '@angular/core';
@@ -24,7 +22,7 @@ import {
   ScrollDirective,
 } from '../../directives';
 import { KcGridService } from '../../services';
-import { GridEventType, KcGridItems } from '../../types';
+import { KcGridItem, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
 
 @Component({
@@ -97,14 +95,14 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   rowsTotalGaps!: number;
 
   containerElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  grid = inject(KcGridService);
+  grid = inject<KcGridService>(KcGridService);
 
   private _destroyRef = inject(DestroyRef);
 
   ngOnInit(): void {
     this.grid.changes
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((items) => this.changes.emit(items as unknown as KcGridItems<T>));
+      .subscribe((items) => this.changes.emit(items.map((item) => item.context as KcGridItem<T>)));
 
     this.colsTotalGaps = this._colsTotalGaps();
     this.rowsTotalGaps = this._rowsTotalGaps();

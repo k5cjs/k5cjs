@@ -32,6 +32,6 @@ export class BarComponent implements OnInit {
   }
 
   add(): void {
-    this.grid.add<Data>({ rows: 2, cols: 2, data: { name: 'Item 5', value: 5 } });
+    this.grid.add<Data>({ rows: 2, cols: 2, data: { id: '5', name: 'Item 5', value: 5 } });
   }
 }

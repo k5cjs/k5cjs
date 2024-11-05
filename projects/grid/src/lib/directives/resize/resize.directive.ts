@@ -1,6 +1,6 @@
-import { Directive, ElementRef, HostListener, Input, NgZone, inject } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
-import { GridEventType, KcGridItem } from '../../types';
+import { KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 
 @Directive({
@@ -24,13 +24,15 @@ export abstract class ResizeDirective {
   protected _isMouseDown = false;
 
   protected _onMouseMoveRef = this._onMouseMove.bind(this);
+  protected _onMouseUpRef = this._onMouseUp.bind(this);
 
   protected _grid = inject(KcGridService);
   protected _gridTemplate = inject(GRID_TEMPLATE);
   protected _item = inject(ITEM_COMPONENT);
   protected _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  private _ng = inject(NgZone);
+  private _offsetLeft = 0;
+  private _offsetTop = 0;
 
   @HostListener('mousedown', ['$event'])
   protected _onMouseDown(e: MouseEvent): void {
@@ -41,54 +43,27 @@ export abstract class ResizeDirective {
     this._grid.handle(this.id);
 
     this._isMouseDown = true;
-    // this._item.skip = true;
 
     this._setCellPositionAndSize();
     this._setMouseOffset(e);
 
-    // this._grid.emit(
-    //   this.id,
-    //   {
-    //     col: this.item.col,
-    //     row: this.item.row,
-    //     cols: this.item.cols,
-    //     rows: this.item.rows,
-    //   },
-    //   GridEventType.Capture,
-    // );
-
     this._grid.editing = true;
 
-    this._ng.runOutsideAngular(() => {
-      document.addEventListener('mousemove', this._onMouseMoveRef);
-    });
+    document.addEventListener('mousemove', this._onMouseMoveRef);
+    document.addEventListener('mouseup', this._onMouseUpRef);
   }
 
-  @HostListener('mouseup', ['$event'])
   protected _onMouseUp(e: MouseEvent): void {
     if (!this._isMouseDown) return;
 
     e.preventDefault();
 
     this._isMouseDown = false;
-    // this._item.skip = false;
 
     this._grid.release(this.id);
 
-    this._ng.runOutsideAngular(() => {
-      document.removeEventListener('mousemove', this._onMouseMoveRef);
-    });
-
-    // this._grid.emit(
-    //   this.id,
-    //   {
-    //     col: this.item.col,
-    //     row: this.item.row,
-    //     cols: this.item.cols,
-    //     rows: this.item.rows,
-    //   },
-    //   GridEventType.Release,
-    // );
+    document.removeEventListener('mousemove', this._onMouseMoveRef);
+    document.removeEventListener('mouseup', this._onMouseMoveRef);
 
     this._grid.editing = false;
   }
@@ -96,11 +71,11 @@ export abstract class ResizeDirective {
   protected abstract _onMouseMove(e: MouseEvent): void;
 
   protected _calcY(e: MouseEvent): number {
-    return e.clientY - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
+    return e.clientY - this._offsetTop + this._grid.scrollTop;
   }
 
   protected _calcX(e: MouseEvent): number {
-    return e.clientX - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
+    return e.clientX - this._offsetLeft + this._grid.scrollLeft;
   }
 
   protected _col(x: number): number {
@@ -163,10 +138,13 @@ export abstract class ResizeDirective {
   }
 
   private _setCellPositionAndSize(): void {
+    this._offsetLeft = this._calculateOffsetLeft(this._gridTemplate.itemsElementRef.nativeElement);
+    this._offsetTop = this._calculateOffsetTop(this._gridTemplate.itemsElementRef.nativeElement);
+
     const { x, y, width, height } = this._item.elementRef.nativeElement.getBoundingClientRect();
 
-    this._x = x - this._gridTemplate.itemsElementRef.nativeElement.offsetLeft + this._grid.scrollLeft;
-    this._y = y - this._gridTemplate.itemsElementRef.nativeElement.offsetTop + this._grid.scrollTop;
+    this._x = x - this._offsetLeft + this._grid.scrollLeft;
+    this._y = y - this._offsetTop + this._grid.scrollTop;
 
     this._width = width;
     this._height = height;
@@ -180,5 +158,31 @@ export abstract class ResizeDirective {
 
     this._mouseOffsetTop = e.clientY - y;
     this._mouseOffsetBottom = y + height - e.clientY;
+  }
+
+  private _calculateOffsetLeft(element: HTMLElement): number {
+    let offsetLeft = element.offsetLeft;
+
+    let parent: Element | null = element.offsetParent;
+
+    while (parent && parent instanceof HTMLElement) {
+      offsetLeft += parent.offsetLeft;
+      parent = parent.offsetParent;
+    }
+
+    return offsetLeft;
+  }
+
+  private _calculateOffsetTop(element: HTMLElement): number {
+    let offsetTop = element.offsetTop;
+
+    let parent: Element | null = element.offsetParent;
+
+    while (parent && parent instanceof HTMLElement) {
+      offsetTop += parent.offsetTop;
+      parent = parent.offsetParent;
+    }
+
+    return offsetTop;
   }
 }
