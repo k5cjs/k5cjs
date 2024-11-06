@@ -202,6 +202,7 @@ export class KcGridService {
 
     this._removeFromMatrix(id);
     this._items.delete(id);
+    this._changes.next([...this._items.values()]);
 
     this._history = [];
     this.pushToHistory();
@@ -529,13 +530,18 @@ export class KcGridService {
     let item1 = this._items.get(id1)!;
     let item2 = this._items.get(id2)!;
 
-    const context1 = { ...item1.context };
-    const context2 = { ...item2.context };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: data1, ...context1 } = item1.context as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: data2, ...context2 } = item2.context as any;
+
     const config1 = item1.config;
     const config2 = item2.config;
 
-    this._items.set(id1, { context: context2, config: config1 });
-    this._items.set(id2, { context: context1, config: config2 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._items.set(id1, { context: { ...context2, data: data1 } as any, config: config1 });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this._items.set(id2, { context: { ...context1, data: data2 } as any, config: config2 });
 
     item1 = this._items.get(id1)!;
     item2 = this._items.get(id2)!;
