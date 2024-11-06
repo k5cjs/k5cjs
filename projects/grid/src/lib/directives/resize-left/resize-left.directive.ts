@@ -29,6 +29,7 @@ export class ResizeLeftDirective extends ResizeDirective {
     });
 
     const allowToResize = this._grid.resize(this.id, {
+      ...this.item,
       col: col,
       row: this.item.row,
       cols: cols,

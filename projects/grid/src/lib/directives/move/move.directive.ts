@@ -329,6 +329,7 @@ export class MoveDirective {
     const row = this._row();
 
     return this._grid.move(this.id, {
+      ...this.item,
       col,
       row,
       cols: this._startCols,
