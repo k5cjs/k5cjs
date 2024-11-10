@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, ViewChild, inject } from '@angular/core';
 
 import { KcGridService } from '../../services';
+import { gapSize } from '../../helpers';
 
 @Component({
   selector: 'kc-grid-lines',
@@ -32,8 +33,8 @@ export class LinesComponent implements OnChanges {
       height: 100%;
     `;
 
-    const totalColsGaps = this.grid.colsGaps.reduce((acc, gap) => acc + gap);
-    const totalRowsGaps = this.grid.rowsGaps.reduce((acc, gap) => acc + gap);
+    const totalColsGaps = this.grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const totalRowsGaps = this.grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     let rowGap = 0;
 
@@ -59,10 +60,10 @@ export class LinesComponent implements OnChanges {
 
         girdLines.appendChild(cell);
 
-        colGap += this.grid.colsGaps[x];
+        colGap += gapSize(this.grid.colsGaps[x]);
       }
 
-      rowGap += this.grid.rowsGaps[y];
+      rowGap += gapSize(this.grid.rowsGaps[y]);
     }
 
     this.gridRef.nativeElement.appendChild(girdLines);

@@ -1,15 +1,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { KcGridService } from '@k5cjs/grid';
-
-interface Data {
-  scale: number;
-  cols: number;
-  rows: number;
-  colsGaps: number[];
-  rowsGaps: number[];
-}
+import { BackgroundConfig, KcGridService, gapSize } from '@k5cjs/grid';
 
 @Component({
   selector: 'app-background',
@@ -18,7 +10,7 @@ interface Data {
 })
 export class BackgroundComponent implements OnInit, OnChanges {
   @Input({ required: true }) grid!: KcGridService;
-  @Input({ required: true }) data!: Data;
+  @Input({ required: true }) config!: BackgroundConfig;
 
   cells: { width: string; height: string; transform: string }[] = [];
 
@@ -33,31 +25,31 @@ export class BackgroundComponent implements OnInit, OnChanges {
   }
 
   private _cells(): void {
-    const gapsWidth = this.data.colsGaps.reduce((acc, gap) => acc + gap);
-    const gapsHeight = this.data.rowsGaps.reduce((acc, gap) => acc + gap);
+    const gapsWidth = this.config.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const cells = [];
 
     let rowGap = 0;
 
-    for (let row = 0; row < this.data.rows; row++) {
+    for (let row = 0; row < this.config.rows; row++) {
       let colGap = 0;
 
-      for (let col = 0; col < this.data.cols; col++) {
-        const x = col / this.data.cols;
-        const y = row / this.data.rows;
+      for (let col = 0; col < this.config.cols; col++) {
+        const x = col / this.config.cols;
+        const y = row / this.config.rows;
 
         cells.push({
-          width: `calc((100cqw - ${gapsWidth}px) / ${this.data.cols})`,
-          height: `calc((100cqh - ${gapsHeight}px) / ${this.data.rows})`,
+          width: `calc((100cqw - ${gapsWidth}px) / ${this.config.cols})`,
+          height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows})`,
           // eslint-disable-next-line max-len
           transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
         });
 
-        colGap += this.data.colsGaps[col];
+        colGap += gapSize(this.config.colsGaps[col]);
       }
 
-      rowGap += this.data.rowsGaps[row];
+      rowGap += gapSize(this.config.rowsGaps[row]);
     }
 
     this.cells = cells;

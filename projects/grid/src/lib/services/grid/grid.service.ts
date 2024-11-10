@@ -1,7 +1,7 @@
 import { EmbeddedViewRef, Injectable } from '@angular/core';
 import { BehaviorSubject, Subject, distinctUntilChanged } from 'rxjs';
 
-import { Direction, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
+import { Direction, Gaps, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
 import {
   getDirection,
   Position,
@@ -27,8 +27,8 @@ export class KcGridService {
   /**
    * cellWidth is the width of each cell in the grid
    */
-  public colsGaps!: number[];
-  public rowsGaps!: number[];
+  public colsGaps!: Gaps;
+  public rowsGaps!: Gaps;
   public cellWidth!: number;
   /**
    * cellHeight is the height of each cell in the grid
@@ -82,8 +82,8 @@ export class KcGridService {
   init(configs: {
     cols: number;
     rows: number;
-    colsGaps: number[];
-    rowsGaps: number[];
+    colsGaps: Gaps;
+    rowsGaps: Gaps;
     cellWidth: number;
     cellHeight: number;
     preview: PreviewDirective;
@@ -148,13 +148,14 @@ export class KcGridService {
 
     const template = this._itemDirective.render(id, item);
 
-    const tmpDetectChanges = template.detectChanges.bind(template);
-
-    template.detectChanges = () => {
-      tmpDetectChanges();
-
-      console.warn('detectChanges', id.toString());
-    };
+    // TODO: for check performance
+    // const tmpDetectChanges = template.detectChanges.bind(template);
+    //
+    // template.detectChanges = () => {
+    //   tmpDetectChanges();
+    //
+    //   console.warn('detectChanges', id.toString());
+    // };
 
     this._items.set(id, { context: item, config: { template, handle: false } });
 
@@ -337,6 +338,8 @@ export class KcGridService {
   }
 
   private _resize(id: symbol, item: KcGridItem, direction: Direction): boolean {
+    if (this._preventOverlapGaps(item.col, item.row, item.cols, item.rows)) return false;
+
     if (this._preventTooMuchRecursion > 500) {
       return false;
     }
@@ -374,6 +377,8 @@ export class KcGridService {
   }
 
   private _move(id: symbol, item: KcGridItem): KcGridItem | null {
+    if (this._preventOverlapGaps(item.col, item.row, item.cols, item.rows)) return null;
+
     if (this._preventTooMuchRecursion > 500) {
       return null;
     }
@@ -429,6 +434,26 @@ export class KcGridService {
     }
 
     return item;
+  }
+
+  private _preventOverlapGaps(col: number, row: number, cols: number, rows: number): boolean {
+    for (let x = col; x < col + cols - 1; x++) {
+      const gap = this.colsGaps[x];
+
+      if (typeof gap === 'number') continue;
+
+      if (gap.preventOverlap) return true;
+    }
+
+    for (let y = row; y < row + rows - 1; y++) {
+      const gap = this.rowsGaps[y];
+
+      if (typeof gap === 'number') continue;
+
+      if (gap.preventOverlap) return true;
+    }
+
+    return false;
   }
 
   private _shiftToLeft(id: symbol, item: KcGridItem, shift: number): boolean {

@@ -3,6 +3,7 @@ import { Directive, ElementRef, Input, OnChanges, inject } from '@angular/core';
 import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
 import { PreviewDirective } from '../preview/preview.directive';
+import { gapSize } from '../../helpers';
 
 @Directive({
   selector: '[kcGridPreviewStyle]',
@@ -40,11 +41,15 @@ export class PreviewStyleDirective implements OnChanges {
   }
 
   private _transformValue(): string {
-    const gapsWidth = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const gapsHeight = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsWidth = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const gapsHeight = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
-    const untilGapsWidth = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
-    const untilGapsHeight = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
+    const untilGapsWidth = this._grid.colsGaps
+      .slice(0, this.item.col)
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const untilGapsHeight = this._grid.rowsGaps
+      .slice(0, this.item.row)
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const x = this.item.col / this._grid.cols;
     const y = this.item.row / this._grid.rows;
@@ -56,19 +61,19 @@ export class PreviewStyleDirective implements OnChanges {
   }
 
   private _widthValue(): string {
-    const gapsWidth = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsWidth = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsWidthInsideItem = this._grid.colsGaps
       .slice(this.item.col, this.item.col + this.item.cols - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     return `calc((100cqw - ${gapsWidth}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsWidthInsideItem}px)`;
   }
 
   private _heightValue(): string {
-    const gapsHeight = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const gapsHeight = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsHeightInsideItem = this._grid.rowsGaps
       .slice(this.item.row, this.item.row + this.item.rows - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     return `calc((100cqh - ${gapsHeight}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsHeightInsideItem}px)`;
   }

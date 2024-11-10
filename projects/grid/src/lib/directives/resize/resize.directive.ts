@@ -2,6 +2,7 @@ import { Directive, ElementRef, HostListener, Input, inject } from '@angular/cor
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
 import { KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
+import { gapSize } from '../../helpers';
 
 @Directive({
   selector: '[kcGridResize]',
@@ -70,6 +71,13 @@ export abstract class ResizeDirective {
 
   protected abstract _onMouseMove(e: MouseEvent): void;
 
+  protected _updateGrid(config: { col: number; row: number; cols: number; rows: number }): boolean {
+    return this._grid.resize(this.id, {
+      ...this.item,
+      ...config,
+    });
+  }
+
   protected _calcY(e: MouseEvent): number {
     return e.clientY - this._offsetTop + this._grid.scrollTop;
   }
@@ -83,7 +91,7 @@ export abstract class ResizeDirective {
     let width = 0;
 
     for (let i = 0; i < this._grid.cols; i++) {
-      width += this._grid.colsGaps[i];
+      width += gapSize(this._grid.colsGaps[i]);
       // TODO: implement memoization function to prevent to calculate every time
       width += this._cellWidth();
 
@@ -98,7 +106,7 @@ export abstract class ResizeDirective {
     let height = 0;
 
     for (let i = 0; i < this._grid.rows; i++) {
-      height += this._grid.rowsGaps[i];
+      height += gapSize(this._grid.rowsGaps[i]);
       // TODO: implement memoization function to prevent to calculate every time
       height += this._cellHeight();
 
@@ -109,7 +117,7 @@ export abstract class ResizeDirective {
   }
 
   protected _cellWidth(): number {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gridWidth = this._gridTemplate.itemsElementRef.nativeElement.offsetWidth - totalColsGaps;
 
     const cellWidth = gridWidth / this._grid.cols;
@@ -118,7 +126,7 @@ export abstract class ResizeDirective {
   }
 
   protected _cellHeight(): number {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gridHeight = this._gridTemplate.itemsElementRef.nativeElement.offsetHeight - totalRowsGaps;
 
     const cellHeight = gridHeight / this._grid.rows;

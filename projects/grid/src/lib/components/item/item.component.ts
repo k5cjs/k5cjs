@@ -14,6 +14,7 @@ import { KcGridItem } from '../../types';
 import { GRID_ITEM_ID, GRID_TEMPLATE, GridItemTemplate, ITEM_COMPONENT } from '../../tokens';
 import { GridItemDirective } from '../../directives';
 import { KcGridService } from '../../services';
+import { gapSize } from '../../helpers';
 
 @Component({
   selector: 'kc-grid-item',
@@ -88,11 +89,11 @@ export class ItemComponent<T = void> implements OnChanges, GridItemTemplate {
   }
 
   private _setTransform(element: HTMLElement): void {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
-    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const xx = this.item.col / this._grid.cols;
     const yy = this.item.row / this._grid.rows;
@@ -102,23 +103,23 @@ export class ItemComponent<T = void> implements OnChanges, GridItemTemplate {
   }
 
   private _setWidthByCols(element: HTMLElement): void {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     // gaps between start column and end column of the item
     const gapsInCols = this._grid.colsGaps
       .slice(this.item.col, this.item.col + this.item.cols - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     element.style.width = `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
   }
 
   private _setHeightByRows(element: HTMLElement): void {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     // gaps between start row and end row of the item
     const gapsInRows = this._grid.rowsGaps
       .slice(this.item.row, this.item.row + this.item.rows - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     element.style.height = `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }

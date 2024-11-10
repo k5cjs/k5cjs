@@ -1,3 +1,4 @@
+export * from './gap.type';
 export * from './cell.type';
 export * from './direction.type';
 export * from './item.type';

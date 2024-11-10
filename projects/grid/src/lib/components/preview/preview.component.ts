@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, Input, OnChanges, OnDes
 
 import { GridEventType, KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
+import { gapSize } from '../../helpers';
 
 @Component({
   selector: 'kc-grid-preview',
@@ -70,11 +71,11 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   private _transformValue(): string {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
-    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce((acc, gap) => acc + gap, 0);
-    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce((acc, gap) => acc + gap, 0);
+    const colGaps = this._grid.colsGaps.slice(0, this.item.col).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const rowGaps = this._grid.rowsGaps.slice(0, this.item.row).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const xx = this.item.col / this._grid.cols;
     const yy = this.item.row / this._grid.rows;
@@ -83,19 +84,19 @@ export class PreviewComponent implements OnChanges, OnDestroy {
   }
 
   private _widthValue(): string {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsInCols = this._grid.colsGaps
       .slice(this.item.col, this.item.col + this.item.cols - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     return `calc((100cqw - ${totalColsGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsInCols}px)`;
   }
 
   private _heightValue(): string {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsInRows = this._grid.rowsGaps
       .slice(this.item.row, this.item.row + this.item.rows - 1)
-      .reduce((acc, gap) => acc + gap, 0);
+      .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     return `calc((100cqh - ${totalRowsGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsInRows}px)`;
   }

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
-import { KcGridItem, KcGridItems, KcGridService } from '@k5cjs/grid';
+import { Gaps, KcGridItem, KcGridItems, KcGridService } from '@k5cjs/grid';
 
 import { TEST_INJECTOR } from '../../tokens';
 import { Data } from '../../types';
@@ -24,8 +24,8 @@ export class SimpleComponent {
   cols = 8;
   rows = 30;
 
-  rowsGaps: [number, ...number[]] = [10];
-  colsGaps: [number, ...number[]] = [10];
+  rowsGaps: Gaps = [10];
+  colsGaps: Gaps = [10];
 
   items: KcGridItems<Data> = [
     { col: 0, row: 0, cols: 2, rows: 2, data: { id: '0', name: 'Item 0', value: 0 } },

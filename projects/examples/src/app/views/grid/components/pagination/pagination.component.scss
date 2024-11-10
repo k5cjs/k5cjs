@@ -1,12 +1,14 @@
 :host {
   @apply
-    block
+    flex
+    flex-col
+    p-10
     bg-slate-200;
 }
 
 .grid {
   @apply
-    p-6;
+    p-10;
 
   &__preview {
     @apply

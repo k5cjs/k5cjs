@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 
-import { BackgroundConfig } from '@k5cjs/grid';
+import { BackgroundConfig, gapSize } from '@k5cjs/grid';
 
 @Component({
   selector: 'app-background-pages',
@@ -22,15 +22,17 @@ export class BackgroundPagesComponent implements OnChanges {
   private _pages(): void {
     const pagesLength = Math.ceil(this.config.rows / this.pageRows);
 
-    const gapsHeight = this.config.rowsGaps.reduce((acc, gap) => acc + gap);
+    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const pages = [];
 
     for (let page = 0; page < pagesLength; page++) {
-      const untilPageRowsGaps = this.config.rowsGaps.slice(0, page * this.pageRows).reduce((acc, gap) => acc + gap, 0);
+      const untilPageRowsGaps = this.config.rowsGaps
+        .slice(0, page * this.pageRows)
+        .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
       const pageRowsGaps = this.config.rowsGaps
         .slice(page * this.pageRows, (page + 1) * this.pageRows - 1)
-        .reduce((acc, gap) => acc + gap, 0);
+        .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
       pages.push({
         height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows} * ${this.pageRows} + ${pageRowsGaps + 20}px)`,
@@ -45,8 +47,8 @@ export class BackgroundPagesComponent implements OnChanges {
   }
 
   private _cells(): void {
-    const gapsWidth = this.config.colsGaps.reduce((acc, gap) => acc + gap);
-    const gapsHeight = this.config.rowsGaps.reduce((acc, gap) => acc + gap);
+    const gapsWidth = this.config.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
     const cells = [];
 
@@ -66,10 +68,10 @@ export class BackgroundPagesComponent implements OnChanges {
           transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
         });
 
-        colGap += this.config.colsGaps[col];
+        colGap += gapSize(this.config.colsGaps[col]);
       }
 
-      rowGap += this.config.rowsGaps[row];
+      rowGap += gapSize(this.config.rowsGaps[row]);
     }
 
     this.cells = cells;

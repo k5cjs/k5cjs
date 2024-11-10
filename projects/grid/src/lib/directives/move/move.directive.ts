@@ -2,6 +2,7 @@ import { Directive, ElementRef, HostListener, Input, inject } from '@angular/cor
 import { GRID_ITEM_ID, GRID_TEMPLATE, ITEM_COMPONENT } from '../../tokens';
 import { KcGridItem } from '../../types';
 import { KcGridService } from '../../services';
+import { gapSize } from '../../helpers';
 
 @Directive({
   selector: '[kcGridMove]',
@@ -341,7 +342,7 @@ export class MoveDirective {
     let width = 0;
 
     for (let i = 0; i < this._grid.cols; i++) {
-      width += this._grid.colsGaps[i];
+      width += gapSize(this._grid.colsGaps[i]);
       width += this._cellWidth();
 
       if (width > this._x) return i;
@@ -354,7 +355,7 @@ export class MoveDirective {
     let height = 0;
 
     for (let i = 0; i < this._grid.rows; i++) {
-      height += this._grid.rowsGaps[i];
+      height += gapSize(this._grid.rowsGaps[i]);
       height += this._cellHeight();
 
       if (height > this._y) return i;
@@ -364,7 +365,7 @@ export class MoveDirective {
   }
 
   private _cellWidth(): number {
-    const totalColsGaps = this._grid.colsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gridWidth = this._gridTemplate.itemsElementRef.nativeElement.offsetWidth - totalColsGaps;
 
     const cellWidth = gridWidth / this._grid.cols;
@@ -373,7 +374,7 @@ export class MoveDirective {
   }
 
   private _cellHeight(): number {
-    const totalRowsGaps = this._grid.rowsGaps.reduce((acc, gap) => acc + gap, 0);
+    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gridHeight = this._gridTemplate.itemsElementRef.nativeElement.offsetHeight - totalRowsGaps;
 
     const cellHeight = gridHeight / this._grid.rows;

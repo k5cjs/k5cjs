@@ -22,8 +22,9 @@ import {
   ScrollDirective,
 } from '../../directives';
 import { KcGridService } from '../../services';
-import { KcGridItem, KcGridItems } from '../../types';
+import { Gaps, KcGridItem, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
+import { gapSize } from '../../helpers';
 
 @Component({
   selector: 'kc-grid',
@@ -52,33 +53,33 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @Input() items: KcGridItems<T> = [];
 
   @Input()
-  set colsGaps(value: [number, ...number[]]) {
+  set colsGaps(value: Gaps) {
     /**
      * generate array of cols gaps
      * the size of the array is length of cols - 1
      * because we have gaps between cols
      */
-    this._colsGaps = new Array(this.cols - 1).fill(0).map((_, i) => value[i] || value[0]);
+    this._colsGaps = new Array(this.cols - 1).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
   }
-  get colsGaps(): number[] {
+  get colsGaps(): Gaps {
     return this._colsGaps;
   }
 
-  private _colsGaps: number[] = [10];
+  private _colsGaps: Gaps = [10];
 
   @Input()
-  set rowsGaps(value: [number, ...number[]]) {
+  set rowsGaps(value: Gaps) {
     /**
      * generate array of rows gaps
      * the size of the array is length of rows - 1
      * because we have gaps between rows
      */
-    this._rowsGaps = new Array(this.rows - 1).fill(0).map((_, i) => value[i] || value[0]);
+    this._rowsGaps = new Array(this.rows - 1).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
   }
-  get rowsGaps(): number[] {
+  get rowsGaps(): Gaps {
     return this._rowsGaps;
   }
-  _rowsGaps: number[] = [10];
+  _rowsGaps: Gaps = [10];
 
   @Output() readonly changes = new EventEmitter<KcGridItems<T>>();
 
@@ -124,22 +125,10 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   }
 
   private _colsTotalGaps(): number {
-    let total = 0;
-
-    for (let i = 0; i < this.cols; i++) {
-      total += this.colsGaps[i] ?? this.colsGaps[0] ?? 0;
-    }
-
-    return total;
+    return this.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
   }
 
   private _rowsTotalGaps(): number {
-    let total = 0;
-
-    for (let i = 0; i < this.rows; i++) {
-      total += this.rowsGaps[i] ?? this.rowsGaps[0] ?? 0;
-    }
-
-    return total;
+    return this.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
   }
 }
