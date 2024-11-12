@@ -7,4 +7,5 @@ export type KcGridItem<T = void> = {
   row: number;
   cols: number;
   rows: number;
+  preventToBeSwapped?: boolean;
 } & (T extends void ? object : { data: T });

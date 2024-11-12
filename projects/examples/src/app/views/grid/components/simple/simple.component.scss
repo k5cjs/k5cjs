@@ -60,6 +60,13 @@
       top-3
       right-12;
   }
+
+  &__text {
+    &--prevent-swap {
+      @apply
+        text-red-500;
+    }
+  }
 }
 
 .header, .footer {
@@ -67,7 +74,7 @@
     p-5;
 }
 
-.test {
+.container {
   @apply
     relative
     flex-grow
@@ -75,7 +82,7 @@
     pt-20;
 }
 
-.test1 {
+.content {
   @apply
     relative
     h-full;

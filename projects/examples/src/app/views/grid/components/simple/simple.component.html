@@ -1,7 +1,6 @@
 <app-bar [grid]="grid" [scale]="scale" />
-
-<div class="test">
-  <div class="test1">
+<div class="container">
+  <div class="content">
     <kc-grid
       [scale]="scale.value"
       [cols]="cols"
@@ -35,10 +34,14 @@
       <div *kcGridItem="let item; id as id type: data" class="grid__item">
         <app-test-injector>
           <div>id: {{ id }}</div>
+          <div *ngIf="item.preventToBeSwapped" class="grid__text--prevent-swap">
+            This item is prevented from being swapped by other neighbors
+          </div>
           <div>col: {{ item.col }}</div>
           <div>row: {{ item.row }}</div>
           <div>cols: {{ item.cols }}</div>
           <div>rows: {{ item.rows }}</div>
+          <div>preventToBeSwapped: {{ item.preventToBeSwapped }}</div>
           <div>
             <span>data:</span>
             <pre>{{ item.data | json }}</pre>

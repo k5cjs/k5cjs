@@ -426,7 +426,7 @@ export class KcGridService {
         } else if (direction === Position.Center) {
           const swap = this.swap(id, overId);
 
-          if (swap) return swap;
+          return swap;
         } else {
           return null;
         }
@@ -548,12 +548,14 @@ export class KcGridService {
     return true;
   }
 
-  swap(id1: symbol, id2: symbol): KcGridItem {
-    this._removeFromMatrix(id1);
-    this._removeFromMatrix(id2);
-
+  swap(id1: symbol, id2: symbol): KcGridItem | null {
     let item1 = this._items.get(id1)!;
     let item2 = this._items.get(id2)!;
+
+    if (item2.context.preventToBeSwapped) return null;
+
+    this._removeFromMatrix(id1);
+    this._removeFromMatrix(id2);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: data1, ...context1 } = item1.context as any;
