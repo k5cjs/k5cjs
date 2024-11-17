@@ -359,17 +359,18 @@ export class KcGridService {
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const overItem = this._items.get(over)!;
+        if (overItem.context.preventToBeResized) return false;
 
-        const ddd = tmpLastDirection.get(over) || direction;
+        const lastDirection = tmpLastDirection.get(over) || direction;
 
-        const canShrink = shrink(overItem.context, item, ddd);
+        const canShrink = shrink(overItem.context, item, lastDirection);
 
         if (!canShrink) {
           this._lastDirection = tmpLastDirection;
           return false;
         }
 
-        this._lastDirection.set(over, ddd);
+        this._lastDirection.set(over, lastDirection);
       }
     }
 

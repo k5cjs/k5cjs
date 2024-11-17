@@ -37,6 +37,9 @@
           <div *ngIf="item.preventToBeSwapped" class="grid__text--prevent-swap">
             This item is prevented from being swapped by other neighbors
           </div>
+          <div *ngIf="item.preventToBeResized" class="grid__text--prevent-swap">
+            This item is prevented from being resized by other neighbors
+          </div>
           <div>col: {{ item.col }}</div>
           <div>row: {{ item.row }}</div>
           <div>cols: {{ item.cols }}</div>
