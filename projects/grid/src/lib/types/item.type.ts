@@ -9,4 +9,5 @@ export type KcGridItem<T = void> = {
   rows: number;
   preventToBeSwapped?: boolean;
   preventToBeResized?: boolean;
+  preventToBeMoved?: boolean;
 } & (T extends void ? object : { data: T });

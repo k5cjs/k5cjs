@@ -35,9 +35,10 @@ export class SimpleComponent {
       rows: 3,
       preventToBeSwapped: true,
       preventToBeResized: true,
+      preventToBeMoved: true,
       data: { id: '0', name: 'Item 0', value: 0 },
     },
-    { col: 3, row: 3, cols: 3, rows: 5, data: { id: '1', name: 'Item 1', value: 1 } },
+    { col: 3, row: 3, cols: 3, rows: 3, data: { id: '1', name: 'Item 1', value: 1 } },
     { col: 2, row: 3, cols: 1, rows: 2, data: { id: '2', name: 'Item 2', value: 2 } },
     { col: 2, row: 12, cols: 4, rows: 3, data: { id: '3', name: 'Item 3', value: 3 } },
   ];

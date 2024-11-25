@@ -86,6 +86,7 @@ export class ItemComponent<T = void> implements OnChanges, GridItemTemplate {
 
     element.style.background = '';
     element.style.zIndex = '';
+    element.style.opacity = '';
   }
 
   private _setTransform(element: HTMLElement): void {

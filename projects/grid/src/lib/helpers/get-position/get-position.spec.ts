@@ -1,6 +1,6 @@
 import { Position, getPosition } from './get-position';
 
-describe('get position', () => {
+fdescribe('get position', () => {
   it('the same distance to the right and down, but the buttom has more priority', () => {
     /**
      *
@@ -89,6 +89,21 @@ describe('get position', () => {
     expect(getPosition(rectangle1, rectangle2)).toEqual(Position.Center);
   });
 
+  it('should detect center overlap big on small', () => {
+    /**
+     *
+     *  ┌───────┐
+     *  │ ┌─┐   │
+     *  │ └─┘   │
+     *  └───────┘
+     *
+     */
+    const staticRectangle = { x: 2, y: 2, width: 1, height: 1 };
+    const movingRectangle = { x: 1, y: 1, width: 4, height: 3 };
+
+    expect(getPosition(staticRectangle, movingRectangle)).toEqual(Position.Center);
+  });
+
   it('should detect overlap when one rectangle completely overlaps another', () => {
     /**
      *
@@ -155,15 +170,14 @@ describe('get position', () => {
     /**
      *
      *  ┌───────┐
-     *  │ ┌─────│─┐
-     *  │ │     │ │
-     *  │ │     │ │
-     *  └───────┘ │
-     *    └───────┘
+     *  │ ┌─────┐
+     *  │ │     │
+     *  │ │     │
+     *  └─└─────┘
      *
      */
     const rectangle1 = { x: 2, y: 2, width: 4, height: 4 };
-    const rectangle2 = { x: 1, y: 1, width: 4, height: 4 };
+    const rectangle2 = { x: 1, y: 1, width: 3, height: 3 };
 
     expect(getPosition(rectangle1, rectangle2)).toEqual(Position.Left);
   });

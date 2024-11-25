@@ -1,0 +1,10 @@
+.canvas {
+  @apply
+    absolute
+    w-full
+    h-full
+    top-[232px]
+    left-0
+    pointer-events-none
+    z-50;
+}

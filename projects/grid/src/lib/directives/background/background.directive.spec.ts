@@ -1,8 +1,8 @@
-import { GridBackgroundDirective } from './grid-background.directive';
+import { BackgroundDirective } from './background.directive';
 
-describe('GridBackgroundDirective', () => {
+describe('BackgroundDirective', () => {
   it('should create an instance', () => {
-    const directive = new GridBackgroundDirective();
+    const directive = new BackgroundDirective();
     expect(directive).toBeTruthy();
   });
 });

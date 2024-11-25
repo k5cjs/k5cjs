@@ -1,6 +1,7 @@
 export * from './background-pages/background-pages.component';
 export * from './background/background.component';
 export * from './bar/bar.component';
+export * from './canvas/canvas.component';
 export * from './delete/delete.component';
 export * from './magnification/magnification.component';
 export * from './move/move.component';

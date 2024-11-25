@@ -1,4 +1,4 @@
-import { EmbeddedViewRef, Injectable } from '@angular/core';
+import { ChangeDetectorRef, EmbeddedViewRef, Injectable } from '@angular/core';
 import { BehaviorSubject, Subject, distinctUntilChanged } from 'rxjs';
 
 import { Direction, Gaps, GridEventType, KcGridItem, KcGridItemContext } from '../../types';
@@ -13,6 +13,13 @@ import {
   shrink,
 } from '../../helpers';
 import { GridDirective, PreviewDirective } from '../../directives';
+
+declare global {
+  interface Window {
+    release(): void;
+    move(): void;
+  }
+}
 
 @Injectable()
 export class KcGridService {
@@ -65,16 +72,18 @@ export class KcGridService {
   private _history: Map<symbol, KcGridItemContext>[] = [];
   private _redo: Map<symbol, KcGridItemContext>[] = [];
 
-  private _lastMoveCol = 0;
-  private _lastMoveRow = 0;
   private _preventTooMuchRecursion = 0;
 
   private _lastDirection = new Map<symbol, Direction>();
 
   private _idIndex = 0;
 
+  private _cdr!: ChangeDetectorRef;
   private _hasUndo = new BehaviorSubject<boolean>(false);
   private _hasRedo = new BehaviorSubject<boolean>(false);
+
+  header!: HTMLElement;
+  footer!: HTMLElement;
 
   hasUndo$ = this._hasUndo.asObservable().pipe(distinctUntilChanged());
   hasRedo$ = this._hasRedo.asObservable().pipe(distinctUntilChanged());
@@ -96,6 +105,9 @@ export class KcGridService {
      */
     scrollLeft: number;
     itemDirective: GridDirective;
+    cdr: ChangeDetectorRef;
+    header: HTMLElement;
+    footer: HTMLElement;
   }) {
     this.cols = configs.cols;
     this.rows = configs.rows;
@@ -107,6 +119,9 @@ export class KcGridService {
     this.scrollTop = configs.scrollTop;
     this.scrollLeft = configs.scrollLeft;
     this._itemDirective = configs.itemDirective;
+    this.header = configs.header;
+    this.footer = configs.footer;
+    this._cdr = configs.cdr;
 
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
   }
@@ -194,6 +209,8 @@ export class KcGridService {
     this._changes.next([...this._items.values()]);
 
     this.render();
+
+    if (window.release) window.release();
   }
 
   delete(id: symbol): void {
@@ -218,7 +235,8 @@ export class KcGridService {
     return Object.prototype.hasOwnProperty.call(item, 'col') && Object.prototype.hasOwnProperty.call(item, 'row');
   }
 
-  move(id: symbol, item: KcGridItem): boolean {
+  move(id: symbol, item: KcGridItem & { colRest: number; rowRest: number }): boolean {
+    if (window.move) window.move();
     /**
      * skip if the item is out of the grid
      */
@@ -229,22 +247,20 @@ export class KcGridService {
     /**
      * skip if the item is already at the last position
      */
-    if (item.col === this._lastMoveCol && item.row === this._lastMoveRow) {
-      return false;
-    }
+    // if (item.col === this._lastMoveCol && item.row === this._lastMoveRow) {
+    //   return false;
+    // }
 
     const tmpItems = this._cloneItems(this._items);
 
     this.restoreFromHistory();
     this.updateGrid();
 
-    this._lastMoveCol = item.col;
-    this._lastMoveRow = item.row;
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this._removeFromMatrix(id);
 
     this._preventTooMuchRecursion = 0;
+
     const change = this._move(id, item);
 
     if (!change) {
@@ -377,7 +393,11 @@ export class KcGridService {
     return true;
   }
 
-  private _move(id: symbol, item: KcGridItem): KcGridItem | null {
+  private _move(
+    id: symbol,
+    item: KcGridItem & { colRest?: number; rowRest?: number },
+    position?: Position,
+  ): KcGridItem | null {
     if (this._preventOverlapGaps(item.col, item.row, item.cols, item.rows)) return null;
 
     if (this._preventTooMuchRecursion > 500) {
@@ -385,6 +405,8 @@ export class KcGridService {
     }
 
     this._preventTooMuchRecursion += 1;
+
+    let preventAction = false;
 
     for (let x = item.col; x < item.col + item.cols; x++) {
       for (let y = item.row; y < item.row + item.rows; y++) {
@@ -395,44 +417,56 @@ export class KcGridService {
         if (id === overId) continue;
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const overItem = this._items.get(overId)!;
+        const overItem = this._items.get(overId)! as KcGridItemContext & { colRest?: number; rowRest?: number };
 
         // TODO need to compare center of the item not first cell of left top corner
-        const direction = getPosition(
-          {
-            x: overItem.context.col,
-            y: overItem.context.row,
-            width: overItem.context.cols,
-            height: overItem.context.rows,
-          },
-          { x: item.col, y: item.row, width: item.cols, height: item.rows },
-        );
+        const direction =
+          position ||
+          getPosition(
+            {
+              x: overItem.context.col,
+              y: overItem.context.row,
+              width: overItem.context.cols,
+              height: overItem.context.rows,
+            },
+            {
+              x: item.col,
+              y: item.row,
+              width: item.cols,
+              height: item.rows,
+              colRest: item.colRest,
+              rowRest: item.rowRest,
+            },
+          );
 
-        if (direction === Position.Right) {
+        if (direction === Position.Center) {
+          const swap = this.swap(id, overId);
+
+          if (swap) return swap;
+          else preventAction = true;
+        } else if (overItem.context.preventToBeMoved) {
+          preventAction = true;
+        } else if (direction === Position.Right) {
           const shift = overItem.context.col + overItem.context.cols - item.col;
 
-          if (!this._shiftToLeft(overId, overItem.context, shift)) return null;
+          if (!this._shiftToLeft(overId, overItem.context, shift, direction)) preventAction = true;
         } else if (direction === Position.Left) {
           const shift = item.col + item.cols - overItem.context.col;
 
-          if (!this._shiftToRight(overId, overItem.context, shift)) return null;
+          if (!this._shiftToRight(overId, overItem.context, shift, direction)) preventAction = true;
         } else if (direction === Position.Bottom) {
           const shift = overItem.context.row + overItem.context.rows - item.row;
 
-          if (!this._shiftToTop(overId, overItem.context, shift)) return null;
+          if (!this._shiftToTop(overId, overItem.context, shift, direction)) preventAction = true;
         } else if (direction === Position.Top) {
           const shift = item.row + item.rows - overItem.context.row;
 
-          if (!this._shiftToBottom(overId, overItem.context, shift)) return null;
-        } else if (direction === Position.Center) {
-          const swap = this.swap(id, overId);
-
-          return swap;
-        } else {
-          return null;
+          if (!this._shiftToBottom(overId, overItem.context, shift, direction)) preventAction = true;
         }
       }
     }
+
+    if (preventAction) return null;
 
     return item;
   }
@@ -457,15 +491,24 @@ export class KcGridService {
     return false;
   }
 
-  private _shiftToLeft(id: symbol, item: KcGridItem, shift: number): boolean {
+  private _shiftToLeft(
+    id: symbol,
+    item: KcGridItem & { colRest?: number; rowRest?: number },
+    shift: number,
+    position: Position,
+  ): boolean {
     // check if there is enough space to shift to left
     if (item.col - shift < 0) return false;
 
     if (
-      !this._move(id, {
-        ...item,
-        col: item.col - shift,
-      })
+      !this._move(
+        id,
+        {
+          ...item,
+          col: item.col - shift,
+        },
+        position,
+      )
     )
       return false;
 
@@ -480,15 +523,24 @@ export class KcGridService {
     return true;
   }
 
-  private _shiftToRight(id: symbol, item: KcGridItem, shift: number): boolean {
+  private _shiftToRight(
+    id: symbol,
+    item: KcGridItem & { colRest?: number; rowRest?: number },
+    shift: number,
+    position: Position,
+  ): boolean {
     // check if there is enough space to shift to right
     if (item.col + item.cols + shift > this.cols) return false;
 
     if (
-      !this._move(id, {
-        ...item,
-        col: item.col + shift,
-      })
+      !this._move(
+        id,
+        {
+          ...item,
+          col: item.col + shift,
+        },
+        position,
+      )
     )
       return false;
 
@@ -503,15 +555,24 @@ export class KcGridService {
     return true;
   }
 
-  private _shiftToTop(id: symbol, item: KcGridItem, shift: number): boolean {
+  private _shiftToTop(
+    id: symbol,
+    item: KcGridItem & { colRest?: number; rowRest?: number },
+    shift: number,
+    position: Position,
+  ): boolean {
     // check if there is enough space to shift to top
     if (item.row - shift < 0) return false;
 
     if (
-      !this._move(id, {
-        ...item,
-        row: item.row - shift,
-      })
+      !this._move(
+        id,
+        {
+          ...item,
+          row: item.row - shift,
+        },
+        position,
+      )
     )
       return false;
 
@@ -526,15 +587,24 @@ export class KcGridService {
     return true;
   }
 
-  private _shiftToBottom(id: symbol, item: KcGridItem, shift: number): boolean {
+  private _shiftToBottom(
+    id: symbol,
+    item: KcGridItem & { colRest?: number; rowRest?: number },
+    shift: number,
+    position: Position,
+  ): boolean {
     // check if there is enough space to shift to bottom
     if (item.row + item.rows + shift > this.rows) return false;
 
     if (
-      !this._move(id, {
-        ...item,
-        row: item.row + shift,
-      })
+      !this._move(
+        id,
+        {
+          ...item,
+          row: item.row + shift,
+        },
+        position,
+      )
     )
       return false;
 
@@ -669,6 +739,10 @@ export class KcGridService {
         }
       }
     });
+  }
+
+  update() {
+    this._cdr.detectChanges();
   }
 
   render() {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild, inject } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { GridEventType, KcGridItems } from '../../types';
+import { KcGridItems } from '../../types';
 import { KcGridService } from './grid.service';
 import { GridDirective, PreviewDirective } from '../../directives';
 
@@ -35,15 +35,10 @@ const mock = (component: PreviewComponent, size: { cols: number; rows: number },
     scrollLeft: 0,
     cellWidth: 100,
     cellHeight: 100,
-    preview: component.previewDirective.render(
-      Symbol('default'),
-      { col: 0, row: 0, cols: 0, rows: 0 },
-      GridEventType.AfterAddRows,
-    ),
+    preview: component.previewDirective,
     itemDirective: component.itemDirective,
-    colsGaps: [],
-    rowsGaps: [],
-    changeDetectorRef: component.cdr,
+    colsGaps: [10],
+    rowsGaps: [10],
   });
 
   const items = new Map<number, symbol>();

@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ContentChild,
   DestroyRef,
@@ -92,6 +93,9 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @ContentChild(GridItemDirective, { static: true }) gridItem!: GridItemDirective<T>;
   @ContentChild(BackgroundDirective, { static: true }) background?: GridItemDirective;
 
+  @ViewChild('header', { static: true }) header!: ElementRef<HTMLElement>;
+  @ViewChild('footer', { static: true }) footer!: ElementRef<HTMLElement>;
+
   colsTotalGaps!: number;
   rowsTotalGaps!: number;
 
@@ -99,6 +103,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   grid = inject<KcGridService>(KcGridService);
 
   private _destroyRef = inject(DestroyRef);
+  private _cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.grid.changes
@@ -119,6 +124,9 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       itemDirective: this.gridElement,
       scrollTop: this.containerElementRef.nativeElement.scrollTop,
       scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
+      footer: this.footer.nativeElement,
+      header: this.header.nativeElement,
+      cdr: this._cdr,
     });
 
     this.items.forEach((item) => this.grid.add(item, { emitEvent: false }));

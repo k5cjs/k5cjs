@@ -8,6 +8,7 @@ import {
   BackgroundComponent,
   BackgroundPagesComponent,
   BarComponent,
+  CanvasComponent,
   DeleteComponent,
   MagnificationComponent,
   MoveComponent,
@@ -48,6 +49,7 @@ import { GridComponent } from './grid.component';
     DeleteComponent,
     MoveComponent,
     TestInjectorChildComponent,
+    CanvasComponent,
   ],
   imports: [CommonModule, GridRoutingModule, ReactiveFormsModule, KcGridModule],
 })

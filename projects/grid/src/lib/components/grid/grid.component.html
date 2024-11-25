@@ -1,5 +1,7 @@
-<div #content>
-  <ng-content select="[header]"></ng-content>
+<div #content class="test">
+  <div #header>
+    <ng-content select="[header]"></ng-content>
+  </div>
 
   <!-- <div -->
   <!--   #items -->
@@ -10,7 +12,7 @@
   <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
     <ng-container *ngIf="background">
       <ng-container
-        *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows, cols, colsGaps, rowsGaps } }"
+        *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows: grid.rows, cols: grid.cols, colsGaps: grid.colsGaps, rowsGaps: grid.rowsGaps } }"
       />
     </ng-container>
 
@@ -27,5 +29,7 @@
     ></kc-grid-item>
   </div>
 
-  <ng-content select="[footer]"></ng-content>
+  <div #footer>
+    <ng-content select="[footer]"></ng-content>
+  </div>
 </div>

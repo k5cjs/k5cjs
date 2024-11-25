@@ -1,3 +1,9 @@
+declare global {
+  interface Window {
+    render(...number: { x: number; y: number }[]): void;
+  }
+}
+
 type Rectangle = {
   x: number;
   y: number;
@@ -30,10 +36,13 @@ const euclideanDistance = (point1: Point, point2: Point) => {
  * @returns 'top' | 'right' | 'bottom' | 'left' | 'center'
  *
  */
-export const getPosition = (staticRectangle: Rectangle, movingRectangle: Rectangle): Position => {
+export const getPosition = (
+  staticRectangle: Rectangle,
+  movingRectangle: Rectangle & { colRest?: number; rowRest?: number },
+): Position => {
   const movingCenter = {
-    x: movingRectangle.x + movingRectangle.width / 2,
-    y: movingRectangle.y + movingRectangle.height / 2,
+    x: movingRectangle.x + (movingRectangle.colRest || 0) + movingRectangle.width / 2,
+    y: movingRectangle.y + (movingRectangle.rowRest || 0) + movingRectangle.height / 2,
   };
 
   const staticTop = { x: staticRectangle.x + staticRectangle.width / 2, y: staticRectangle.y };
@@ -92,16 +101,11 @@ export const getPosition = (staticRectangle: Rectangle, movingRectangle: Rectang
     },
   ];
 
-  // console.log(directions, {
-  //   staticRectangle,
-  //   movingRectangle,
-  //   movingCenter,
-  //   staticTop,
-  //   staticRight,
-  //   staticBottom,
-  //   staticLeft,
-  //   staticCenter,
-  // });
+  if (window.render) window.render(movingCenter, staticTop, staticRight, staticBottom, staticLeft, staticCenter);
 
-  return directions.reduce((prev, current) => (prev.distance <= current.distance ? prev : current)).direction;
+  const direction = directions.reduce((prev, current) =>
+    prev.distance <= current.distance ? prev : current,
+  ).direction;
+
+  return direction;
 };

@@ -149,6 +149,7 @@ export class MoveDirective {
     element.style.transform = `translate(${this._x}px, ${this._y}px)`;
     element.style.zIndex = `999`;
     element.style.backgroundColor = 'green';
+    element.style.opacity = '0.75';
   }
 
   private _setFixedSize(element: HTMLElement): void {
@@ -220,11 +221,14 @@ export class MoveDirective {
 
     if (this._grid.scrollTop + increaseY <= 0) increaseY = 0;
 
+    /**
+     * Remove the top padding because it is included in both clientHeight and scrollLeft calculations.
+     */
     const scrollWidth =
-      this._gridTemplate.containerElementRef.nativeElement.clientWidth -
+      this._gridTemplate.containerElementRef.nativeElement.clientWidth +
+      this._grid.scrollLeft -
       this.padding.left -
-      this.padding.right +
-      this._grid.scrollLeft;
+      this.padding.right;
     const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
 
     let temp: number | undefined;
@@ -246,12 +250,18 @@ export class MoveDirective {
       }
     }
 
+    /**
+     * Remove the top padding because it is included in both clientHeight and scrollTop calculations.
+     */
     const scrollHeight =
-      this._gridTemplate.containerElementRef.nativeElement.clientHeight -
+      this._gridTemplate.containerElementRef.nativeElement.clientHeight +
+      this._grid.scrollTop -
       this.padding.top -
-      this.padding.bottom +
-      this._grid.scrollTop;
-    const contentHeight = this._gridTemplate.contentElementRef.nativeElement.offsetHeight;
+      // TODO: exclude when the scroll is available
+      this.padding.bottom;
+
+    const contentHeight =
+      this._gridTemplate.contentElementRef.nativeElement.offsetHeight - this._grid.footer.offsetHeight;
 
     // add new row if scroll is at the bottom
     if (scrollHeight + increaseY > contentHeight) {
@@ -261,19 +271,19 @@ export class MoveDirective {
         temp = increaseY;
         increaseY = remainingHeight;
       } else {
-        console.error('add new row');
+        const addRows = 30;
 
-        // this._grid.emit(this.id, this.item, GridEventType.BeforeAddRows);
-        //
-        // this._grid.rows += 8;
-        // this._grid.rows += 8;
-        // this._grid.rowsGaps = [...this._grid.rowsGaps, 0] as unknown as [number, ...number[]];
-        // // this._grid.rowsTotalGaps = this._rowsTotalGaps();
-        //
-        // // this._cdr.detectChanges();
-        //
-        // this._scroll(increaseX, temp || increaseY);
-        return;
+        this._grid.rows += addRows;
+        this._grid.rowsGaps = [...this._grid.rowsGaps, ...this._grid.rowsGaps.slice(0, addRows)] as unknown as [
+          number,
+          ...number[],
+        ];
+
+        this._grid.update();
+
+        cancelAnimationFrame(this._requestAnimationFrameId);
+
+        return this._scroll(increaseX, temp || increaseY);
       }
     }
 
@@ -326,42 +336,54 @@ export class MoveDirective {
   }
 
   private _updateGrid() {
-    const col = this._col();
-    const row = this._row();
+    const { col, colRest } = this._col();
+    const { row, rowRest } = this._row();
 
     return this._grid.move(this.id, {
       ...this.item,
       col,
+      colRest,
       row,
+      rowRest,
       cols: this._startCols,
       rows: this._startRows,
     });
   }
 
-  private _col(): number {
+  private _col(): { col: number; colRest: number } {
     let width = 0;
 
     for (let i = 0; i < this._grid.cols; i++) {
       width += gapSize(this._grid.colsGaps[i]);
       width += this._cellWidth();
 
-      if (width > this._x) return i;
+      if (width > this._x) {
+        const rest = (width - this._cellWidth() - gapSize(this._grid.colsGaps[i]) - this._x) * -1;
+        const colRest = rest / this._cellWidth();
+
+        return { col: i, colRest };
+      }
     }
 
-    return this._grid.cols - 1;
+    return { col: this._grid.cols - 1, colRest: 0 };
   }
 
-  private _row(): number {
+  private _row(): { row: number; rowRest: number } {
     let height = 0;
 
     for (let i = 0; i < this._grid.rows; i++) {
       height += gapSize(this._grid.rowsGaps[i]);
       height += this._cellHeight();
 
-      if (height > this._y) return i;
+      if (height > this._y) {
+        const rest = (height - this._cellHeight() - gapSize(this._grid.rowsGaps[i]) - this._y) * -1;
+        const rowRest = rest / this._cellHeight();
+
+        return { row: i, rowRest };
+      }
     }
 
-    return this._grid.rows - 1;
+    return { row: this._grid.rows - 1, rowRest: 0 };
   }
 
   private _cellWidth(): number {

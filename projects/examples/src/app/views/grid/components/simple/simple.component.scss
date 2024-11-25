@@ -9,7 +9,8 @@
 
 .grid {
   @apply
-    p-10;
+    p-10
+    pt-20;
 
   &__preview {
     @apply
@@ -62,7 +63,7 @@
   }
 
   &__text {
-    &--prevent-swap {
+    &--prevent {
       @apply
         text-red-500;
     }

@@ -151,7 +151,7 @@ class DumpyComponent implements GridItemTemplate, GridTemplate {
   };
 }
 
-fdescribe('ResizeDirective', () => {
+describe('ResizeDirective', () => {
   let component: DumpyComponent;
   let fixture: ComponentFixture<DumpyComponent>;
 
