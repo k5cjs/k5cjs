@@ -742,10 +742,11 @@ export class KcGridService {
   }
 
   update() {
+    this.render(true);
     this._cdr.detectChanges();
   }
 
-  render() {
+  render(force?: boolean): void {
     this._items.forEach((item, id) => {
       // render the item in redo logic if the item is deleted
       if (item.config.template.destroyed) {
@@ -754,8 +755,13 @@ export class KcGridService {
         item.config.template = template;
       }
 
+      /**
+       * item is handled by the template itself
+       */
+      if (item.config.handle) return;
+
       // skip rerendering the item if it's already rendered
-      if (item.config.handle || this._checkIsEqual(item.context, item.config.template.context.$implicit)) return;
+      if (!force && this._checkIsEqual(item.context, item.config.template.context.$implicit)) return;
 
       this._rerenderItem(item.config.template, item.context);
     });

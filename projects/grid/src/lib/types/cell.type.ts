@@ -13,6 +13,7 @@ export interface KcGridItemContext<T = void> {
   context: KcGridItem<T>;
   config: {
     template: EmbeddedViewRef<{ $implicit: KcGridItem<T>; id: symbol }>;
+    // template rendering is handled by the template itself
     handle: boolean;
   };
 }
