@@ -7,6 +7,15 @@
 }
 
 .grid {
+  &__content {
+    @apply
+      p-10
+      min-w-full
+      min-h-full
+      overflow-hidden
+      inline-block;
+  }
+
   &__items {
     @apply
       relative
@@ -21,9 +30,4 @@
       left-0
       z-10;
   }
-}
-
-.test {
-  @apply
-    relative;
 }

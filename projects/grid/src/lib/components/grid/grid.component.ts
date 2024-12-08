@@ -6,6 +6,7 @@ import {
   DestroyRef,
   ElementRef,
   EventEmitter,
+  HostBinding,
   Input,
   OnInit,
   Output,
@@ -26,6 +27,7 @@ import { KcGridService } from '../../services';
 import { Gaps, KcGridItem, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
 import { gapSize } from '../../helpers';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
 
 @Component({
   selector: 'kc-grid',
@@ -82,6 +84,9 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   }
   _rowsGaps: Gaps = [10];
 
+  @Input({ transform: (value: string | number) => coerceNumberProperty(value) }) countOfColsToAdd?: number;
+  @Input({ transform: (value: string | number) => coerceNumberProperty(value) }) countOfRowsToAdd?: number;
+
   @Output() readonly changes = new EventEmitter<KcGridItems<T>>();
 
   @ViewChild('content', { static: true }) contentElementRef!: ElementRef<HTMLElement>;
@@ -126,6 +131,8 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       scrollLeft: this.containerElementRef.nativeElement.scrollLeft,
       footer: this.footer.nativeElement,
       header: this.header.nativeElement,
+      countOfColsToAdd: this.countOfColsToAdd,
+      countOfRowsToAdd: this.countOfRowsToAdd,
       cdr: this._cdr,
     });
 

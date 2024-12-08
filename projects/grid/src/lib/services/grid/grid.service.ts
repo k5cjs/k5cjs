@@ -85,6 +85,9 @@ export class KcGridService {
   header!: HTMLElement;
   footer!: HTMLElement;
 
+  countOfRowsToAdd!: number;
+  countOfColsToAdd!: number;
+
   hasUndo$ = this._hasUndo.asObservable().pipe(distinctUntilChanged());
   hasRedo$ = this._hasRedo.asObservable().pipe(distinctUntilChanged());
 
@@ -108,6 +111,9 @@ export class KcGridService {
     cdr: ChangeDetectorRef;
     header: HTMLElement;
     footer: HTMLElement;
+    // add a config for count of rows to add to the end of the grid when the user moves the item to the end of the grid
+    countOfRowsToAdd?: number;
+    countOfColsToAdd?: number;
   }) {
     this.cols = configs.cols;
     this.rows = configs.rows;
@@ -121,6 +127,8 @@ export class KcGridService {
     this._itemDirective = configs.itemDirective;
     this.header = configs.header;
     this.footer = configs.footer;
+    this.countOfRowsToAdd = configs.countOfRowsToAdd || 0;
+    this.countOfColsToAdd = configs.countOfColsToAdd || 0;
     this._cdr = configs.cdr;
 
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));

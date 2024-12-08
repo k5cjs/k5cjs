@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PaginationComponent, SimpleComponent } from './components';
+import { PaginationComponent, SimpleComponent, SimpleScrollXyComponent } from './components';
 import { GridComponent } from './grid.component';
 
 const routes: Routes = [
@@ -12,6 +12,10 @@ const routes: Routes = [
       {
         path: '',
         component: SimpleComponent,
+      },
+      {
+        path: 'scroll-xy',
+        component: SimpleScrollXyComponent,
       },
       {
         path: 'pagination',

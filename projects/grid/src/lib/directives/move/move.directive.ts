@@ -221,69 +221,77 @@ export class MoveDirective {
 
     if (this._grid.scrollTop + increaseY <= 0) increaseY = 0;
 
-    /**
-     * Remove the top padding because it is included in both clientHeight and scrollLeft calculations.
-     */
-    const scrollWidth =
-      this._gridTemplate.containerElementRef.nativeElement.clientWidth +
-      this._grid.scrollLeft -
-      this.padding.left -
-      this.padding.right;
-    const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
-
     let temp: number | undefined;
 
-    // add new column if scroll is at the right
-    if (scrollWidth + increaseX > contentWidth) {
-      const remainingWidth = contentWidth - scrollWidth;
+    if (this._grid.countOfColsToAdd) {
+      /**
+       * Remove the top padding because it is included in both clientHeight and scrollLeft calculations.
+       */
+      const scrollWidth =
+        this._gridTemplate.containerElementRef.nativeElement.clientWidth +
+        this._grid.scrollLeft -
+        this.padding.left -
+        this.padding.right;
 
-      if (remainingWidth > 0) {
-        temp = increaseX;
-        increaseX = remainingWidth;
-      } else {
-        console.error('add new column');
-        // this.grid.cols += 1;
-        // this._cdr.detectChanges();
-        //
-        // this._scroll(temp || increaseX, increaseY)
-        return;
+      const contentWidth = this._gridTemplate.contentElementRef.nativeElement.offsetWidth;
+
+      // add new column if scroll is at the right
+      if (scrollWidth + increaseX > contentWidth) {
+        const remainingWidth = contentWidth - scrollWidth;
+
+        if (remainingWidth > 0) {
+          temp = increaseX;
+          increaseX = remainingWidth;
+        } else {
+          this._grid.cols += this._grid.countOfColsToAdd;
+          this._grid.colsGaps = [
+            ...this._grid.colsGaps,
+            ...this._grid.colsGaps.slice(0, this._grid.countOfColsToAdd),
+          ] as unknown as [number, ...number[]];
+
+          this._grid.update();
+
+          cancelAnimationFrame(this._requestAnimationFrameId);
+
+          return this._scroll(temp || increaseX, increaseY);
+        }
       }
     }
 
-    /**
-     * Remove the top padding because it is included in both clientHeight and scrollTop calculations.
-     */
-    const scrollHeight =
-      this._gridTemplate.containerElementRef.nativeElement.clientHeight +
-      this._grid.scrollTop -
-      this.padding.top -
-      // TODO: exclude when the scroll is available
-      this.padding.bottom;
+    if (this._grid.countOfRowsToAdd) {
+      /**
+       * Remove the top padding because it is included in both clientHeight and scrollTop calculations.
+       */
+      const scrollHeight =
+        this._gridTemplate.containerElementRef.nativeElement.clientHeight +
+        this._grid.scrollTop -
+        this.padding.top -
+        // TODO: exclude when the scroll is available
+        this.padding.bottom;
 
-    const contentHeight =
-      this._gridTemplate.contentElementRef.nativeElement.offsetHeight - this._grid.footer.offsetHeight;
+      const contentHeight =
+        this._gridTemplate.contentElementRef.nativeElement.offsetHeight - this._grid.footer.offsetHeight;
 
-    // add new row if scroll is at the bottom
-    if (scrollHeight + increaseY > contentHeight) {
-      const remainingHeight = contentHeight - scrollHeight;
+      // add new row if scroll is at the bottom
+      if (scrollHeight + increaseY > contentHeight) {
+        const remainingHeight = contentHeight - scrollHeight;
 
-      if (remainingHeight > 0) {
-        temp = increaseY;
-        increaseY = remainingHeight;
-      } else {
-        const addRows = 30;
+        if (remainingHeight > 0) {
+          temp = increaseY;
+          increaseY = remainingHeight;
+        } else {
+          this._grid.rows += this._grid.countOfRowsToAdd;
+          this._grid.rowsGaps = [
+            ...this._grid.rowsGaps,
+            ...this._grid.rowsGaps.slice(0, this._grid.countOfRowsToAdd),
+          ] as unknown as [number, ...number[]];
 
-        this._grid.rows += addRows;
-        this._grid.rowsGaps = [...this._grid.rowsGaps, ...this._grid.rowsGaps.slice(0, addRows)] as unknown as [
-          number,
-          ...number[],
-        ];
+          this._grid.update();
 
-        this._grid.update();
+          cancelAnimationFrame(this._requestAnimationFrameId);
 
-        cancelAnimationFrame(this._requestAnimationFrameId);
-
-        return this._scroll(increaseX, temp || increaseY);
+          return this._scroll(increaseX, temp || increaseY);
+        }
       }
     }
 

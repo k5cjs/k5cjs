@@ -22,6 +22,7 @@ import {
   ResizeTopLeftComponent,
   ResizeTopRightComponent,
   SimpleComponent,
+  SimpleScrollXyComponent,
   TestInjectorChildComponent,
   TestInjectorComponent,
 } from './components';
@@ -33,6 +34,7 @@ import { GridComponent } from './grid.component';
     GridComponent,
     TestInjectorComponent,
     SimpleComponent,
+    SimpleScrollXyComponent,
     PaginationComponent,
     BackgroundComponent,
     BackgroundPagesComponent,

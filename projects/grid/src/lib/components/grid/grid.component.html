@@ -1,15 +1,14 @@
-<div #content class="test">
+<div #content class="grid__content">
   <div #header>
     <ng-content select="[header]"></ng-content>
   </div>
 
-  <!-- <div -->
-  <!--   #items -->
-  <!--   class="grid__items" -->
-  <!--   [style.width.px]="(grid.cols * grid.cellWidth + colsTotalGaps) * scale" -->
-  <!--   [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale" -->
-  <!-- > -->
-  <div #items class="grid__items" [style.height.px]="(grid.rows * grid.cellHeight + rowsTotalGaps) * scale">
+  <div
+    #items
+    class="grid__items"
+    [style.width.px]="countOfColsToAdd ? (grid.cols * grid.cellWidth + colsTotalGaps) * scale : null"
+    [style.height.px]="countOfRowsToAdd ? (grid.rows * grid.cellHeight + rowsTotalGaps) * scale : null"
+  >
     <ng-container *ngIf="background">
       <ng-container
         *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows: grid.rows, cols: grid.cols, colsGaps: grid.colsGaps, rowsGaps: grid.rowsGaps } }"

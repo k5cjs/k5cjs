@@ -14,6 +14,7 @@ export * from './resize-right/resize-right.component';
 export * from './resize-top-left/resize-top-left.component';
 export * from './resize-top-right/resize-top-right.component';
 export * from './resize-top/resize-top.component';
+export * from './simple-scroll-xy/simple-scroll-xy.component';
 export * from './simple/simple.component';
 export * from './test-injector-child/test-injector-child.component';
 export * from './test-injector/test-injector.component';
