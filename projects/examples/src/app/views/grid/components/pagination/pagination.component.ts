@@ -22,7 +22,7 @@ export class PaginationComponent {
   rows = 30;
   pageRows = 5;
 
-  rowsGaps: Gaps = Array.from<Gap, Gap>({ length: this.rows - 1 }, (_, i) => this._rowGapSize(i + 1)) as Gaps;
+  rowsGaps: Gaps = Array.from<Gap, Gap>({ length: this.rows }, (_, i) => this._rowGapSize(i + 1)) as Gaps;
 
   // colsGaps: Gaps = [10, { size: 50, preventOverlap: true } as Gap] as Gaps;
   colsGaps: Gaps = [10];

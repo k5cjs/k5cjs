@@ -117,8 +117,7 @@ export abstract class ResizeDirective {
   }
 
   protected _cellWidth(): number {
-    const totalColsGaps = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-    const gridWidth = this._gridTemplate.itemsElementRef.nativeElement.offsetWidth - totalColsGaps;
+    const gridWidth = this._gridTemplate.itemsElementRef.nativeElement.offsetWidth - this._grid.colsTotalGaps;
 
     const cellWidth = gridWidth / this._grid.cols;
 
@@ -126,8 +125,7 @@ export abstract class ResizeDirective {
   }
 
   protected _cellHeight(): number {
-    const totalRowsGaps = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-    const gridHeight = this._gridTemplate.itemsElementRef.nativeElement.offsetHeight - totalRowsGaps;
+    const gridHeight = this._gridTemplate.itemsElementRef.nativeElement.offsetHeight - this._grid.rowsTotalGaps;
 
     const cellHeight = gridHeight / this._grid.rows;
 

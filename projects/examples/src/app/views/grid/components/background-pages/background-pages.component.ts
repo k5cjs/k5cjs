@@ -22,8 +22,6 @@ export class BackgroundPagesComponent implements OnChanges {
   private _pages(): void {
     const pagesLength = Math.ceil(this.config.rows / this.pageRows);
 
-    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-
     const pages = [];
 
     for (let page = 0; page < pagesLength; page++) {
@@ -35,11 +33,13 @@ export class BackgroundPagesComponent implements OnChanges {
         .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
       pages.push({
-        height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows} * ${this.pageRows} + ${pageRowsGaps + 20}px)`,
+        height: `calc((100cqh - ${this.config.rowsTotalGaps}px) / ${this.config.rows} * ${this.pageRows} + ${
+          pageRowsGaps + 20
+        }px)`,
         width: `calc(100% + 20px)`,
-        transform: `translate(-10px, calc((100cqh - ${gapsHeight}px) * ${(page * this.pageRows) / this.config.rows} + ${
-          untilPageRowsGaps - 10
-        }px))`,
+        transform: `translate(-10px, calc((100cqh - ${this.config.rowsTotalGaps}px) * ${
+          (page * this.pageRows) / this.config.rows
+        } + ${untilPageRowsGaps - 10}px))`,
       });
     }
 
@@ -47,9 +47,6 @@ export class BackgroundPagesComponent implements OnChanges {
   }
 
   private _cells(): void {
-    const gapsWidth = this.config.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-
     const cells = [];
 
     let rowGap = 0;
@@ -62,10 +59,10 @@ export class BackgroundPagesComponent implements OnChanges {
         const y = row / this.config.rows;
 
         cells.push({
-          width: `calc((100cqw - ${gapsWidth}px) / ${this.config.cols})`,
-          height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows})`,
+          width: `calc((100cqw - ${this.config.colsTotalGaps}px) / ${this.config.cols})`,
+          height: `calc((100cqh - ${this.config.rowsTotalGaps}px) / ${this.config.rows})`,
           // eslint-disable-next-line max-len
-          transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
+          transform: `translate(calc((100cqw - ${this.config.colsTotalGaps}px) * ${x} + ${colGap}px), calc((100cqh - ${this.config.rowsTotalGaps}px) * ${y} + ${rowGap}px))`,
         });
 
         colGap += gapSize(this.config.colsGaps[col]);

@@ -45,7 +45,12 @@ export class SimpleComponent {
 
   data!: Data;
 
-  changes(items: KcGridItem[]): void {
+  gridChanges(items: { cols: number; rows: number }): void {
+    // eslint-disable-next-line no-console
+    console.log(items);
+  }
+
+  itemsChanges(items: KcGridItem[]): void {
     // eslint-disable-next-line no-console
     console.log(items);
   }

@@ -8,10 +8,9 @@ describe('SimpleScrollXyComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SimpleScrollXyComponent]
-    })
-    .compileComponents();
-    
+      imports: [SimpleScrollXyComponent],
+    }).compileComponents();
+
     fixture = TestBed.createComponent(SimpleScrollXyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

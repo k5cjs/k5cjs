@@ -6,4 +6,6 @@ export interface BackgroundConfig {
   rows: number;
   colsGaps: Gaps;
   rowsGaps: Gaps;
+  colsTotalGaps: number;
+  rowsTotalGaps: number;
 }

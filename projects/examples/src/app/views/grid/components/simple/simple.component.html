@@ -8,7 +8,8 @@
       [colsGaps]="colsGaps"
       [rowsGaps]="rowsGaps"
       [countOfRowsToAdd]="1"
-      (changes)="changes($event)"
+      (gridChanges)="gridChanges($event)"
+      (itemsChanges)="itemsChanges($event)"
       [items]="items"
       class="grid"
     >

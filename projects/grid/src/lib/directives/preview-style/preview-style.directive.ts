@@ -41,9 +41,6 @@ export class PreviewStyleDirective implements OnChanges {
   }
 
   private _transformValue(): string {
-    const gapsWidth = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-    const gapsHeight = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-
     const untilGapsWidth = this._grid.colsGaps
       .slice(0, this.item.col)
       .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
@@ -54,27 +51,25 @@ export class PreviewStyleDirective implements OnChanges {
     const x = this.item.col / this._grid.cols;
     const y = this.item.row / this._grid.rows;
 
-    const translateX = `calc((100cqw - ${gapsWidth}px) * ${x} + ${untilGapsWidth}px)`;
-    const translateY = `calc((100cqh - ${gapsHeight}px) * ${y} + ${untilGapsHeight}px)`;
+    const translateX = `calc((100cqw - ${this._grid.colsTotalGaps}px) * ${x} + ${untilGapsWidth}px)`;
+    const translateY = `calc((100cqh - ${this._grid.rowsTotalGaps}px) * ${y} + ${untilGapsHeight}px)`;
 
     return `translate3d(${translateX}, ${translateY}, 0)`;
   }
 
   private _widthValue(): string {
-    const gapsWidth = this._grid.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsWidthInsideItem = this._grid.colsGaps
       .slice(this.item.col, this.item.col + this.item.cols - 1)
       .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
-    return `calc((100cqw - ${gapsWidth}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsWidthInsideItem}px)`;
+    return `calc((100cqw - ${this._grid.colsTotalGaps}px) / ${this._grid.cols} * ${this.item.cols} + ${gapsWidthInsideItem}px)`;
   }
 
   private _heightValue(): string {
-    const gapsHeight = this._grid.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
     const gapsHeightInsideItem = this._grid.rowsGaps
       .slice(this.item.row, this.item.row + this.item.rows - 1)
       .reduce<number>((acc, gap) => acc + gapSize(gap), 0);
 
-    return `calc((100cqh - ${gapsHeight}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsHeightInsideItem}px)`;
+    return `calc((100cqh - ${this._grid.rowsTotalGaps}px) / ${this._grid.rows} * ${this.item.rows} + ${gapsHeightInsideItem}px)`;
   }
 }

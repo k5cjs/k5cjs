@@ -6,12 +6,12 @@
   <div
     #items
     class="grid__items"
-    [style.width.px]="countOfColsToAdd ? (grid.cols * grid.cellWidth + colsTotalGaps) * scale : null"
-    [style.height.px]="countOfRowsToAdd ? (grid.rows * grid.cellHeight + rowsTotalGaps) * scale : null"
+    [style.width.px]="countOfColsToAdd ? (grid.cols * grid.cellWidth + grid.colsTotalGaps) * scale : null"
+    [style.height.px]="countOfRowsToAdd ? (grid.rows * grid.cellHeight + grid.rowsTotalGaps) * scale : null"
   >
     <ng-container *ngIf="background">
       <ng-container
-        *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows: grid.rows, cols: grid.cols, colsGaps: grid.colsGaps, rowsGaps: grid.rowsGaps } }"
+        *ngTemplateOutlet="background.template; context: { $implicit: { scale, rows: grid.rows, cols: grid.cols, colsGaps: grid.colsGaps.slice(0, -1), rowsGaps: grid.rowsGaps.slice(0, -1), colsTotalGaps: grid.colsTotalGaps, rowsTotalGaps: grid.rowsTotalGaps } }"
       />
     </ng-container>
 

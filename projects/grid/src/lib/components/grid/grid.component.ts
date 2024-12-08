@@ -6,7 +6,6 @@ import {
   DestroyRef,
   ElementRef,
   EventEmitter,
-  HostBinding,
   Input,
   OnInit,
   Output,
@@ -14,6 +13,7 @@ import {
   forwardRef,
   inject,
 } from '@angular/core';
+import { coerceNumberProperty } from '@angular/cdk/coercion';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
@@ -26,8 +26,6 @@ import {
 import { KcGridService } from '../../services';
 import { Gaps, KcGridItem, KcGridItems } from '../../types';
 import { GRID_TEMPLATE, GridTemplate } from '../../tokens';
-import { gapSize } from '../../helpers';
-import { coerceNumberProperty } from '@angular/cdk/coercion';
 
 @Component({
   selector: 'kc-grid',
@@ -57,12 +55,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
   @Input()
   set colsGaps(value: Gaps) {
-    /**
-     * generate array of cols gaps
-     * the size of the array is length of cols - 1
-     * because we have gaps between cols
-     */
-    this._colsGaps = new Array(this.cols - 1).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
+    this._colsGaps = new Array(this.cols).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
   }
   get colsGaps(): Gaps {
     return this._colsGaps;
@@ -72,12 +65,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
 
   @Input()
   set rowsGaps(value: Gaps) {
-    /**
-     * generate array of rows gaps
-     * the size of the array is length of rows - 1
-     * because we have gaps between rows
-     */
-    this._rowsGaps = new Array(this.rows - 1).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
+    this._rowsGaps = new Array(this.rows).fill(0).map((_, i) => value[i] ?? value[0]) as Gaps;
   }
   get rowsGaps(): Gaps {
     return this._rowsGaps;
@@ -87,7 +75,8 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @Input({ transform: (value: string | number) => coerceNumberProperty(value) }) countOfColsToAdd?: number;
   @Input({ transform: (value: string | number) => coerceNumberProperty(value) }) countOfRowsToAdd?: number;
 
-  @Output() readonly changes = new EventEmitter<KcGridItems<T>>();
+  @Output() readonly itemsChanges = new EventEmitter<KcGridItems<T>>();
+  @Output() readonly gridChanges = new EventEmitter<{ cols: number; rows: number }>();
 
   @ViewChild('content', { static: true }) contentElementRef!: ElementRef<HTMLElement>;
   @ViewChild('items', { static: true }) itemsElementRef!: ElementRef<HTMLElement>;
@@ -101,9 +90,6 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @ViewChild('header', { static: true }) header!: ElementRef<HTMLElement>;
   @ViewChild('footer', { static: true }) footer!: ElementRef<HTMLElement>;
 
-  colsTotalGaps!: number;
-  rowsTotalGaps!: number;
-
   containerElementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   grid = inject<KcGridService>(KcGridService);
 
@@ -111,12 +97,13 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   private _cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
-    this.grid.changes
+    this.grid.gridChanges
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe((items) => this.changes.emit(items.map((item) => item.context as KcGridItem<T>)));
+      .subscribe((config) => this.gridChanges.emit(config));
 
-    this.colsTotalGaps = this._colsTotalGaps();
-    this.rowsTotalGaps = this._rowsTotalGaps();
+    this.grid.itemsChanges
+      .pipe(takeUntilDestroyed(this._destroyRef))
+      .subscribe((items) => this.itemsChanges.emit(items.map((item) => item.context as KcGridItem<T>)));
 
     this.grid.init({
       cols: this.cols,
@@ -137,13 +124,5 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
     });
 
     this.items.forEach((item) => this.grid.add(item, { emitEvent: false }));
-  }
-
-  private _colsTotalGaps(): number {
-    return this.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-  }
-
-  private _rowsTotalGaps(): number {
-    return this.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
   }
 }

@@ -25,9 +25,6 @@ export class BackgroundComponent implements OnInit, OnChanges {
   }
 
   private _cells(): void {
-    const gapsWidth = this.config.colsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-    const gapsHeight = this.config.rowsGaps.reduce<number>((acc, gap) => acc + gapSize(gap), 0);
-
     const cells = [];
 
     let rowGap = 0;
@@ -40,10 +37,10 @@ export class BackgroundComponent implements OnInit, OnChanges {
         const y = row / this.config.rows;
 
         cells.push({
-          width: `calc((100cqw - ${gapsWidth}px) / ${this.config.cols})`,
-          height: `calc((100cqh - ${gapsHeight}px) / ${this.config.rows})`,
+          width: `calc((100cqw - ${this.config.colsTotalGaps}px) / ${this.config.cols})`,
+          height: `calc((100cqh - ${this.config.rowsTotalGaps}px) / ${this.config.rows})`,
           // eslint-disable-next-line max-len
-          transform: `translate(calc((100cqw - ${gapsWidth}px) * ${x} + ${colGap}px), calc((100cqh - ${gapsHeight}px) * ${y} + ${rowGap}px))`,
+          transform: `translate(calc((100cqw - ${this.config.colsTotalGaps}px) * ${x} + ${colGap}px), calc((100cqh - ${this.config.rowsTotalGaps}px) * ${y} + ${rowGap}px))`,
         });
 
         colGap += gapSize(this.config.colsGaps[col]);

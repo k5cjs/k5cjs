@@ -11,6 +11,7 @@ import {
   shiftToRight,
   shiftToTop,
   shrink,
+  gapSize,
 } from '../../helpers';
 import { GridDirective, PreviewDirective } from '../../directives';
 
@@ -26,11 +27,25 @@ export class KcGridService {
   /**
    * cols are the number of columns in the grid
    */
-  public cols!: number;
+  get cols(): number {
+    return this._cols;
+  }
+  set cols(value: number) {
+    this._cols = value;
+    this._gridChanges.next({ cols: value, rows: this.rows });
+  }
+  public _cols!: number;
   /**
    * rows are the number of rows in the grid
    */
-  public rows!: number;
+  get rows(): number {
+    return this._rows;
+  }
+  set rows(value: number) {
+    this._rows = value;
+    this._gridChanges.next({ cols: this.cols, rows: value });
+  }
+  public _rows!: number;
   /**
    * cellWidth is the width of each cell in the grid
    */
@@ -60,8 +75,11 @@ export class KcGridService {
 
   public isItemScrolling = false;
 
-  private _changes = new Subject<KcGridItemContext[]>();
-  public changes = this._changes.asObservable();
+  private _itemsChanges = new Subject<KcGridItemContext[]>();
+  public itemsChanges = this._itemsChanges.asObservable();
+
+  private _gridChanges = new Subject<{ cols: number; rows: number }>();
+  public gridChanges = this._gridChanges.asObservable();
 
   private _itemDirective!: GridDirective;
 
@@ -134,6 +152,14 @@ export class KcGridService {
     this._matrix = new Array(this.rows).fill(null).map(() => new Array(this.cols).fill(null));
   }
 
+  get colsTotalGaps(): number {
+    return this.colsGaps.slice(0, -1).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+  }
+
+  get rowsTotalGaps(): number {
+    return this.rowsGaps.slice(0, -1).reduce<number>((acc, gap) => acc + gapSize(gap), 0);
+  }
+
   add<T = void>(
     item: Omit<KcGridItem<T>, 'col' | 'row' | 'rows' | 'cols'> & Partial<Pick<KcGridItem<T>, 'rows' | 'cols'>>,
     options?: { emitEvent: boolean },
@@ -185,7 +211,7 @@ export class KcGridService {
     this._history = [];
     this.pushToHistory();
 
-    if (options?.emitEvent) this._changes.next([...this._items.values()]);
+    if (options?.emitEvent) this._itemsChanges.next([...this._items.values()]);
 
     // TODO: implement logic to check if the item is out of the grid
     return id;
@@ -214,7 +240,7 @@ export class KcGridService {
 
     this.pushToHistory();
     this.updateGrid();
-    this._changes.next([...this._items.values()]);
+    this._itemsChanges.next([...this._items.values()]);
 
     this.render();
 
@@ -228,7 +254,7 @@ export class KcGridService {
 
     this._removeFromMatrix(id);
     this._items.delete(id);
-    this._changes.next([...this._items.values()]);
+    this._itemsChanges.next([...this._items.values()]);
 
     this._history = [];
     this.pushToHistory();
