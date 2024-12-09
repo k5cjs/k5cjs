@@ -51,6 +51,9 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @Input() cols = 0;
   @Input() rows = 0;
   @Input() autoWidth = true;
+  @Input() maxWidth = 0;
+  @Input() cellHeight = 100;
+  @Input() cellWidth = 100;
   @Input() items: KcGridItems<T> = [];
 
   @Input()
@@ -110,8 +113,8 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
       rows: this.rows,
       colsGaps: this.colsGaps,
       rowsGaps: this.rowsGaps,
-      cellWidth: 100,
-      cellHeight: 100,
+      cellWidth: this.cellWidth,
+      cellHeight: this.cellHeight,
       preview: this.preview,
       itemDirective: this.gridElement,
       scrollTop: this.containerElementRef.nativeElement.scrollTop,
