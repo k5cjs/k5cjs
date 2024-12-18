@@ -7,7 +7,7 @@
     #items
     class="grid__items"
     [style.maxWidth.px]="maxWidth ? maxWidth : null"
-    [style.width.px]="countOfColsToAdd ? (grid.cols * grid.cellWidth + grid.colsTotalGaps) * scale : null"
+    [style.width]="countOfColsToAdd ? (grid.cols * grid.cellWidth + grid.colsTotalGaps) * scale  : autoWidth? '100%': null "
     [style.height.px]="countOfRowsToAdd ? (grid.rows * grid.cellHeight + grid.rowsTotalGaps) * scale : null"
   >
     <ng-container *ngIf="background">
