@@ -36,7 +36,7 @@ describe('KcSelectComponent', () => {
     const valueChanges = jasmine.createSpy('valueChanges');
     component.control.valueChanges.subscribe(valueChanges);
 
-    component.control.setValue(3, { emitEvent: false });
+    component.control.setValue([3], { emitEvent: false });
 
     flush();
     fixture.detectChanges();
@@ -50,7 +50,7 @@ describe('KcSelectComponent', () => {
     const valueChanges = jasmine.createSpy('valueChanges');
     component.control.valueChanges.subscribe(valueChanges);
 
-    component.control.setValue(3);
+    component.control.setValue([3]);
 
     flush();
     fixture.detectChanges();
@@ -70,12 +70,60 @@ describe('KcSelectComponent', () => {
 
     expect(value.textContent).toContain('2');
   }));
+
+  it('reset value multiple', fakeAsync(() => {
+    component.options = of(component.options as KcOption<number>[]).pipe(delay(300), shareReplay());
+
+    fixture.detectChanges();
+    tick(300);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    let value = compiled.querySelector('kc-value') as HTMLElement;
+
+    expect(value.textContent).toContain('2');
+
+    component.control.reset();
+
+    fixture.detectChanges();
+    tick(300);
+    fixture.detectChanges();
+
+    value = compiled.querySelector('kc-value') as HTMLElement;
+
+    expect(value.textContent).toContain('Please choose an option');
+  }));
+
+  it('reset value single', fakeAsync(() => {
+    component.multiple = false;
+    component.control.setValue(2);
+    component.options = of(component.options as KcOption<number>[]).pipe(delay(300), shareReplay());
+
+    fixture.detectChanges();
+    tick(300);
+    fixture.detectChanges();
+
+    const compiled = fixture.nativeElement as HTMLElement;
+    let value = compiled.querySelector('kc-value') as HTMLElement;
+
+    expect(value.textContent).toContain('2');
+
+    component.control.reset();
+
+    fixture.detectChanges();
+    tick(300);
+    fixture.detectChanges();
+
+    value = compiled.querySelector('kc-value') as HTMLElement;
+
+    expect(value.textContent).toContain('Please choose an option');
+  }));
 });
 
 @Component({
   selector: 'kc-dummy',
   template: `
-    <kc-select [formControl]="control" [options]="options" multiple>
+    <kc-select [formControl]="control" [options]="options" [multiple]="multiple">
       <kc-value *kcValue></kc-value>
 
       <kc-options *kcOptions="let options" [options]="options">
@@ -86,7 +134,8 @@ describe('KcSelectComponent', () => {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class DummyComponent {
-  control = new FormControl(2);
+  multiple = true;
+  control = new FormControl<number[] | number>([2]);
 
   options: KcOption<number>[] | Observable<KcOption<number>[]> = Array.from({ length: 10 }, (_, i) => ({
     value: i,
