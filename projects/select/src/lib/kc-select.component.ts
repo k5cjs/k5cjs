@@ -407,12 +407,10 @@ export class KcSelectComponent<V, K, L>
     this._getSelectedOptions
       .pipe(
         tap((options) => {
-          if (!options) return;
-
           this._subscriptionChanges?.unsubscribe();
 
-          this.selection.clear({ emitEvent: false });
-          this.selection.set(options);
+          this.selection.clear({ emitEvent: !options?.length });
+          if (options?.length) this.selection.set(options);
 
           this._subscriptionChanges = this._initSelectionModel();
         }),

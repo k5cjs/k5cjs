@@ -19,9 +19,8 @@ export class KcValueComponent<T extends boolean = false> {
       startWith({ source: { selected: this._selection.selected } }),
       map(({ source: { selected } }) => {
         if (Array.isArray(selected)) return selected.map(({ label }) => label).join(', ');
-        // TODO: need to check if this is not { value: string, label: string }
-        else if (selected && typeof selected === 'object' && Object.keys(selected).length > 0) return 'Object logic';
         else if (selected && selected.label) return selected.label;
+        else if (selected && typeof selected === 'object') return 'Object logic';
 
         return;
       }),
