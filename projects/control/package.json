@@ -1,10 +1,10 @@
 {
   "name": "@k5cjs/control",
-  "version": "0.0.1-alpha.10",
+  "version": "16.0.0",
   "peerDependencies": {
-    "@angular/core": "^14.0.0 || ^15.0.0 || ^16.0.0",
-    "@angular/cdk": "^14.0.0 || ^15.0.0 || ^16.0.0",
-    "@angular/forms": "^14.0.0 || ^15.0.0 || ^16.0.0"
+    "@angular/core": "^16.0.0",
+    "@angular/cdk": "^16.0.0",
+    "@angular/forms": "^16.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

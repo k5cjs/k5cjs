@@ -1,11 +1,11 @@
 {
   "name": "@k5cjs/select",
-  "version": "16.0.0-alpha.0",
+  "version": "16.0.0",
   "peerDependencies": {
     "@angular/common": "^16.0.0",
     "@angular/core": "^16.0.0",
     "@angular/cdk": "^16.0.0",
-    "@k5cjs/selection-model": "^15.0.2-alpha"
+    "@k5cjs/selection-model": "^16.0.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

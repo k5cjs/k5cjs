@@ -53,8 +53,6 @@
     "@angular/platform-browser": "^16.2.4",
     "@angular/platform-browser-dynamic": "^16.2.4",
     "@angular/router": "^16.2.4",
-    "@k5cjs/select": "file:projects/select",
-    "@k5cjs/selection-model": "file:projects/selection-model",
     "@ngrx/effects": "^16.3.0",
     "@ngrx/entity": "^16.3.0",
     "@ngrx/store": "^16.3.0",
