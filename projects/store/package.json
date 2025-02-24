@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/store",
-  "version": "17.0.2",
+  "version": "17.0.3",
   "peerDependencies": {
     "@angular/common": "^17.2.1",
     "@angular/core": "^17.2.1",
