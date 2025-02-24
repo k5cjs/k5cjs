@@ -236,24 +236,35 @@ export class StoreServiceBase<T extends { id: PropertyKey }> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...finishedActions: [...ActionCreatorType<any>[], ActionCreatorType<any>[]] | ActionCreatorType<any>[]
   ): Observable<string> {
-    setTimeout(() => this._store.dispatch(action));
-
     const errorsActions = finishedActions[finishedActions.length - 1];
     const errors = Array.isArray(errorsActions) ? errorsActions : [errorsActions];
 
-    return this._actions$.pipe(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ofType<ActionCreatorType<any> & { query: string }>(...finishedActions.flat()),
-      filter(({ query }) => query === action.query),
-      map(({ type }) => {
-        if (errors.some((error) => error.type === type)) {
-          throw new Error(type);
-        }
+    return new Observable<string>((observer) => {
+      // Subscribe to actions$ first
+      const subscription = this._actions$
+        .pipe(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ofType<ActionCreatorType<any> & { query: string }>(...finishedActions.flat()),
+          filter(({ query }) => query === action.query),
+          map(({ type }) => {
+            if (errors.some((error) => error.type === type)) throw new Error(type);
 
-        return type;
-      }),
-      first(),
-    );
+            return type;
+          }),
+          first(),
+        )
+        .subscribe({
+          next: (value) => observer.next(value),
+          error: (err) => observer.error(err),
+          complete: () => observer.complete(),
+        });
+
+      // Then dispatch the action
+      this._store.dispatch(action);
+
+      // Cleanup when unsubscribed
+      return () => subscription.unsubscribe();
+    });
   }
 
   protected _query(param: Record<PropertyKey, unknown>): string {

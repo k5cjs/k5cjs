@@ -183,6 +183,18 @@ describe('Store', () => {
     expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
   }));
 
+  it('prevent request if subscribe is not called', fakeAsync(() => {
+    const spy = spyOn(http, 'getByQuery').and.returnValue(
+      of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }),
+    );
+
+    service.getByQuery({ params: {} });
+
+    flush();
+
+    expect(spy).not.toHaveBeenCalled();
+  }));
+
   it('getByQuery is loaded', fakeAsync(() => {
     store.dispatch({
       type: 'set',
