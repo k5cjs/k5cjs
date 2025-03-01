@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - select-alpha
 # Ensure only one workflow per branch is running
 concurrency:
   group: deploy-docs-${{ github.ref }}
@@ -46,3 +45,4 @@ jobs:
         uses: actions/deploy-pages@v1
         with:
           artifact_name: github-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
