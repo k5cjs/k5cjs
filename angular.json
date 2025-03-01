@@ -132,7 +132,7 @@
         }
       }
     },
-    "examples": {
+    "docs": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -142,32 +142,32 @@
           "strict": true
         }
       },
-      "root": "projects/examples",
-      "sourceRoot": "projects/examples/src",
+      "root": "projects/docs",
+      "sourceRoot": "projects/docs/src",
       "prefix": "app",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": {
-              "base": "dist/examples"
+              "base": "dist/docs"
             },
-            "index": "projects/examples/src/index.html",
+            "index": "projects/docs/src/index.html",
             "polyfills": [
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/examples/tsconfig.app.json",
+            "tsConfig": "projects/docs/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
+              "projects/docs/src/favicon.ico",
+              "projects/docs/src/assets"
             ],
             "styles": [
-              "projects/examples/src/styles.scss"
+              "projects/docs/src/styles.scss"
             ],
             "scripts": [],
-            "browser": "projects/examples/src/main.ts"
+            "browser": "projects/docs/src/main.ts"
           },
           "configurations": {
             "production": {
@@ -185,8 +185,8 @@
               ],
               "fileReplacements": [
                 {
-                  "replace": "projects/examples/src/environments/environment.ts",
-                  "with": "projects/examples/src/environments/environment.prod.ts"
+                  "replace": "projects/docs/src/environments/environment.ts",
+                  "with": "projects/docs/src/environments/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
@@ -205,10 +205,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "examples:build:production"
+              "buildTarget": "docs:build:production"
             },
             "development": {
-              "buildTarget": "examples:build:development"
+              "buildTarget": "docs:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -216,7 +216,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "examples:build"
+            "buildTarget": "docs:build"
           }
         },
         "test": {
@@ -226,15 +226,15 @@
               "zone.js",
               "zone.js/testing"
             ],
-            "tsConfig": "projects/examples/tsconfig.spec.json",
-            "karmaConfig": "projects/examples/karma.conf.js",
+            "tsConfig": "projects/docs/tsconfig.spec.json",
+            "karmaConfig": "projects/docs/karma.conf.js",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "projects/examples/src/favicon.ico",
-              "projects/examples/src/assets"
+              "projects/docs/src/favicon.ico",
+              "projects/docs/src/assets"
             ],
             "styles": [
-              "projects/examples/src/styles.scss"
+              "projects/docs/src/styles.scss"
             ],
             "scripts": []
           }
@@ -243,8 +243,8 @@
           "builder": "@angular-eslint/builder:lint",
           "options": {
             "lintFilePatterns": [
-              "projects/examples/**/*.ts",
-              "projects/examples/**/*.html"
+              "projects/docs/**/*.ts",
+              "projects/docs/**/*.html"
             ]
           }
         }

@@ -48,7 +48,7 @@ const libs = [
   Libs.Router,
 ];
 
-const apps = [Apps.Examples];
+const apps = [Apps.Docs];
 
 const lints = [...apps, ...libs];
 

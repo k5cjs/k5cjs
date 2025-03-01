@@ -8,9 +8,9 @@ export default defineConfig({
       options: {
         projectConfig: {
           root: '',
-          sourceRoot: 'projects/examples/src',
+          sourceRoot: 'projects/docs/src',
           buildOptions: {
-            tsConfig: 'projects/examples/tsconfig.cy.json',
+            tsConfig: 'projects/docs/tsconfig.cy.json',
           },
         },
       },

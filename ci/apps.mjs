@@ -1,3 +1,3 @@
 export const Apps = {
-  Examples: 'examples',
+  Docs: 'docs',
 };
