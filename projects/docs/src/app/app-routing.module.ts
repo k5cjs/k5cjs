@@ -35,6 +35,10 @@ const routes: Routes = [
     loadChildren: () => import('./views/fake-progress-bar'),
   },
   {
+    path: 'store',
+    loadChildren: () => import('./views/store'),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'home',

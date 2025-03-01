@@ -38,7 +38,16 @@
       "@k5cjs/fake-progress-bar": ["dist/fake-progress-bar"],
       "@k5cjs/router": ["dist/router"],
       "@k5cjs/types": ["dist/types"],
-      "@k5cjs/toggle": ["dist/toggle"]
+      "@k5cjs/toggle": [
+        "dist/toggle"
+      ],
+      "schem": [
+        "./dist/schem"
+      ],
+      "schematics": [
+        "./dist/schematics",
+        "./dist/schematics"
+      ]
     },
     "target": "ES2022",
     "module": "es2020",

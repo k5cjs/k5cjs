@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "store": {
+      "description": "Generate an Angular feature with multiple files",
+      "factory": "./store/index",
+      "schema": "./sotre/store.schema.json"
+    }
+  }
+}

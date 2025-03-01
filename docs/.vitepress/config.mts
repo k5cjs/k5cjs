@@ -10,18 +10,31 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Docs', link: '/docs' },
-      { text: 'Demo', link: '/demo' },
+      { text: 'Docs', link: '/store/' },
     ],
 
     sidebar: [
+      // {
+      //   text: 'Libraries',
+      //   items: [
+      //     // { text: 'Markdown Examples', link: '/markdown-examples' },
+      //     // { text: 'Runtime API Examples', link: '/api-examples' },
+      //     { text: 'Custom input', link: '/custom-input' },
+      //     { text: 'Dropdown', link: '/dropdown' },
+      //   ],
+      // },
       {
-        text: 'Demo',
+        text: 'Store',
         items: [
-          // { text: 'Markdown Examples', link: '/markdown-examples' },
-          // { text: 'Runtime API Examples', link: '/api-examples' },
-          { text: 'Custom input', link: '/custom-input' },
-          { text: 'Dropdown', link: '/dropdown' },
+          { text: 'Overview', link: '/store/' },
+          { text: 'Actions', link: '/store/actions' },
+          { text: 'Reducer', link: '/store/reducer' },
+          { text: 'Selectors', link: '/store/selectors' },
+          { text: 'Http Service', link: '/store/http-service' },
+          { text: 'Effects', link: '/store/effects' },
+          { text: 'Service', link: '/store/service' },
+          { text: 'Module', link: '/store/module' },
+          { text: 'Usage', link: '/store/usage' },
         ],
       },
     ],
