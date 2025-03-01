@@ -33,8 +33,8 @@ jobs:
         run: |
           npm run build:libs:prod
           npm run build:docs
-          cp dist/docs/index.html dist/docs/404.html
-          mv dist/docs docs/public/docs
+          cp dist/docs/browser/index.html dist/docs/404.html
+          mv dist/docs/browser docs/public/docs
           npm run docs:build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

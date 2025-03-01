@@ -11,12 +11,12 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Docs', link: '/docs' },
-      { text: 'Examples', link: '/examples' },
+      { text: 'Demo', link: '/demo' },
     ],
 
     sidebar: [
       {
-        text: 'Examples',
+        text: 'Demo',
         items: [
           // { text: 'Markdown Examples', link: '/markdown-examples' },
           // { text: 'Runtime API Examples', link: '/api-examples' },
