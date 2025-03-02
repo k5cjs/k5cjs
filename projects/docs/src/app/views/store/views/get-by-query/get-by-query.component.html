@@ -1,3 +1,5 @@
+<app-code [forms]="forms" />
+
 <div @blockInitialRender class="query">
   <div class="query__content">
     <app-table />
@@ -5,5 +7,5 @@
     <app-actions />
   </div>
 
-  <app-update />
+  <app-update [forms]="forms" />
 </div>

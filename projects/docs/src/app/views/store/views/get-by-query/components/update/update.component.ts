@@ -1,13 +1,9 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { merge } from 'rxjs';
+import { Component, Input, inject } from '@angular/core';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { Highlight } from 'ngx-highlightjs';
 
 import { UsersService } from '../../users';
-
-import { code } from './code';
 
 @Component({
   selector: 'app-update',
@@ -17,43 +13,22 @@ import { code } from './code';
   styleUrl: './update.component.scss',
 })
 export class UpdateComponent {
+  @Input() forms!: FormGroup<{
+    reloadSelectors: FormControl<boolean>;
+    resetQueries: FormControl<boolean>;
+    reloadIdentifiers: FormControl<boolean>;
+  }>;
+
   private _users = inject(UsersService);
-  private _destroyRef = inject(DestroyRef);
-  private _cdr = inject(ChangeDetectorRef);
-
-  reloadSelectors = new FormControl(true, { nonNullable: true });
-  resetQueries = new FormControl(false, { nonNullable: true });
-  reloadIdentifiers = new FormControl(false, { nonNullable: true });
-
-  code = ``;
-
-  constructor() {
-    this._update();
-
-    merge(this.reloadSelectors.valueChanges, this.resetQueries.valueChanges, this.reloadIdentifiers.valueChanges)
-      .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(() => {
-        this._update();
-        this._cdr.detectChanges();
-      });
-  }
 
   update(): void {
-    this._update();
-
     const age = Math.floor(Math.random() * 100);
 
     this._users
       .update({
         params: { item: { id: '2', age } },
-        reloadSelectors: this.reloadSelectors.value,
-        resetQueries: this.resetQueries.value,
-        reloadIdentifiers: this.reloadIdentifiers.value,
+        ...this.forms.value,
       })
       .subscribe();
-  }
-
-  private _update(): void {
-    this.code = code(this.reloadSelectors.value, this.resetQueries.value, this.reloadIdentifiers.value);
   }
 }

@@ -1,7 +1,13 @@
+:host {
+  @apply
+    flex
+    flex-col
+    p-2;
+}
+
 .title {
   @apply
     font-semibold
-    mt-3
     mb-2;
 }
 

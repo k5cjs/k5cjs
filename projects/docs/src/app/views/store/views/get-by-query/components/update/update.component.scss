@@ -1,11 +1,44 @@
-.code {
-  @apply
-    rounded-md;
-}
-
 .actions {
   @apply
+    p-2
     flex
     flex-col
+    gap-1
     items-start;
+}
+
+label {
+  @apply
+    ml-2;
+}
+
+button {
+  @apply
+    mt-3
+    w-full
+    px-3
+    p-1.5
+    inline-flex
+    justify-center
+    items-center
+    rounded-md
+    text-sm
+    font-semibold
+    leading-6
+    disabled:cursor-not-allowed
+    disabled:pointer-events-none
+    text-white
+    disabled:text-white/50
+    shadow-sm
+    bg-indigo-600
+    dark:bg-indigo-500
+    hover:bg-indigo-500
+    dark:hover:bg-indigo-400
+    disabled:bg-indigo-600/50
+    dark:disabled:bg-indigo-500/50
+    focus-visible:outline
+    focus-visible:outline-2
+    focus-visible:outline-offset-2
+    focus-visible:outline-indigo-600
+    dark:focus-visible:outline-indigo-500;
 }

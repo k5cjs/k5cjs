@@ -1,18 +1,16 @@
-<pre><code [highlight]="code" language="typescript" class="code"></code></pre>
-
-<div class="actions">
+<div class="actions" [formGroup]="forms">
   <div>
-    <input [formControl]="reloadSelectors" type="checkbox" id="reloadSelectors" />
+    <input formControlName="reloadSelectors" type="checkbox" id="reloadSelectors" />
     <label for="reloadSelectors">Reload selectors</label>
   </div>
 
   <div>
-    <input [formControl]="resetQueries" type="checkbox" id="resetQueries" />
+    <input formControlName="resetQueries" type="checkbox" id="resetQueries" />
     <label for="resetQueries">Reset queries</label>
   </div>
 
   <div>
-    <input [formControl]="reloadIdentifiers" type="checkbox" id="reloadIdentifiers" />
+    <input formControlName="reloadIdentifiers" type="checkbox" id="reloadIdentifiers" />
     <label for="reloadIdentifiers">Reload identifiers</label>
   </div>
 
