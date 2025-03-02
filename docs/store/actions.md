@@ -9,6 +9,7 @@ Actions are created using `createAction` from `@ngrx/store`. The `ActionsBase` c
 ### Example Action Definitions
 ```typescript
 import { ActionsBase } from '@k5cjs/store';
+
 import { key } from './users.config';
 import { User } from './users.type';
 

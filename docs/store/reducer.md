@@ -9,6 +9,7 @@ Reducers in this library are based on `@ngrx/store` and leverage `reducerBase` f
 ### Example Reducer Definition
 ```typescript
 import { reducerBase, stateBase } from '@k5cjs/store';
+import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, Action } from '@ngrx/store';
 
 import { actions } from './users.actions';

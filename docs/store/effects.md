@@ -14,6 +14,7 @@ import { EffectsBase } from '@k5cjs/store';
 import { actions } from './users.actions';
 import { selectors } from './users.selectors';
 import { HttpService } from './users.http.service';
+import { User } from './users.type';
 
 @Injectable()
 export class Effects extends EffectsBase<User> {
