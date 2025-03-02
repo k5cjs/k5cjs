@@ -1,0 +1,20 @@
+import { reducerBase, stateBase } from '@k5cjs/store';
+import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
+import { createReducer, Action } from '@ngrx/store';
+
+import { actions } from './<%= dasherize(name) %>.actions';
+import { State, <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+export const adapter: EntityAdapter<<%= classify(type) %>> = createEntityAdapter<<%= classify(type) %>>();
+
+const initialState: State = adapter.getInitialState({
+  ...stateBase(),
+});
+
+export function reducer(state: State | undefined, action: Action): State {
+  return createReducer(
+    initialState,
+
+    ...reducerBase(adapter, actions),
+  )(state, action);
+}

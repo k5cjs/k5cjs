@@ -1,0 +1,7 @@
+import { StateBase } from '@k5cjs/store';
+
+export type State = StateBase<<%= classify(type) %>>;
+
+export interface <%= classify(type) %> {
+  id: string;
+}

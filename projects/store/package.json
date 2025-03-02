@@ -1,6 +1,10 @@
 {
   "name": "@k5cjs/store",
   "version": "18.0.1",
+  "scripts": {
+    "build": "tsc -p tsconfig.schematics.json",
+    "postbuild": "copyfiles schematics/*/schema.json schematics/*/files/** schematics/collection.json ../../dist/store/"
+  },
   "peerDependencies": {
     "@angular/common": "^18.0.0",
     "@angular/core": "^18.0.0",
@@ -8,6 +12,10 @@
     "@ngrx/effects": "^18.0.0",
     "@ngrx/entity": "^18.0.0",
     "@ngrx/store": "^18.0.0"
+  },
+  "schematics": "./schematics/collection.json",
+  "ng-add": {
+    "save": "dependencies"
   },
   "dependencies": {
     "tslib": "^2.3.0"

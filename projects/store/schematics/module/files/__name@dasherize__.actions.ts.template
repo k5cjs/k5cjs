@@ -1,0 +1,8 @@
+import { ActionsBase } from '@k5cjs/store';
+
+import { key } from './<%= dasherize(name) %>.config';
+import { <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+class Actions extends ActionsBase<<%= classify(type) %>> {}
+
+export const actions = new Actions(key);

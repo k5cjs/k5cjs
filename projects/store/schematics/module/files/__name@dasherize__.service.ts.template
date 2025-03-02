@@ -1,0 +1,13 @@
+import { Injectable } from '@angular/core';
+import { StoreServiceBase } from '@k5cjs/store';
+
+import { actions } from './users.actions';
+import { selectors } from './users.selectors';
+import { <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+@Injectable({ providedIn: 'root' })
+export class <%= classify(name) %>Service extends StoreServiceBase<<%= classify(type) %>> {
+  constructor() {
+    super(actions, selectors);
+  }
+}

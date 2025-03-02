@@ -1,0 +1,13 @@
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+import { HttpServiceBase } from '@k5cjs/store';
+
+import { <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+@Injectable({ providedIn: 'root' })
+export class HttpService extends HttpServiceBase<<%= classify(type) %>> {
+  constructor(private _http: HttpClient) {
+    super();
+  }
+}

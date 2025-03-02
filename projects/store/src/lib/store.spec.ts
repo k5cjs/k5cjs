@@ -4,7 +4,6 @@ import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { Observable, catchError, delay, first, map, of, throwError, zip } from 'rxjs';
 
-import { AtLeastDeep } from '@k5cjs/types';
 import { EffectsModule } from '@ngrx/effects';
 import { IdSelector, createEntityAdapter } from '@ngrx/entity';
 import { Action, Store, StoreModule, createAction, createReducer, on, props } from '@ngrx/store';
@@ -71,45 +70,23 @@ const selectors = (selectId: IdSelector<FeatureStoreType> | null) => new Selecto
 @Injectable({ providedIn: 'root' })
 class HttpService extends HttpServiceBase<FeatureStoreType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getByQuery(_options: ActionInit<HttpParams>): Observable<{ items: FeatureStoreType[] }> {
+  override getByQuery(_options: ActionInit<HttpParams>): Observable<{ items: FeatureStoreType[] }> {
     return of({ items: [], total: 0 });
   }
 
   test = 0;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getById(_options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
+  override getById(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>,
+  ): Observable<{ item: FeatureStoreType }> {
     if (this.test) {
       return of({ item: { id: '1', name: 'first' } });
     }
 
     this.test += 1;
 
-    return throwError(() => 'errror');
-  }
-
-  delete(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>,
-  ): Observable<{ item: FeatureStoreType }> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  create(_options: ActionInit<{ item: Omit<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(_options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
-    throw new Error('Method not implemented.');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  updateAll(_options: ActionInit<{ items: AtLeastDeep<FeatureStoreType, 'id'>[] }>): Observable<{
-    items: FeatureStoreType[];
-  }> {
-    throw new Error('Method not implemented.');
+    return throwError(() => 'error');
   }
 }
 
@@ -1114,7 +1091,7 @@ describe('Store', () => {
     expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
   }));
 
-  it('check paralel dispaches', fakeAsync(() => {
+  it('check parallel dispaches', fakeAsync(() => {
     spyOn(http, 'getById').and.returnValues(
       of({ item: { id: '1', name: 'first' } }).pipe(delay(300)),
       throwError(() => new HttpErrorResponse({ error: 'Error message' })).pipe(delay(200)),

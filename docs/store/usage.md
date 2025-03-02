@@ -21,6 +21,8 @@ export const key = 'users';
 Defines the structure of user-related entities.
 
 ```typescript
+import { StateBase } from '@k5cjs/store';
+
 export type State = StateBase<User>;
 
 export interface User {
@@ -56,6 +58,7 @@ Defines how the store state changes in response to actions.
 
 ```typescript
 import { reducerBase, stateBase } from '@k5cjs/store';
+import { EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { createReducer, Action } from '@ngrx/store';
 
 import { actions } from './users.actions';
@@ -115,8 +118,9 @@ export class HttpService extends HttpServiceBase<User> {
     super();
   }
 
-  getByQuery({ params }: ActionInit<HttpParams>): Observable<{ items: User[]; config: Params }> {
-    return this._http.get<{ content: User[]; totalElements: number }>('/api/users', { params })
+  override getByQuery({ params }: ActionInit<HttpParams>): Observable<{ items: User[]; config: Params }> {
+    return this._http
+      .get<{ content: User[]; totalElements: number }>('/api/users', { params })
       .pipe(map(({ content: items, totalElements: total }) => ({ items, config: { total } })));
   }
 }
@@ -135,6 +139,7 @@ import { EffectsBase } from '@k5cjs/store';
 import { actions } from './users.actions';
 import { selectors } from './users.selectors';
 import { HttpService } from './users.http.service';
+import { User } from './users.type';
 
 @Injectable()
 export class Effects extends EffectsBase<User> {
@@ -152,11 +157,11 @@ Provides an abstraction over store interactions.
 
 ```typescript
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { StoreServiceBase } from '@k5cjs/store';
 
 import { actions } from './users.actions';
 import { selectors } from './users.selectors';
+import { User } from './users.type';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService extends StoreServiceBase<User> {

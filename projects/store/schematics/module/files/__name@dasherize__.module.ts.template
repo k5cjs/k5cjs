@@ -1,0 +1,15 @@
+import { NgModule } from '@angular/core';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+
+import { key } from './<%= dasherize(name) %>.config';
+import { Effects } from './<%= dasherize(name) %>.effects';
+import { reducer } from './<%= dasherize(name) %>.reducer';
+
+@NgModule({
+  imports: [
+    StoreModule.forFeature(key, reducer),
+    EffectsModule.forFeature([Effects])
+  ],
+})
+export class <%= classify(name) %>Module {}

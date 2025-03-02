@@ -1,0 +1,14 @@
+import { Injectable } from '@angular/core';
+import { EffectsBase } from '@k5cjs/store';
+
+import { actions } from './<%= dasherize(name) %>.actions';
+import { selectors } from './<%= dasherize(name) %>.selectors';
+import { HttpService } from './<%= dasherize(name) %>.http.service';
+import { <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+@Injectable()
+export class Effects extends EffectsBase<<%= classify(type) %>> {
+  constructor(http: HttpService) {
+    super(actions, selectors, http);
+  }
+}

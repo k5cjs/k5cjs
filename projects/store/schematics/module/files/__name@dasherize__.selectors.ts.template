@@ -1,0 +1,9 @@
+import { SelectorsBase } from '@k5cjs/store';
+
+import { key } from './<%= dasherize(name) %>.config';
+import { adapter } from './<%= dasherize(name) %>.reducer';
+import { <%= classify(type) %> } from './<%= dasherize(name) %>.type';
+
+class Selectors extends SelectorsBase<<%= classify(type) %>> {}
+
+export const selectors = new Selectors(key, adapter);
