@@ -30,15 +30,15 @@ export class ActionsBase<T extends { id: PropertyKey }> {
   setSuccess: Success<{ items: T[]; config?: Params }>;
 
   update: Init<{ item: AtLeastDeep<T, 'id'> }>;
-  updateSuccess: Success<{ item: T; config?: Params; before?: Params }>;
+  updateSuccess: Success<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }>;
   updateError: Error<{ error: HttpErrorResponse }>;
 
   updateAll: Init<{ items: AtLeastDeep<T, 'id'>[] }>;
-  updateAllSuccess: Success<{ items: T[]; config?: Params; before?: Params }>;
+  updateAllSuccess: Success<{ items: AtLeastDeep<T, 'id'>[]; config?: Params; before?: Params }>;
   updateAllError: Error<{ error: HttpErrorResponse }>;
 
   delete: Init<{ item: AtLeastDeep<T, 'id'> }>;
-  deleteSuccess: Success<{ item: T; config?: Params; before?: Params }>;
+  deleteSuccess: Success<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }>;
   deleteError: Error<{ error: HttpErrorResponse }>;
 
   protected _type: (action: string) => string;
@@ -78,14 +78,14 @@ export class ActionsBase<T extends { id: PropertyKey }> {
     this.update = createAction(this._type('update'), props<ActionInit<{ item: AtLeastDeep<T, 'id'> }>>());
     this.updateSuccess = createAction(
       this._type('update success'),
-      props<ActionSuccess<{ item: T; config?: Params; before?: Params }>>(),
+      props<ActionSuccess<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }>>(),
     );
     this.updateError = createAction(this._type('update error'), props<ActionError<{ error: HttpErrorResponse }>>());
 
     this.updateAll = createAction(this._type('update all'), props<ActionInit<{ items: AtLeastDeep<T, 'id'>[] }>>());
     this.updateAllSuccess = createAction(
       this._type('update all success'),
-      props<ActionSuccess<{ items: T[]; config?: Params; before?: Params }>>(),
+      props<ActionSuccess<{ items: AtLeastDeep<T, 'id'>[]; config?: Params; before?: Params }>>(),
     );
     this.updateAllError = createAction(
       this._type('update all error'),
@@ -99,7 +99,7 @@ export class ActionsBase<T extends { id: PropertyKey }> {
     this.delete = createAction(this._type('delete'), props<ActionInit<{ item: AtLeastDeep<T, 'id'> }>>());
     this.deleteSuccess = createAction(
       this._type('delete success'),
-      props<ActionSuccess<{ item: T; config?: Params; before?: Params }>>(),
+      props<ActionSuccess<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }>>(),
     );
     this.deleteError = createAction(this._type('delete error'), props<ActionError<{ error: HttpErrorResponse }>>());
   }

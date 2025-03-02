@@ -14,15 +14,15 @@ const userConfig: UserConfig<DefaultTheme.Config> = {
     ],
 
     sidebar: [
-      // {
-      //   text: 'Libraries',
-      //   items: [
-      //     // { text: 'Markdown Examples', link: '/markdown-examples' },
-      //     // { text: 'Runtime API Examples', link: '/api-examples' },
-      //     { text: 'Custom input', link: '/custom-input' },
-      //     { text: 'Dropdown', link: '/dropdown' },
-      //   ],
-      // },
+      {
+        text: 'Input',
+        items: [
+          // { text: 'Markdown Examples', link: '/markdown-examples' },
+          // { text: 'Runtime API Examples', link: '/api-examples' },
+          { text: 'Custom input', link: '/custom-input' },
+          // { text: 'Dropdown', link: '/dropdown' },
+        ],
+      },
       {
         text: 'Store',
         items: [

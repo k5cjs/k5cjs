@@ -12,7 +12,7 @@ import { HttpServiceBase } from './store.http.service';
 import { SelectorsBase } from './store.selectors';
 import { ActionInit, ActionSuccess, Options, Params } from './store.type';
 
-const createSuccesActionBody = <T extends Params = Params<string | number | boolean>>(
+const createSuccessActionBody = <T extends Params = Params<string | number | boolean>>(
   params: T,
   { query, resetQueries, reloadSelectors }: ActionInit,
 ): ActionSuccess<T> => ({ query, reloadSelectors, resetQueries, params });
@@ -31,12 +31,12 @@ export class EffectsBase<T extends { id: PropertyKey }> {
       this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
       mergeMap(([action, queries]) =>
-        queries[action.query]
+        queries[action.query] && !action.skipLoaded
           ? of(this._actions.getByQueryIsLoaded(action))
           : this._http.getByQuery(action).pipe(
               this._callBefore(action),
               concatMap((response) => [
-                this._actions.getByQuerySuccess(createSuccesActionBody(response, action)),
+                this._actions.getByQuerySuccess(createSuccessActionBody(response, action)),
                 ...this._reloadIdentifiers(this._actions.getByQuerySuccess, action),
               ]),
               catchError((error: HttpErrorResponse) =>
@@ -53,12 +53,12 @@ export class EffectsBase<T extends { id: PropertyKey }> {
       this._setIdentified(),
       concatLatestFrom(() => this._store.select(this._selectors.queries)),
       mergeMap(([action, queries]) =>
-        queries[action.query]
+        queries[action.query] && !action.skipLoaded
           ? of(this._actions.getByIdIsLoaded(action))
           : this._http.getById(action).pipe(
               this._callBefore(action),
               concatMap((response) => [
-                this._actions.getByIdSuccess(createSuccesActionBody(response, action)),
+                this._actions.getByIdSuccess(createSuccessActionBody(response, action)),
                 ...this._reloadIdentifiers(this._actions.getByIdSuccess, action),
               ]),
               catchError((error: HttpErrorResponse) =>
@@ -77,7 +77,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
         this._http.create(action).pipe(
           this._callBefore(action),
           concatMap((response) => [
-            this._actions.createSuccess(createSuccesActionBody(response, action)),
+            this._actions.createSuccess(createSuccessActionBody(response, action)),
             ...this._reloadIdentifiers(this._actions.createSuccess, action),
           ]),
           catchError((error: HttpErrorResponse) =>
@@ -106,7 +106,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
         this._http.update(action).pipe(
           this._callBefore(action),
           concatMap((params) => [
-            this._actions.updateSuccess(createSuccesActionBody(params, action)),
+            this._actions.updateSuccess(createSuccessActionBody(params, action)),
             ...this._reloadIdentifiers(this._actions.updateSuccess, action),
           ]),
           catchError((error: HttpErrorResponse) =>
@@ -125,7 +125,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
         this._http.updateAll(action).pipe(
           this._callBefore(action),
           concatMap((response) => [
-            this._actions.updateAllSuccess(createSuccesActionBody(response, action)),
+            this._actions.updateAllSuccess(createSuccessActionBody(response, action)),
             ...this._reloadIdentifiers(this._actions.updateAllSuccess, action),
           ]),
           catchError((error: HttpErrorResponse) =>
@@ -144,7 +144,7 @@ export class EffectsBase<T extends { id: PropertyKey }> {
         this._http.delete(action).pipe(
           this._callBefore(action),
           concatMap((params) => [
-            this._actions.deleteSuccess(createSuccesActionBody(params, action)),
+            this._actions.deleteSuccess(createSuccessActionBody(params, action)),
             ...this._reloadIdentifiers(this._actions.deleteSuccess, action),
           ]),
           catchError((error: HttpErrorResponse) =>

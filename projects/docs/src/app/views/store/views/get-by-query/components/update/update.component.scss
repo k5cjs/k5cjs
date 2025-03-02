@@ -1,0 +1,11 @@
+.code {
+  @apply
+    rounded-md;
+}
+
+.actions {
+  @apply
+    flex
+    flex-col
+    items-start;
+}

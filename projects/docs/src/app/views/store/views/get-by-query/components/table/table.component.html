@@ -1,0 +1,11 @@
+<div class="table">
+  <div class="table__header table__item">
+    <div>ID</div>
+    <div>Name</div>
+    <div>Age</div>
+  </div>
+
+  @for (user of users$ | async; track user.id) {
+  <app-item [user]="user" class="table__item" />
+  }
+</div>

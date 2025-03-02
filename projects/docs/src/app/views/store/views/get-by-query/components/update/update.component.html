@@ -1,0 +1,21 @@
+<pre><code [highlight]="code" language="typescript" class="code"></code></pre>
+
+<div class="actions">
+  <div>
+    <input [formControl]="reloadSelectors" type="checkbox" id="reloadSelectors" />
+    <label for="reloadSelectors">Reload selectors</label>
+  </div>
+
+  <div>
+    <input [formControl]="resetQueries" type="checkbox" id="resetQueries" />
+    <label for="resetQueries">Reset queries</label>
+  </div>
+
+  <div>
+    <input [formControl]="reloadIdentifiers" type="checkbox" id="reloadIdentifiers" />
+    <label for="reloadIdentifiers">Reload identifiers</label>
+  </div>
+
+  <button (click)="update()">Update</button>
+  <div></div>
+</div>

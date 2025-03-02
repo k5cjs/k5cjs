@@ -8,6 +8,10 @@ const routes: Routes = [
     path: '',
     component: StoreComponent,
   },
+  {
+    path: 'get-by-query',
+    loadComponent: () => import('./views/get-by-query'),
+  },
 ];
 
 @NgModule({

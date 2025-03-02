@@ -1,0 +1,10 @@
+.row {
+  @apply
+    flex
+    gap-4;
+
+  div {
+    @apply
+      flex-1;
+  }
+}

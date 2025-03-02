@@ -164,7 +164,8 @@
               "projects/docs/src/assets"
             ],
             "styles": [
-              "projects/docs/src/styles.scss"
+              "projects/docs/src/styles.scss",
+              "node_modules/highlight.js/styles/github-dark.css",
             ],
             "scripts": [],
             "browser": "projects/docs/src/main.ts"

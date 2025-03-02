@@ -59,6 +59,7 @@
     "@ngrx/entity": "^18.0.1",
     "@ngrx/operators": "^18.0.0",
     "@ngrx/store": "^18.0.1",
+    "ngx-highlightjs": "^12.0.0",
     "object-hash": "^3.0.0",
     "patch-package": "^8.0.0",
     "rxjs": "~7.5.0",

@@ -1,0 +1,7 @@
+<div class="title">Actions</div>
+
+<div #content class="actions">
+  @for (action of actions; track action.id) {
+  <div @show>{{ action.type }}</div>
+  }
+</div>

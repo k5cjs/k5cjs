@@ -23,21 +23,21 @@ export abstract class HttpServiceBase<T extends { id: PropertyKey }> {
   update(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ActionInit<{ item: AtLeastDeep<T, 'id'> }>,
-  ): Observable<{ item: T; config?: Params; before?: Params }> {
+  ): Observable<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }> {
     throw new Error('The update method has not been implemented.');
   }
 
   updateAll(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ActionInit<{ items: AtLeastDeep<T, 'id'>[] }>,
-  ): Observable<{ items: T[]; config?: Params; before?: Params }> {
+  ): Observable<{ items: AtLeastDeep<T, 'id'>[]; config?: Params; before?: Params }> {
     throw new Error('The updateAll method has not been implemented.');
   }
 
   delete(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: ActionInit<{ item: AtLeastDeep<T, 'id'> }>,
-  ): Observable<{ item: T; config?: Params; before?: Params }> {
+  ): Observable<{ item: AtLeastDeep<T, 'id'>; config?: Params; before?: Params }> {
     throw new Error('The delete method has not been implemented.');
   }
 }

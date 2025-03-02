@@ -1,0 +1,22 @@
+.table {
+  @apply
+    flex
+    flex-col
+    w-72;
+
+  &__item {
+    @apply
+      odd:bg-[#202127];
+  }
+
+  &__header {
+    @apply
+      flex
+      gap-4;
+
+    div {
+      @apply
+        flex-1;
+    }
+  }
+}

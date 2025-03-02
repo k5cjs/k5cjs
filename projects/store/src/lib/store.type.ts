@@ -37,6 +37,10 @@ interface ActionBase {
    * you have a list of items
    */
   reloadSelectors?: boolean;
+  /**
+   * skip loaded action to force a new request
+   */
+  skipLoaded?: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

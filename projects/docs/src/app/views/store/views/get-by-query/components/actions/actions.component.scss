@@ -1,0 +1,16 @@
+.title {
+  @apply
+    font-semibold
+    mt-3
+    mb-2;
+}
+
+.actions {
+  @apply
+    flex
+    flex-col
+    gap-1
+    max-h-40
+    overflow-auto
+    text-sm;
+}
