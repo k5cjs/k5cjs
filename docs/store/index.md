@@ -18,7 +18,7 @@ The Store Library provides a structured state management solution using **NGRX**
 
 ---
 
-<demo src="store/get-by-query" height="731"/>
+<demo src="store/get-by-query" height="492"/>
 
 📖 **Next:** [Actions](./actions.md)
 

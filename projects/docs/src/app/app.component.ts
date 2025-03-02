@@ -12,7 +12,7 @@ export class AppComponent {
   constructor(private _router: Router, private _route: ActivatedRoute, private _renderer: Renderer2) {
     this._route.queryParamMap.subscribe((params) => {
       const embed = params.get('embed');
-      const dark = params.get('dark');
+      const dark = params.get('dark') || 'true';
 
       if (coerceBooleanProperty(dark)) this._renderer.addClass(document.documentElement, 'dark');
 
