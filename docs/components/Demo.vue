@@ -2,9 +2,9 @@
 import { useData } from 'vitepress';
 
 const { isDark } = useData();
-const { src } = defineProps(['src']);
+const { src, height = 315 } = defineProps(['src', 'height']);
 </script>
 
 <template>
-  <iframe width="100%" height="315" frameBorder="0" :src="`/k5cjs/docs/?embed=${src}&dark=${isDark}`"></iframe>
+  <iframe width="100%" :height="height" frameBorder="0" :src="`/k5cjs/docs/?embed=${src}&dark=${isDark}`"></iframe>
 </template>
