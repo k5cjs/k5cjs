@@ -91,7 +91,7 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
     if (!leftMost) return false;
 
-    return isDateEqual(this.day, leftMost);
+    return isDateEqual(this.day, removeTime(leftMost));
   }
 
   @HostBinding('class.kc-cal-day--end')
@@ -102,7 +102,7 @@ export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implemen
 
     if (!rightMost) return false;
 
-    return isDateEqual(this.day, rightMost);
+    return isDateEqual(this.day, removeTime(rightMost));
   }
 
   @HostBinding('class.kc-cal-day--rounded')
