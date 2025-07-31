@@ -182,9 +182,26 @@ export class KcGridService {
       const rows = partialItem.rows || 2;
 
       // find the fist empty space for the item
-      const space = this._searchEmptySpace(cols, rows);
+      let space = this._searchEmptySpace(cols, rows);
 
-      if (!space) return null;
+      if (!space) {
+        // try to add more rows or cols to the grid
+        if (this.countOfRowsToAdd) {
+          this.rows = this.rows + this.countOfRowsToAdd;
+          this.rowsGaps = [...this.rowsGaps, ...this.rowsGaps.slice(0, this.countOfRowsToAdd)] as Gaps;
+          this.updateGrid();
+          this.update();
+          space = this._searchEmptySpace(cols, rows);
+        } else if (this.countOfColsToAdd) {
+          this.cols = this.cols + this.countOfColsToAdd;
+          this.colsGaps = [...this.colsGaps, ...this.colsGaps.slice(0, this.countOfColsToAdd)] as Gaps;
+          this.updateGrid();
+          this.update();
+          space = this._searchEmptySpace(cols, rows);
+        }
+
+        if (!space) return null;
+      }
 
       item = { ...partialItem, cols, rows, col: space.col, row: space.row } as KcGridItem;
     }
@@ -213,7 +230,6 @@ export class KcGridService {
 
     if (options?.emitEvent) this._itemsChanges.next([...this._items.values()]);
 
-    // TODO: implement logic to check if the item is out of the grid
     return id;
   }
 
@@ -806,8 +822,15 @@ export class KcGridService {
   // search empty space for a new item with the given size rows and cols
   private _searchEmptySpace(cols: number, rows: number): { col: number; row: number } | null {
     for (let y = 0; y < this.rows; y++) {
+      // skip if out of bounds
+      if (y + rows > this.rows) break;
+
       for (let x = 0; x < this.cols; x++) {
+        if (x + cols > this.cols) break;
+
         if (this._matrix[y]?.[x]) continue;
+
+        if (this._preventOverlapGaps(x, y, cols, rows)) continue;
 
         let empty = true;
 
@@ -823,6 +846,7 @@ export class KcGridService {
         if (empty) return { col: x, row: y };
       }
     }
+
     return null;
   }
 
