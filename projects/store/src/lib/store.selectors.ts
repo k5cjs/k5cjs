@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EntityAdapter, EntityState, IdSelector } from '@ngrx/entity';
+import { Dictionary, EntityAdapter, EntityState, IdSelector } from '@ngrx/entity';
 import {
   MemoizedSelector,
   createFeatureSelector,
@@ -97,6 +97,11 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     ) => { item: T } | undefined
   >;
 
+  private _memoizedSelectors: Map<
+    string,
+    MemoizedSelector<object, Dictionary<T>, (s1: StateBase<T>) => Dictionary<T>>
+  > = new Map();
+
   constructor(key: string, adapter: EntityAdapter<T>) {
     const selectState = createFeatureSelector<StateBase<T>>(key);
 
@@ -118,10 +123,11 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
 
     this.query = (queryId: string) => createSelector(this.queries, (queries) => queries[queryId]);
 
-    const entitiesFirstMemoized = createSelectorFirstMemoized(selectState, (state) => state.entities);
+    const selectorFirstMemoized = createSelectorFirstMemoized(selectState, (state) => state.entities);
+    this._memoizedSelectors.set('selectorFirstMemoized', selectorFirstMemoized);
 
     this.queryAll = (queryId: string) =>
-      createSelector(this.query(queryId), entitiesFirstMemoized, (query, entities) => {
+      createSelector(this.query(queryId), selectorFirstMemoized, (query, entities) => {
         if (!query) return undefined;
 
         const { ids, ...rest } = query;
@@ -146,5 +152,9 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
           item: entities[selectId]!,
         };
       });
+  }
+
+  release() {
+    this._memoizedSelectors.forEach((selector) => selector.release());
   }
 }

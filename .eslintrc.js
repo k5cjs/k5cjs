@@ -12,9 +12,8 @@ module.exports = {
         'prettier',
         'plugin:import/errors',
         'plugin:import/warnings',
-        'plugin:@ngrx/recommended-requiring-type-checking',
       ],
-      plugins: ['unused-imports', 'sort-export-all'],
+      plugins: ['unused-imports', 'sort-export-all', '@ngrx'],
       rules: {
         'max-len': ['error', 120],
         '@typescript-eslint/no-misused-promises': [
