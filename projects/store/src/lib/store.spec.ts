@@ -1,16 +1,16 @@
 /* eslint-disable @ngrx/good-action-hygiene */
 import { HttpErrorResponse } from '@angular/common/http';
-import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
+import { Inject, Injectable, InjectionToken } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
-import { Observable, catchError, delay, first, map, of, throwError, zip } from 'rxjs';
+import { Observable, catchError, delay, first, map, of, switchMap, tap, throwError, zip } from 'rxjs';
 
 import { AtLeastDeep } from '@k5cjs/types';
 import { EffectsModule } from '@ngrx/effects';
 import { IdSelector, createEntityAdapter } from '@ngrx/entity';
-import { Action, Store, StoreModule, createAction, createReducer, on, props } from '@ngrx/store';
+import { Action, ActionReducer, Store, StoreModule, createAction, createReducer, on, props } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { ActionsBase } from './store.actions';
+import { ActionsBase, GLOBAL_ACTIONS } from './store.actions';
 import { EffectsBase } from './store.effects';
 import { HttpServiceBase } from './store.http.service';
 import { reducerBase, stateBase } from './store.reducer';
@@ -18,7 +18,7 @@ import { SelectorsBase } from './store.selectors';
 import { StoreServiceBase } from './store.service';
 import { ActionInit, HttpParams, Options, Params, StateBase } from './store.type';
 
-const SELECT_ID_TOKEN = new InjectionToken<IdSelector<FeatureStoreType>>('SELECT_ID');
+const SELECTOR_TOKEN = new InjectionToken<SelectorsBase<FeatureStoreType>>('SELECTOR_TOKEN');
 
 const key = 'store';
 
@@ -117,22 +117,20 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
 class Effects extends EffectsBase<FeatureStoreType> {
   constructor(
     http: HttpService,
-    @Optional()
-    @Inject(SELECT_ID_TOKEN)
-    selectId: IdSelector<FeatureStoreType> | null,
+    @Inject(SELECTOR_TOKEN)
+    selectors: Selectors,
   ) {
-    super(actions, selectors(selectId), http);
+    super(actions, selectors, http);
   }
 }
 
 @Injectable({ providedIn: 'root' })
 class StoreService extends StoreServiceBase<FeatureStoreType> {
   constructor(
-    @Optional()
-    @Inject(SELECT_ID_TOKEN)
-    selectId: IdSelector<FeatureStoreType> | null,
+    @Inject(SELECTOR_TOKEN)
+    selectors: Selectors,
   ) {
-    super(actions, selectors(selectId));
+    super(actions, selectors);
   }
 
   override getByQuery(
@@ -148,6 +146,8 @@ class StoreService extends StoreServiceBase<FeatureStoreType> {
 }
 
 describe('Store', () => {
+  const selector = selectors(null);
+
   let service: StoreService;
   let http: HttpService;
   // eslint-disable-next-line @ngrx/no-typed-global-store
@@ -158,11 +158,17 @@ describe('Store', () => {
       imports: [
         StoreModule.forRoot({ [key]: reducer(null) }),
         EffectsModule.forRoot([Effects]),
-        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'store dev' }),
       ],
       teardown: {
         destroyAfterEach: false,
       },
+      providers: [
+        {
+          provide: SELECTOR_TOKEN,
+          useValue: selector,
+        },
+      ],
     });
 
     service = TestBed.inject(StoreService);
@@ -1114,7 +1120,7 @@ describe('Store', () => {
     expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
   }));
 
-  it('check paralel dispaches', fakeAsync(() => {
+  it('check parallel dispaches', fakeAsync(() => {
     spyOn(http, 'getById').and.returnValues(
       of({ item: { id: '1', name: 'first' } }).pipe(delay(300)),
       throwError(() => new HttpErrorResponse({ error: 'Error message' })).pipe(delay(200)),
@@ -1187,6 +1193,7 @@ describe('Store', () => {
 
   describe('Store with select id', () => {
     const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
+    const selector = selectors(selectId);
 
     beforeEach(() => {
       TestBed.resetTestingModule();
@@ -1195,15 +1202,15 @@ describe('Store', () => {
         imports: [
           StoreModule.forRoot({ [key]: reducer(selectId) }),
           EffectsModule.forRoot([Effects]),
-          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'store dev' }),
         ],
         teardown: {
           destroyAfterEach: false,
         },
         providers: [
           {
-            provide: SELECT_ID_TOKEN,
-            useValue: selectId,
+            provide: SELECTOR_TOKEN,
+            useValue: selector,
           },
         ],
       });
@@ -2042,6 +2049,61 @@ describe('Store', () => {
       flush();
 
       expect(expected!).toBeTrue();
+    }));
+  });
+
+  describe('Store that test memoized after reset store', () => {
+    const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
+    const selector = selectors(selectId);
+
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+
+      function resetMetaReducer(reducer: ActionReducer<State>): ActionReducer<State> {
+        return (state: State | undefined, action: Action): State => {
+          if (action.type === GLOBAL_ACTIONS.reset.type) return reducer(undefined, action);
+
+          return reducer(state, action);
+        };
+      }
+
+      TestBed.configureTestingModule({
+        imports: [
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          StoreModule.forRoot({ [key]: reducer(selectId) }, { metaReducers: [resetMetaReducer as any] }),
+          EffectsModule.forRoot([Effects]),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'store dev' }),
+        ],
+        teardown: {
+          destroyAfterEach: false,
+        },
+        providers: [
+          {
+            provide: SELECTOR_TOKEN,
+            useValue: selector,
+          },
+        ],
+      });
+
+      service = TestBed.inject(StoreService);
+      http = TestBed.inject(HttpService);
+      store = TestBed.inject(Store) as Store<{ [key]: StateBase<FeatureStoreType> }>;
+    });
+
+    it('check reload selectors after reset', fakeAsync(() => {
+      const query = { id: 'can-match' };
+
+      service
+        .set({ params: { items: [{ id: '1', name: 'test update' }], query }, first: true })
+        .pipe(
+          switchMap(() => service.byQuery(query).pipe(first())),
+          tap((expected) => expect(expected).toEqual({ items: [{ id: '1', name: 'test update' }] })),
+          tap(() => store.dispatch(GLOBAL_ACTIONS.reset())),
+          switchMap(() => service.set({ params: { items: [{ id: '2', name: 'test update' }], query }, first: true })),
+          switchMap(() => service.byQuery(query).pipe(first())),
+          tap((expected) => expect(expected).toEqual({ items: [{ id: '2', name: 'test update' }] })),
+        )
+        .subscribe();
     }));
   });
 });
