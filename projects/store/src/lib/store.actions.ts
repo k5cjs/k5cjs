@@ -104,3 +104,7 @@ export class ActionsBase<T extends { id: PropertyKey }> {
     this.deleteError = createAction(this._type('delete error'), props<ActionError<{ error: HttpErrorResponse }>>());
   }
 }
+
+export const GLOBAL_ACTIONS = {
+  reset: createAction(`[GLOBAL] reset`),
+};
