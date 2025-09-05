@@ -11,6 +11,16 @@
   @apply
     p-10;
 
+  &__header {
+    @apply
+      mb-5;
+  }
+
+  &__footer {
+    @apply
+      mt-5;
+  }
+
   &__preview {
     @apply
       absolute

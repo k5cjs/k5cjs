@@ -1,5 +1,11 @@
-<div #content class="grid__content">
-  <div #header>
+<div #content class="grid__content" [ngStyle]="contentStyle">
+  <div
+    #header
+    class="grid__header"
+    [style.maxWidth.px]="maxWidth ? maxWidth : null"
+    [style.maxWidth.px]="maxWidth ? maxWidth : null"
+    [style.width]="countOfColsToAdd ? (grid.cols * grid.cellWidth + grid.colsTotalGaps) * scale  : autoWidth? '100%': null "
+  >
     <ng-content select="[header]"></ng-content>
   </div>
 
@@ -29,7 +35,13 @@
     ></kc-grid-item>
   </div>
 
-  <div #footer>
+  <div
+    #footer
+    class="grid__footer"
+    [style.maxWidth.px]="maxWidth ? maxWidth : null"
+    [style.maxWidth.px]="maxWidth ? maxWidth : null"
+    [style.width]="countOfColsToAdd ? (grid.cols * grid.cellWidth + grid.colsTotalGaps) * scale  : autoWidth? '100%': null "
+  >
     <ng-content select="[footer]"></ng-content>
   </div>
 </div>

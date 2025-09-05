@@ -15,6 +15,13 @@
       overflow-hidden;
   }
 
+  &__header,
+  &__footer {
+    @apply
+      relative
+      mx-auto
+  }
+
   &__items {
     @apply
       relative

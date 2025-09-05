@@ -12,6 +12,8 @@
   [maxWidth]="600"
   class="grid"
 >
+  <div header class="grid__header">header test</div>
+
   <app-background-pages *kcGridBackground="let data;" [config]="data" [pageRows]="pageRows" />
 
   <div
@@ -42,4 +44,6 @@
     <app-resize-bottom [item]="item" class="grid__resize" />
     <app-resize-bottom-right [item]="item" class="grid__resize" />
   </div>
+
+  <div footer class="grid__footer">footer test</div>
 </kc-grid>

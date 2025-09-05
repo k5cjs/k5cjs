@@ -55,6 +55,7 @@ export class GridComponent<T = void> implements OnInit, GridTemplate {
   @Input() cellHeight = 100;
   @Input() cellWidth = 100;
   @Input() items: KcGridItems<T> = [];
+  @Input() contentStyle: { [key: string]: string } = {};
 
   @Input()
   set colsGaps(value: Gaps) {

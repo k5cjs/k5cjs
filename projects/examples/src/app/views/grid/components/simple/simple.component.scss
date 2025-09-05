@@ -8,6 +8,9 @@
 }
 
 .grid {
+  @apply
+    p-10;
+
   &__preview {
     @apply
       absolute
