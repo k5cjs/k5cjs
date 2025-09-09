@@ -42,7 +42,10 @@ export class MapEmit<K, V, T extends boolean = false> {
   private _selected!: (T extends false ? V | null : V[]) | null;
   private _selectedEntries!: (T extends false ? [K, V] | null : [K, V][]) | null;
 
-  constructor(private _multiple: T = false as T, initiallyValues?: T extends false ? [K, V] : [K, V][]) {
+  constructor(
+    private _multiple: T = false as T,
+    initiallyValues?: T extends false ? [K, V] : [K, V][],
+  ) {
     this._map = new Map<K, V>();
 
     this._changed = new Subject();
@@ -63,10 +66,10 @@ export class MapEmit<K, V, T extends boolean = false> {
   /** Selected values. */
   get selected(): T extends false ? V | null : V[] {
     if (!this._selected) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (this._multiple) this._selected = Array.from(this._map.values()) as unknown as any;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      else this._selected = this._map.values().next().value;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      else this._selected = this._map.values().next().value as unknown as any;
     }
 
     return this._selected!;
@@ -75,10 +78,10 @@ export class MapEmit<K, V, T extends boolean = false> {
   /** Selected values. */
   get selectedEntries(): T extends false ? [K, V] | null : [K, V][] {
     if (!this._selectedEntries) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if (this._multiple) this._selectedEntries = Array.from(this._map.entries()) as unknown as any;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      else this._selectedEntries = this._map.entries().next().value;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      else this._selectedEntries = this._map.entries().next().value as unknown as any;
     }
 
     return this._selectedEntries!;
@@ -206,11 +209,11 @@ export class MapEmit<K, V, T extends boolean = false> {
     if (this._setToEmit.length || this._updatedToEmit.length || this._deletedToEmit.length) {
       this._changed.next({
         source: this,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(this._setToEmit.length && { added: this._setToEmit as unknown as any }),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(this._updatedToEmit.length && { updated: this._updatedToEmit as unknown as any }),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...(this._deletedToEmit.length && { removed: this._deletedToEmit as unknown as any }),
       });
 

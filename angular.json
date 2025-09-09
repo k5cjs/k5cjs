@@ -29,10 +29,7 @@
           "options": {
             "tsConfig": "projects/rxjs/tsconfig.spec.json",
             "karmaConfig": "projects/rxjs/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -72,10 +69,7 @@
           "options": {
             "tsConfig": "projects/forms/tsconfig.spec.json",
             "karmaConfig": "projects/forms/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -115,10 +109,7 @@
           "options": {
             "tsConfig": "projects/tables/tsconfig.spec.json",
             "karmaConfig": "projects/tables/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -153,19 +144,14 @@
               "base": "dist/examples"
             },
             "index": "projects/examples/src/index.html",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/examples/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "projects/examples/src/favicon.ico",
               "projects/examples/src/assets"
             ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": [],
             "browser": "projects/examples/src/main.ts"
           },
@@ -222,10 +208,7 @@
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
+            "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "projects/examples/tsconfig.spec.json",
             "karmaConfig": "projects/examples/karma.conf.js",
             "inlineStyleLanguage": "scss",
@@ -233,9 +216,7 @@
               "projects/examples/src/favicon.ico",
               "projects/examples/src/assets"
             ],
-            "styles": [
-              "projects/examples/src/styles.scss"
-            ],
+            "styles": ["projects/examples/src/styles.scss"],
             "scripts": []
           }
         },
@@ -276,10 +257,7 @@
           "options": {
             "tsConfig": "projects/scroll/tsconfig.spec.json",
             "karmaConfig": "projects/scroll/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -319,10 +297,7 @@
           "options": {
             "tsConfig": "projects/select/tsconfig.spec.json",
             "karmaConfig": "projects/select/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -362,10 +337,7 @@
           "options": {
             "tsConfig": "projects/selection-model/tsconfig.spec.json",
             "karmaConfig": "projects/selection-model/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -405,10 +377,7 @@
           "options": {
             "tsConfig": "projects/control/tsconfig.spec.json",
             "karmaConfig": "projects/control/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -448,10 +417,7 @@
           "options": {
             "tsConfig": "projects/input/tsconfig.spec.json",
             "karmaConfig": "projects/input/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -491,10 +457,7 @@
           "options": {
             "tsConfig": "projects/form-field/tsconfig.spec.json",
             "karmaConfig": "projects/form-field/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -534,10 +497,7 @@
           "options": {
             "tsConfig": "projects/textarea/tsconfig.spec.json",
             "karmaConfig": "projects/textarea/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -577,10 +537,7 @@
           "options": {
             "tsConfig": "projects/dropdown/tsconfig.spec.json",
             "karmaConfig": "projects/dropdown/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -620,13 +577,8 @@
           "options": {
             "tsConfig": "projects/cal/tsconfig.spec.json",
             "karmaConfig": "projects/cal/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ],
-            "styles": [
-              "projects/cal/karma.style.scss"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"],
+            "styles": ["projects/cal/karma.style.scss"]
           }
         },
         "lint": {
@@ -666,10 +618,7 @@
           "options": {
             "tsConfig": "projects/animations/tsconfig.spec.json",
             "karmaConfig": "projects/animations/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -709,10 +658,7 @@
           "options": {
             "tsConfig": "projects/form-error/tsconfig.spec.json",
             "karmaConfig": "projects/form-error/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -752,10 +698,7 @@
           "options": {
             "tsConfig": "projects/store/tsconfig.spec.json",
             "karmaConfig": "projects/store/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -764,7 +707,8 @@
             "lintFilePatterns": [
               "projects/store/**/*.ts",
               "projects/store/**/*.html"
-            ]
+            ],
+            "eslintConfig": "projects/store/eslint.config.js"
           }
         }
       }
@@ -795,10 +739,7 @@
           "options": {
             "tsConfig": "projects/types/tsconfig.spec.json",
             "karmaConfig": "projects/types/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -838,10 +779,7 @@
           "options": {
             "tsConfig": "projects/toggle/tsconfig.spec.json",
             "karmaConfig": "projects/toggle/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -850,7 +788,8 @@
             "lintFilePatterns": [
               "projects/toggle/**/*.ts",
               "projects/toggle/**/*.html"
-            ]
+            ],
+            "eslintConfig": "projects/toggle/eslint.config.js"
           }
         }
       }
@@ -881,10 +820,7 @@
           "options": {
             "tsConfig": "projects/fake-progress-bar/tsconfig.spec.json",
             "karmaConfig": "projects/fake-progress-bar/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -924,10 +860,7 @@
           "options": {
             "tsConfig": "projects/router/tsconfig.spec.json",
             "karmaConfig": "projects/router/karma.conf.js",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "lint": {
@@ -943,9 +876,7 @@
     }
   },
   "cli": {
-    "schematicCollections": [
-      "@angular-eslint/schematics"
-    ],
+    "schematicCollections": ["angular-eslint"],
     "analytics": false,
     "cache": {
       "enabled": false,
@@ -953,12 +884,6 @@
     }
   },
   "schematics": {
-    "@angular-eslint/schematics:application": {
-      "setParserOptionsProject": true
-    },
-    "@angular-eslint/schematics:library": {
-      "setParserOptionsProject": true
-    },
     "@schematics/angular:component": {
       "type": "component"
     },

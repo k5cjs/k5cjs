@@ -3,7 +3,7 @@
   "extends": "../../tsconfig.build.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
-    "types": ["jasmine", "../../dev-mode-types"]
+    "types": ["jasmine"]
   },
   "include": ["**/*.spec.ts", "**/*.d.ts"]
 }
