@@ -9,7 +9,7 @@ import { KcInput } from '@k5cjs/input';
 import { ExtendsFormFieldComponent } from './extends-form-field.component';
 
 @Component({
-  template: `
+    template: `
     <app-extends-form-field>
       <input kc-input name="name" tabindex="0" placeholder="" />
 
@@ -19,6 +19,7 @@ import { ExtendsFormFieldComponent } from './extends-form-field.component';
       </div>
     </app-extends-form-field>
   `,
+    standalone: false
 })
 class DumpyComponent {}
 

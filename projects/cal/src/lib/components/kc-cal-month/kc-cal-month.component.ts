@@ -18,10 +18,11 @@ import { KcCalWeekData } from '../../types';
 import { KcCalWeekComponent } from '../kc-cal-week/kc-cal-week.component';
 
 @Component({
-  selector: 'kc-cal-month',
-  templateUrl: './kc-cal-month.component.html',
-  styleUrls: ['./kc-cal-month.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-cal-month',
+    templateUrl: './kc-cal-month.component.html',
+    styleUrls: ['./kc-cal-month.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcCalMonthComponent implements OnInit {
   @Input() month!: Date;

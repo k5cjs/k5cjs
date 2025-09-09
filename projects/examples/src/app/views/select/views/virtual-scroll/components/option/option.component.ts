@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild, ViewConta
 import { KcOption, KcOptionDirective } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-option',
-  templateUrl: './option.component.html',
-  styleUrls: ['./option.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-option',
+    templateUrl: './option.component.html',
+    styleUrls: ['./option.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OptionComponent implements OnInit {
   @Input() option!: KcOption<string, string, string>;

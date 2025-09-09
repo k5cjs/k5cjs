@@ -30,11 +30,16 @@ const fixtureOpacity = (fixture: ComponentFixture<unknown>) => (element: string)
 };
 
 @Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleO>Default state</div>
-    <div id="state2" *ngIf="state2" [@toggleO]="state2">Boolean state</div>
-  `,
-  animations: [toggleO(100)],
+    template: `
+    @if (state1) {
+      <div id="state1" @toggleO>Default state</div>
+    }
+    @if (state2) {
+      <div id="state2" [@toggleO]="state2">Boolean state</div>
+    }
+    `,
+    animations: [toggleO(100)],
+    standalone: false
 })
 class DumpyComponent {
   state1 = false;
@@ -42,10 +47,13 @@ class DumpyComponent {
 }
 
 @Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleO>Default state</div>
-  `,
-  animations: [toggleO()],
+    template: `
+    @if (state1) {
+      <div id="state1" @toggleO>Default state</div>
+    }
+    `,
+    animations: [toggleO()],
+    standalone: false
 })
 class Dumpy1Component {
   state1 = false;

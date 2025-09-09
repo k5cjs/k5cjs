@@ -1,2 +1,4 @@
 <span>{{ option.label }}</span>
-<span *ngIf="selected">(selected)</span>
+@if (selected) {
+  <span>(selected)</span>
+}

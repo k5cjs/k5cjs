@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, Component, HostListener, Input } from '@angula
 import { KcInternalDropdownComponent } from '../internal-dropdown/internal-dropdown.component';
 
 @Component({
-  selector: 'kc-dropdown-options',
-  templateUrl: './dropdown-options.component.html',
-  styleUrls: ['./dropdown-options.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-dropdown-options',
+    templateUrl: './dropdown-options.component.html',
+    styleUrls: ['./dropdown-options.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcDropdownOptionsComponent {
   @Input() preventClose!: boolean;

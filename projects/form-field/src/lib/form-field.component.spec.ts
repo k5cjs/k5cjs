@@ -9,27 +9,33 @@ import { KcFormField } from './form-field.component';
 import { KC_FORM_FIELD } from './form-field.token';
 
 @Component({
-  selector: 'kc-injector',
-  template: `
+    selector: 'kc-injector',
+    template: `
     <div>Test</div>
   `,
+    standalone: false
 })
 class Dumpy2Component {
   constructor(@Inject(KC_FORM_FIELD) public formField: KcFormField) {}
 }
 
 @Component({
-  template: `
+    template: `
     <kc-form-field class="field">
-      <span *ngIf="label" label class="label">{{ label }}</span>
-
-      <span *ngIf="placeholder" placeholder>{{ placeholder }}</span>
-
+      @if (label) {
+        <span label class="label">{{ label }}</span>
+      }
+    
+      @if (placeholder) {
+        <span placeholder>{{ placeholder }}</span>
+      }
+    
       <input [formControl]="control" kc-input [name]="name" tabindex="0" placeholder="" />
-
+    
       <kc-injector after></kc-injector>
     </kc-form-field>
-  `,
+    `,
+    standalone: false
 })
 class DumpyComponent {
   @ViewChild(KcFormField, { static: true }) formField!: KcFormField;

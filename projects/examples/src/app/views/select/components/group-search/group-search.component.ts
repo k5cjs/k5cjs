@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption, filterNestedOptions } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-group-search',
-  templateUrl: './group-search.component.html',
-  styleUrls: ['./group-search.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-group-search',
+    templateUrl: './group-search.component.html',
+    styleUrls: ['./group-search.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GroupSearchComponent {
   control: UntypedFormControl;

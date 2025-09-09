@@ -6,21 +6,24 @@ import { ngIf } from './ng-if';
 import { toggleY } from './toggle-y';
 
 @Component({
-  template: `
-    <div @ngIf *ngIf="state">
-      <div @toggleY id="child">Child</div>
-    </div>
-  `,
-  styles: [
-    `
+    template: `
+    @if (state) {
+      <div @ngIf>
+        <div @toggleY id="child">Child</div>
+      </div>
+    }
+    `,
+    styles: [
+        `
       #child {
         width: 200px;
         font-size: 16px;
         line-height: 16px;
       }
     `,
-  ],
-  animations: [ngIf(), toggleY(40)],
+    ],
+    animations: [ngIf(), toggleY(40)],
+    standalone: false
 })
 class DumpyComponent {
   state = true;

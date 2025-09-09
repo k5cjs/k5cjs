@@ -4,16 +4,17 @@ import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { KC_CAL_SELECTOR, KcCalComponent, KcCalEvent, KcCalSelector } from '@k5cjs/cal';
 
 @Component({
-  selector: 'app-cal',
-  templateUrl: './cal.component.html',
-  styleUrls: ['./cal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: KC_CAL_SELECTOR,
-      useClass: KcCalSelector,
-    },
-  ],
+    selector: 'app-cal',
+    templateUrl: './cal.component.html',
+    styleUrls: ['./cal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: KC_CAL_SELECTOR,
+            useClass: KcCalSelector,
+        },
+    ],
+    standalone: false
 })
 export class CalComponent extends KcCalComponent {
   @ViewChild(CdkVirtualScrollViewport, { static: true }) viewport!: CdkVirtualScrollViewport;

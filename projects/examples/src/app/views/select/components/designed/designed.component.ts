@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption, KcOptionValue } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-designed',
-  templateUrl: './designed.component.html',
-  styleUrls: ['./designed.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-designed',
+    templateUrl: './designed.component.html',
+    styleUrls: ['./designed.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class DesignedComponent {
   control: UntypedFormControl;

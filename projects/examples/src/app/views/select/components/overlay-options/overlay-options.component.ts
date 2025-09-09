@@ -5,10 +5,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption, KcOptionValue } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-overlay-options',
-  templateUrl: './overlay-options.component.html',
-  styleUrls: ['./overlay-options.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-overlay-options',
+    templateUrl: './overlay-options.component.html',
+    styleUrls: ['./overlay-options.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OverlayOptionsComponent {
   control: UntypedFormControl;

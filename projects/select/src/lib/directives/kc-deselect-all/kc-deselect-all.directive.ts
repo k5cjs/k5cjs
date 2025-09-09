@@ -4,7 +4,8 @@ import { KC_SELECT } from '../../tokens';
 import { KcSelect } from '../../types';
 
 @Directive({
-  selector: '[kcDeselectAll]',
+    selector: '[kcDeselectAll]',
+    standalone: false
 })
 export class KcDeselectAllDirective {
   constructor(@Inject(KC_SELECT) private _kcSelect: KcSelect) {}

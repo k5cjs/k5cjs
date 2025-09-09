@@ -7,20 +7,24 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { slideRToL } from './slide-r-to-l';
 
 @Component({
-  template: `
+    template: `
     <div id="state" [@slideRToL]="state">Default state</div>
   `,
-  animations: [slideRToL(50)],
+    animations: [slideRToL(50)],
+    standalone: false
 })
 class DumpyComponent {
   state: boolean | number = false;
 }
 
 @Component({
-  template: `
-    <div id="state" *ngIf="state" @slideRToL>Default state</div>
-  `,
-  animations: [slideRToL()],
+    template: `
+    @if (state) {
+      <div id="state" @slideRToL>Default state</div>
+    }
+    `,
+    animations: [slideRToL()],
+    standalone: false
 })
 class Dumpy1Component {
   state = false;

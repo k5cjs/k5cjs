@@ -5,8 +5,8 @@ import { WrappedFormControl, provideValueAccessor } from '@k5cjs/forms';
 import { KcOption, KcSelectComponent } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-wrapped-shared',
-  template: `
+    selector: 'app-simple-wrapped-shared',
+    template: `
     <kc-select [options]="options" multiple>
       <kc-value *kcValue></kc-value>
       <ng-container *kcValue>
@@ -14,30 +14,33 @@ import { KcOption, KcSelectComponent } from '@k5cjs/select';
         <div #ref ngProjectAs="[value]" class="value">
           <ng-content select="[value]"></ng-content>
         </div>
-
-        <button *ngIf="!ref.children.length" value>Default button</button>
+    
+        @if (!ref.children.length) {
+          <button value>Default button</button>
+        }
       </ng-container>
-
+    
       <div class="modal">
         <ng-content></ng-content>
-
+    
         <div kcToggle>Toggle</div>
         <div kcClear>Clear</div>
         <div kcSelectAll>Select All</div>
-
+    
         <div class="modal__options">
           <kc-options *kcOptions="let options" [options]="options">
             <kc-option *kcOption="let option" [option]="option"></kc-option>
           </kc-options>
         </div>
-
+    
         <div kcSubmit>Submit</div>
       </div>
     </kc-select>
-  `,
-  styles: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [provideValueAccessor(SimpleWrappedSharedComponent)],
+    `,
+    styles: [],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [provideValueAccessor(SimpleWrappedSharedComponent)],
+    standalone: false
 })
 export class SimpleWrappedSharedComponent<T = unknown> extends WrappedFormControl {
   @Input() options!: KcOption<T, T>[];
@@ -46,16 +49,17 @@ export class SimpleWrappedSharedComponent<T = unknown> extends WrappedFormContro
 }
 
 @Component({
-  selector: 'app-simple-wrapped',
-  template: `
+    selector: 'app-simple-wrapped',
+    template: `
     <pre>{{ control.value | json }}</pre>
 
     <app-simple-wrapped-shared [formControl]="control" [options]="options">
       <input [formControl]="search" kc-input type="text" />
     </app-simple-wrapped-shared>
   `,
-  styles: [],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    styles: [],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleWrappedComponent {
   control: UntypedFormControl;

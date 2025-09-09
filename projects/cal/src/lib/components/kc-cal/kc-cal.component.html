@@ -1,6 +1,8 @@
 <div class="cal">
   <div class="cal__header">
-    <div *ngIf="kcCal.changes | async as kcCal" class="cal__month">{{ kcCal.month | date:'MMMM yyyy' }}</div>
+    @if (kcCal.changes | async; as kcCal) {
+      <div class="cal__month">{{ kcCal.month | date:'MMMM yyyy' }}</div>
+    }
 
     <div>
       <button (click)="kcCal.prev()" class="cal__button">

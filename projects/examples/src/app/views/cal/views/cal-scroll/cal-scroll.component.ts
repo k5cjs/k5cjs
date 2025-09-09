@@ -4,10 +4,11 @@ import { FormControl } from '@angular/forms';
 import { KcCal } from '@k5cjs/cal';
 
 @Component({
-  selector: 'app-cal-scroll',
-  templateUrl: './cal-scroll.component.html',
-  styleUrls: ['./cal-scroll.component.scss'],
-  providers: [KcCal],
+    selector: 'app-cal-scroll',
+    templateUrl: './cal-scroll.component.html',
+    styleUrls: ['./cal-scroll.component.scss'],
+    providers: [KcCal],
+    standalone: false
 })
 export class CalScrollComponent {
   control: FormControl<Date> = new FormControl<Date>(new Date(), { nonNullable: true });

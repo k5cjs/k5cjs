@@ -2,7 +2,8 @@ import { NumberInput, coerceNumberProperty } from '@angular/cdk/coercion';
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2 } from '@angular/core';
 
 @Directive({
-  selector: '[kcDisablePointerOnScroll], [k5cDisablePointerOnScroll]',
+    selector: '[kcDisablePointerOnScroll], [k5cDisablePointerOnScroll]',
+    standalone: false
 })
 export class DisablePointerOnScrollDirective {
   @Input()

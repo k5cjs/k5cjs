@@ -7,7 +7,7 @@ import { KcToggleModule } from '../toggle.module';
 import { KcToggleGroupDirective } from './toggle-group.directive';
 
 @Component({
-  template: `
+    template: `
     <div toggleGroup #group="toggleGroup" [formControl]="control" [options]="options">
       <button
         (click)="group.select(value.value)"
@@ -19,6 +19,7 @@ import { KcToggleGroupDirective } from './toggle-group.directive';
       </button>
     </div>
   `,
+    standalone: false
 })
 class DummyComponent {
   @ViewChild(KcToggleGroupDirective) toggleGroup!: KcToggleGroupDirective<string>;

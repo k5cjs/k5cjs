@@ -4,10 +4,11 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewCh
 import { KcInternalDropdownComponent } from '../internal-dropdown/internal-dropdown.component';
 
 @Component({
-  selector: 'kc-dropdown',
-  templateUrl: './dropdown.component.html',
-  styleUrls: ['./dropdown.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-dropdown',
+    templateUrl: './dropdown.component.html',
+    styleUrls: ['./dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcDropdownComponent {
   @ViewChild(KcInternalDropdownComponent) internalDropdown!: KcInternalDropdownComponent;

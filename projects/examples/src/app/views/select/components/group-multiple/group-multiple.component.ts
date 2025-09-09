@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcGroup } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-group-multiple',
-  templateUrl: './group-multiple.component.html',
-  styleUrls: ['./group-multiple.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-group-multiple',
+    templateUrl: './group-multiple.component.html',
+    styleUrls: ['./group-multiple.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GroupMultipleComponent {
   control: UntypedFormControl;

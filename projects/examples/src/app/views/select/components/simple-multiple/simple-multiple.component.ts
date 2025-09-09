@@ -4,9 +4,10 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-multiple',
-  templateUrl: './simple-multiple.component.html',
-  styleUrls: ['./simple-multiple.component.scss'],
+    selector: 'app-simple-multiple',
+    templateUrl: './simple-multiple.component.html',
+    styleUrls: ['./simple-multiple.component.scss'],
+    standalone: false
 })
 export class SimpleMultipleComponent {
   control: UntypedFormControl;

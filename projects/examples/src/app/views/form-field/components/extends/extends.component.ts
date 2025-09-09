@@ -5,10 +5,11 @@ import { Observable, Subject, distinctUntilChanged } from 'rxjs';
 import { staggerChild, toggleY } from '@k5cjs/animations';
 
 @Component({
-  selector: 'app-extends',
-  templateUrl: './extends.component.html',
-  styleUrls: ['./extends.component.scss'],
-  animations: [staggerChild(), toggleY()],
+    selector: 'app-extends',
+    templateUrl: './extends.component.html',
+    styleUrls: ['./extends.component.scss'],
+    animations: [staggerChild(), toggleY()],
+    standalone: false
 })
 export class ExtendsComponent {
   name?: string;

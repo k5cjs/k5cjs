@@ -4,7 +4,8 @@ import { KC_SELECT } from '../../tokens';
 import { KcSelect } from '../../types';
 
 @Directive({
-  selector: '[kcToggle]',
+    selector: '[kcToggle]',
+    standalone: false
 })
 export class KcToggleDirective {
   constructor(@Inject(KC_SELECT) private _kcSelect: KcSelect) {}

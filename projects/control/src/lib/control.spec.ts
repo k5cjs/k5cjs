@@ -15,13 +15,14 @@ import { take } from 'rxjs';
 import { KcControl, Parent, kcControlProviders } from './control';
 
 @Directive({
-  selector: '[kcControl]',
-  providers: kcControlProviders(DumpyDirective),
+    selector: '[kcControl]',
+    providers: kcControlProviders(DumpyDirective),
+    standalone: false
 })
 class DumpyDirective extends KcControl {}
 
 @Component({
-  template: `
+    template: `
     <input #dir1 [formControl]="control" kcControl />
     <input #dir2 kcControl />
 
@@ -31,6 +32,7 @@ class DumpyDirective extends KcControl {}
       <button #submit type="submit">Submit</button>
     </form>
   `,
+    standalone: false
 })
 class DumpyComponent {
   @ViewChild('dir1', { read: DumpyDirective }) dir1!: DumpyDirective;

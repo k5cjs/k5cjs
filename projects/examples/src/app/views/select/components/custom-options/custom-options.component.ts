@@ -4,9 +4,10 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-custom-options',
-  templateUrl: './custom-options.component.html',
-  styleUrls: ['./custom-options.component.scss'],
+    selector: 'app-custom-options',
+    templateUrl: './custom-options.component.html',
+    styleUrls: ['./custom-options.component.scss'],
+    standalone: false
 })
 export class CustomOptionsComponent {
   control: UntypedFormControl;

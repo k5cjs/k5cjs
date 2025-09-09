@@ -7,20 +7,22 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { relativeToByComponent, relativeToByComponentName } from './relative-to-by-component-name.helper';
 
 @Component({
-  selector: 'kc-incorrect',
-  template: `
+    selector: 'kc-incorrect',
+    template: `
     Dummy3
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class IncorrectComponent {}
 
 @Component({
-  selector: 'kc-dumpy3',
-  template: `
+    selector: 'kc-dumpy3',
+    template: `
     Dummy3
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class Dumpy3Component {
   private _roue = inject(ActivatedRoute);
@@ -35,11 +37,12 @@ class Dumpy3Component {
 }
 
 @Component({
-  selector: 'kc-dumpy2',
-  template: `
+    selector: 'kc-dumpy2',
+    template: `
     Dummy2
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class Dumpy2Component {
   private _roue = inject(ActivatedRoute);
@@ -54,22 +57,24 @@ class Dumpy2Component {
 }
 
 @Component({
-  selector: 'kc-dumpy1',
-  template: `
+    selector: 'kc-dumpy1',
+    template: `
     Dummy1
     <router-outlet name="dialog"></router-outlet>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class Dumpy1Component {}
 
 @Component({
-  selector: 'kc-dumpy',
-  template: `
+    selector: 'kc-dumpy',
+    template: `
     Dummy
     <router-outlet></router-outlet>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class DumpyComponent {}
 

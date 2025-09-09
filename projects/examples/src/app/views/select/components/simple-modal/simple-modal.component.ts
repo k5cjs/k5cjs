@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-modal',
-  templateUrl: './simple-modal.component.html',
-  styleUrls: ['./simple-modal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-modal',
+    templateUrl: './simple-modal.component.html',
+    styleUrls: ['./simple-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleModalComponent {
   control: UntypedFormControl;

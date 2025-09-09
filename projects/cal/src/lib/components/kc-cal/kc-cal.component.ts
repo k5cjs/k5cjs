@@ -16,17 +16,18 @@ import { KC_CAL_SELECTOR } from '../../tokens';
 import { KcCalEvent } from '../../types';
 
 @Component({
-  selector: 'kc-cal',
-  templateUrl: './kc-cal.component.html',
-  styleUrls: ['./kc-cal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: KC_CAL_SELECTOR,
-      useClass: KcCalSelector,
-    },
-    KcCal,
-  ],
+    selector: 'kc-cal',
+    templateUrl: './kc-cal.component.html',
+    styleUrls: ['./kc-cal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: KC_CAL_SELECTOR,
+            useClass: KcCalSelector,
+        },
+        KcCal,
+    ],
+    standalone: false
 })
 export class KcCalComponent implements AfterContentInit, OnDestroy {
   @ViewChild('container', { read: ViewContainerRef, static: true }) protected _container!: ViewContainerRef;

@@ -4,9 +4,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { KcError } from './form-error.directive';
 
 @Component({
-  template: `
+    template: `
     <span *kcError>error</span>
   `,
+    standalone: false
 })
 class DumpyComponent {
   @ViewChild(KcError, { static: true }) kcError!: KcError;

@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-cal-two-sides',
-  templateUrl: './cal-two-sides.component.html',
-  styleUrls: ['./cal-two-sides.component.scss'],
+    selector: 'app-cal-two-sides',
+    templateUrl: './cal-two-sides.component.html',
+    styleUrls: ['./cal-two-sides.component.scss'],
+    standalone: false
 })
 export class CalTwoSidesComponent {}

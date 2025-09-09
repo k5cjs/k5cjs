@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-multiple-toggle',
-  templateUrl: './simple-multiple-toggle.component.html',
-  styleUrls: ['./simple-multiple-toggle.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-multiple-toggle',
+    templateUrl: './simple-multiple-toggle.component.html',
+    styleUrls: ['./simple-multiple-toggle.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleMultipleToggleComponent {
   control: UntypedFormControl;

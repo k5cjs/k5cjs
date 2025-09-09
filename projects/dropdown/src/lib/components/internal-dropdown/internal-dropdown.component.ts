@@ -16,10 +16,11 @@ import { POSITIONS } from '../../config';
 import { KcDropdownOptionsDirective } from '../../directives/dropdown.directive';
 
 @Component({
-  selector: 'kc-internal-dropdown',
-  templateUrl: './internal-dropdown.component.html',
-  styleUrls: ['./internal-dropdown.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-internal-dropdown',
+    templateUrl: './internal-dropdown.component.html',
+    styleUrls: ['./internal-dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcInternalDropdownComponent implements OnDestroy {
   @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;

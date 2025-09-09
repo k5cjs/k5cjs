@@ -1,7 +1,8 @@
 import { Directive, TemplateRef } from '@angular/core';
 
 @Directive({
-  selector: '[kcDropdown], [kc-dropdown]',
+    selector: '[kcDropdown], [kc-dropdown]',
+    standalone: false
 })
 export class KcDropdownOptionsDirective {
   constructor(public template: TemplateRef<unknown>) {}

@@ -5,7 +5,8 @@ import { KC_SELECT } from '../../tokens';
 import { KcSelect } from '../../types';
 
 @Directive({
-  selector: '[kcClose]',
+    selector: '[kcClose]',
+    standalone: false
 })
 export class KcCloseDirective {
   @Input({ transform: coerceBooleanProperty }) kcClose = true;

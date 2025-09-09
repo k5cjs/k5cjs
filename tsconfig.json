@@ -14,35 +14,82 @@
     "sourceMap": true,
     "declaration": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "paths": {
-      "@angular/*": ["node_modules/@angular/*"],
-      "rxjs/*": ["node_modules/rxjs/*"],
-      "rxjs": ["node_modules/rxjs"],
-      "@k5cjs/rxjs": ["dist/rxjs"],
-      "@k5cjs/forms": ["dist/forms"],
-      "@k5cjs/tables": ["dist/tables"],
-      "@k5cjs/scroll": ["dist/scroll"],
-      "@k5cjs/select": ["dist/select"],
-      "@k5cjs/selection-model": ["dist/selection-model"],
-      "@k5cjs/control": ["dist/control"],
-      "@k5cjs/form-field": ["dist/form-field"],
-      "@k5cjs/input": ["dist/input"],
-      "@k5cjs/textarea": ["dist/textarea"],
-      "@k5cjs/dropdown": ["dist/dropdown"],
-      "@k5cjs/cal": ["dist/cal"],
-      "@k5cjs/animations": ["dist/animations"],
-      "@k5cjs/form-error": ["dist/form-error"],
-      "@k5cjs/store": ["dist/store"],
-      "@k5cjs/fake-progress-bar": ["dist/fake-progress-bar"],
-      "@k5cjs/router": ["dist/router"],
-      "@k5cjs/types": ["dist/types"],
-      "@k5cjs/toggle": ["dist/toggle"]
+      "@angular/*": [
+        "node_modules/@angular/*"
+      ],
+      "rxjs/*": [
+        "node_modules/rxjs/*"
+      ],
+      "rxjs": [
+        "node_modules/rxjs"
+      ],
+      "@k5cjs/rxjs": [
+        "dist/rxjs"
+      ],
+      "@k5cjs/forms": [
+        "dist/forms"
+      ],
+      "@k5cjs/tables": [
+        "dist/tables"
+      ],
+      "@k5cjs/scroll": [
+        "dist/scroll"
+      ],
+      "@k5cjs/select": [
+        "dist/select"
+      ],
+      "@k5cjs/selection-model": [
+        "dist/selection-model"
+      ],
+      "@k5cjs/control": [
+        "dist/control"
+      ],
+      "@k5cjs/form-field": [
+        "dist/form-field"
+      ],
+      "@k5cjs/input": [
+        "dist/input"
+      ],
+      "@k5cjs/textarea": [
+        "dist/textarea"
+      ],
+      "@k5cjs/dropdown": [
+        "dist/dropdown"
+      ],
+      "@k5cjs/cal": [
+        "dist/cal"
+      ],
+      "@k5cjs/animations": [
+        "dist/animations"
+      ],
+      "@k5cjs/form-error": [
+        "dist/form-error"
+      ],
+      "@k5cjs/store": [
+        "dist/store"
+      ],
+      "@k5cjs/fake-progress-bar": [
+        "dist/fake-progress-bar"
+      ],
+      "@k5cjs/router": [
+        "dist/router"
+      ],
+      "@k5cjs/types": [
+        "dist/types"
+      ],
+      "@k5cjs/toggle": [
+        "dist/toggle"
+      ]
     },
     "target": "ES2022",
     "module": "es2020",
-    "lib": ["es2020", "dom"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
     "useDefineForClassFields": false,
     "composite": true
   },

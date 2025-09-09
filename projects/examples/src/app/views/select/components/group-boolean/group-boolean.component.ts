@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcGroup } from 'dist/select/public-api';
 
 @Component({
-  selector: 'app-group-boolean',
-  templateUrl: './group-boolean.component.html',
-  styleUrls: ['./group-boolean.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-group-boolean',
+    templateUrl: './group-boolean.component.html',
+    styleUrls: ['./group-boolean.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GroupBooleanComponent {
   control: UntypedFormControl;

@@ -5,10 +5,11 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-virtual-scroll',
-  templateUrl: './virtual-scroll.component.html',
-  styleUrls: ['./virtual-scroll.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-virtual-scroll',
+    templateUrl: './virtual-scroll.component.html',
+    styleUrls: ['./virtual-scroll.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class VirtualScrollComponent {
   control: UntypedFormControl;

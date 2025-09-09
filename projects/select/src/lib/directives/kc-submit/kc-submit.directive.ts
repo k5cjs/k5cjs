@@ -4,7 +4,8 @@ import { KC_SELECT } from '../../tokens';
 import { KcSelect } from '../../types';
 
 @Directive({
-  selector: '[kcSubmit]',
+    selector: '[kcSubmit]',
+    standalone: false
 })
 export class KcSubmitDirective {
   constructor(@Inject(KC_SELECT) private _kcSelect: KcSelect) {}

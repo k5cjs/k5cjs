@@ -4,17 +4,18 @@ import { FormControl } from '@angular/forms';
 import { KC_CAL_SELECTOR, KcCal, KcCalComponent, KcCalEvent, KcCalSelector } from '@k5cjs/cal';
 
 @Component({
-  selector: 'app-cal',
-  templateUrl: './cal.component.html',
-  styleUrls: ['./cal.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: KC_CAL_SELECTOR,
-      useClass: KcCalSelector,
-    },
-    KcCal,
-  ],
+    selector: 'app-cal',
+    templateUrl: './cal.component.html',
+    styleUrls: ['./cal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: KC_CAL_SELECTOR,
+            useClass: KcCalSelector,
+        },
+        KcCal,
+    ],
+    standalone: false
 })
 export class CalComponent extends KcCalComponent {
   control: FormControl<Date> = new FormControl<Date>(new Date(), { nonNullable: true });

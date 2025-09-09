@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -21,14 +21,13 @@ import { KcControl, KcControlType } from '@k5cjs/control';
 import { KC_FORM_FIELD } from './form-field.token';
 
 @Component({
-  standalone: true,
-  imports: [NgIf],
-  selector: 'kc-form-field',
-  templateUrl: './form-field.component.html',
-  styleUrls: ['./form-field.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: KC_FORM_FIELD, useExisting: forwardRef(() => KcFormField) }],
-  exportAs: 'kcFormField',
+    imports: [],
+    selector: 'kc-form-field',
+    templateUrl: './form-field.component.html',
+    styleUrls: ['./form-field.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [{ provide: KC_FORM_FIELD, useExisting: forwardRef(() => KcFormField) }],
+    exportAs: 'kcFormField'
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class KcFormField implements OnInit, OnDestroy, KcControlType {

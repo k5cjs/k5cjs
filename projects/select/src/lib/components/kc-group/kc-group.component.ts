@@ -28,22 +28,23 @@ import {
 } from '../../types';
 
 @Component({
-  selector: 'kc-group',
-  templateUrl: './kc-group.component.html',
-  styleUrls: ['./kc-group.component.scss'],
-  providers: [
-    {
-      provide: KC_SELECTION,
-      useFactory: (autocomplete: KcGroupComponent<unknown, unknown, unknown>) => autocomplete.selection,
-      deps: [forwardRef(() => KcGroupComponent)],
-    },
-    {
-      provide: KC_VALUE,
-      useFactory: (component: KcGroupComponent<unknown, unknown, unknown>) => component.value,
-      deps: [forwardRef(() => KcGroupComponent)],
-    },
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-group',
+    templateUrl: './kc-group.component.html',
+    styleUrls: ['./kc-group.component.scss'],
+    providers: [
+        {
+            provide: KC_SELECTION,
+            useFactory: (autocomplete: KcGroupComponent<unknown, unknown, unknown>) => autocomplete.selection,
+            deps: [forwardRef(() => KcGroupComponent)],
+        },
+        {
+            provide: KC_VALUE,
+            useFactory: (component: KcGroupComponent<unknown, unknown, unknown>) => component.value,
+            deps: [forwardRef(() => KcGroupComponent)],
+        },
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcGroupComponent<V, K, L> implements OnInit, AfterContentInit, OnDestroy {
   @Input()

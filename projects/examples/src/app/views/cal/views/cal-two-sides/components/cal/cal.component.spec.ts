@@ -7,11 +7,12 @@ import { KcCalModule } from '@k5cjs/cal';
 import { CalComponent } from './cal.component';
 
 @Component({
-  template: `
+    template: `
     <app-cal>
       <div *kc-cal-month="let month">{{ month }}</div>
     </app-cal>
   `,
+    standalone: false
 })
 class DummyComponent {}
 

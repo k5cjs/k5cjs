@@ -14,10 +14,11 @@ import { KcCalDayData, KcCalWeekData } from '../../types';
 import { KcCalDayComponent } from '../kc-cal-day/kc-cal-day.component';
 
 @Component({
-  selector: 'kc-cal-week',
-  templateUrl: './kc-cal-week.component.html',
-  styleUrls: ['./kc-cal-week.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-cal-week',
+    templateUrl: './kc-cal-week.component.html',
+    styleUrls: ['./kc-cal-week.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcCalWeekComponent implements OnInit {
   @Input() week!: KcCalWeekData;

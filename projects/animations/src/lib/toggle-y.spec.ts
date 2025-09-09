@@ -299,23 +299,30 @@ describe('Toggle y', () => {
 });
 
 @Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
-    <div id="state2" *ngIf="state2" [@toggleY]="state2">Boolean state</div>
-    <div id="state3" #ref *ngIf="state3" [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
-      {{ message }}
-    </div>
-  `,
-  styles: [
-    `
+    template: `
+    @if (state1) {
+      <div id="state1" @toggleY>Default state</div>
+    }
+    @if (state2) {
+      <div id="state2" [@toggleY]="state2">Boolean state</div>
+    }
+    @if (state3) {
+      <div id="state3" #ref [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
+        {{ message }}
+      </div>
+    }
+    `,
+    styles: [
+        `
       div {
         width: 200px;
         font-size: 16px;
         line-height: 16px;
       }
     `,
-  ],
-  animations: [toggleY(40)],
+    ],
+    animations: [toggleY(40)],
+    standalone: false
 })
 class DumpyComponent {
   state1 = false;
@@ -326,43 +333,51 @@ class DumpyComponent {
 }
 
 @Component({
-  template: `
-    <div id="state1" *ngIf="state1" @toggleY>Default state</div>
-  `,
-  styles: [
-    `
+    template: `
+    @if (state1) {
+      <div id="state1" @toggleY>Default state</div>
+    }
+    `,
+    styles: [
+        `
       div {
         width: 200px;
         font-size: 16px;
         line-height: 16px;
       }
     `,
-  ],
-  animations: [toggleY()],
+    ],
+    animations: [toggleY()],
+    standalone: false
 })
 class Dumpy1Component {
   state1 = false;
 }
 
 @Component({
-  template: `
+    template: `
     <div>test</div>
-    <div id="state1" #ref *ngIf="state1" [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
-      <div @toggleO *ngIf="state2">
-        {{ message }}
+    @if (state1) {
+      <div id="state1" #ref [@toggleY]="{ value: message, params: { height: ref.offsetHeight } }">
+        @if (state2) {
+          <div @toggleO>
+            {{ message }}
+          </div>
+        }
       </div>
-    </div>
-  `,
-  styles: [
-    `
+    }
+    `,
+    styles: [
+        `
       div {
         width: 200px;
         font-size: 16px;
         line-height: 16px;
       }
     `,
-  ],
-  animations: [toggleY(), toggleO()],
+    ],
+    animations: [toggleY(), toggleO()],
+    standalone: false
 })
 class Dumpy2Component implements AfterContentChecked {
   state1 = false;

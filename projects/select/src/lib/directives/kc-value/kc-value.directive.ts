@@ -1,6 +1,9 @@
 import { ChangeDetectorRef, Directive, TemplateRef, ViewContainerRef } from '@angular/core';
 
-@Directive({ selector: '[kcValue]' })
+@Directive({
+    selector: '[kcValue]',
+    standalone: false
+})
 export class KcValueDirective {
   constructor(public template: TemplateRef<unknown>, private _cdr: ChangeDetectorRef) {}
 

@@ -9,7 +9,9 @@
     <app-options *kcOptions="let options" [options]="options" (index)="indexChanged($event)">
       <kc-option *kcOption="let option" [option]="option"></kc-option>
 
-      <div *ngIf="loading" scroll>Loading...</div>
+      @if (loading) {
+        <div scroll>Loading...</div>
+      }
     </app-options>
   </kc-select>
 </div>

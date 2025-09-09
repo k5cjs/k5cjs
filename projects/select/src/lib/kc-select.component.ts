@@ -55,28 +55,29 @@ import { KC_SELECT, KC_SELECTION, KC_VALUE } from './tokens';
 import { KcGroup, KcOption, KcOptionGroupValue, KcOptionSelection, KcOptionValue, KcSelect } from './types';
 
 @Component({
-  selector: 'kc-select',
-  templateUrl: './kc-select.component.html',
-  styleUrls: ['./kc-select.component.scss'],
-  providers: [
-    kcControlProviders(KcSelectComponent),
-    {
-      provide: KC_SELECT,
-      useExisting: forwardRef(() => KcSelectComponent),
-    },
-    {
-      provide: KC_SELECTION,
-      useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.selection,
-      deps: [forwardRef(() => KcSelectComponent)],
-    },
-    {
-      provide: KC_VALUE,
-      useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.value,
-      deps: [forwardRef(() => KcSelectComponent)],
-    },
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  exportAs: 'kcSelect',
+    selector: 'kc-select',
+    templateUrl: './kc-select.component.html',
+    styleUrls: ['./kc-select.component.scss'],
+    providers: [
+        kcControlProviders(KcSelectComponent),
+        {
+            provide: KC_SELECT,
+            useExisting: forwardRef(() => KcSelectComponent),
+        },
+        {
+            provide: KC_SELECTION,
+            useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.selection,
+            deps: [forwardRef(() => KcSelectComponent)],
+        },
+        {
+            provide: KC_VALUE,
+            useFactory: (component: KcSelectComponent<unknown, unknown, unknown>) => component.value,
+            deps: [forwardRef(() => KcSelectComponent)],
+        },
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    exportAs: 'kcSelect',
+    standalone: false
 })
 export class KcSelectComponent<V, K, L>
   extends KcControl<KcOptionValue<V> | KcOptionGroupValue<V>>

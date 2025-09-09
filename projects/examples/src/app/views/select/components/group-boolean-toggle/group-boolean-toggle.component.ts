@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcGroup } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-group-boolean-toggle',
-  templateUrl: './group-boolean-toggle.component.html',
-  styleUrls: ['./group-boolean-toggle.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-group-boolean-toggle',
+    templateUrl: './group-boolean-toggle.component.html',
+    styleUrls: ['./group-boolean-toggle.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class GroupBooleanToggleComponent {
   control: UntypedFormControl;

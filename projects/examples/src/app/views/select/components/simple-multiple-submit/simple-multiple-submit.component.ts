@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption, KcOptionValue } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-multiple-submit',
-  templateUrl: './simple-multiple-submit.component.html',
-  styleUrls: ['./simple-multiple-submit.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-multiple-submit',
+    templateUrl: './simple-multiple-submit.component.html',
+    styleUrls: ['./simple-multiple-submit.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleMultipleSubmitComponent {
   control: UntypedFormControl;

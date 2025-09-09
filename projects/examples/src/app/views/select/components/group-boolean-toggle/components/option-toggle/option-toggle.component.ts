@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject } from '@
 import { KC_SELECTION, KcOption, KcOptionComponent, MapEmitSelect } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-option-toggle',
-  templateUrl: './option-toggle.component.html',
-  styleUrls: ['./option-toggle.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-option-toggle',
+    templateUrl: './option-toggle.component.html',
+    styleUrls: ['./option-toggle.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OptionToggleComponent extends KcOptionComponent<boolean, string, string> {
   constructor(

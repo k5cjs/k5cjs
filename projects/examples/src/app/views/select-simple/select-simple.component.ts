@@ -5,10 +5,11 @@ import { Observable, of } from 'rxjs';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-select-simple',
-  templateUrl: './select-simple.component.html',
-  styleUrls: ['./select-simple.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-select-simple',
+    templateUrl: './select-simple.component.html',
+    styleUrls: ['./select-simple.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SelectSimpleComponent {
   control = new FormControl();

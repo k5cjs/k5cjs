@@ -1,1 +1,3 @@
-<span *ngIf="day">{{ day | date: 'd' }}</span>
+@if (day) {
+  <span>{{ day | date: 'd' }}</span>
+}

@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-multiple-select-all',
-  templateUrl: './simple-multiple-select-all.component.html',
-  styleUrls: ['./simple-multiple-select-all.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-multiple-select-all',
+    templateUrl: './simple-multiple-select-all.component.html',
+    styleUrls: ['./simple-multiple-select-all.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleMultipleSelectAllComponent {
   control: UntypedFormControl;

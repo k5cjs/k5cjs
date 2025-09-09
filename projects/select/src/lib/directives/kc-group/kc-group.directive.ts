@@ -5,7 +5,8 @@ import { KcGroup } from '../../types';
 type Context<V, K, L> = { $implicit: KcGroup<V, K, L> };
 
 @Directive({
-  selector: '[kcGroup]',
+    selector: '[kcGroup]',
+    standalone: false
 })
 export class KcGroupDirective<V, K, L> {
   private _embeddedViewRef: EmbeddedViewRef<Context<V, K, L>> | undefined;

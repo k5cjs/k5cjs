@@ -7,13 +7,14 @@ import { ControlValueAccessor, FormsModule, ReactiveFormsModule } from '@angular
 import { provideValueAccessor } from './provide-value-accessor';
 
 @Component({
-  selector: 'kc-input',
-  template: `
+    selector: 'kc-input',
+    template: `
     <input [(ngModel)]="value" />
     <span>{{ value }}</span>
   `,
-  providers: [provideValueAccessor(InputComponent)],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [provideValueAccessor(InputComponent)],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class InputComponent implements ControlValueAccessor {
   set value(val: unknown) {

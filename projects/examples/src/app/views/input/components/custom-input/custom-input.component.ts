@@ -3,10 +3,11 @@ import { Component, Input } from '@angular/core';
 import { WrappedFormControl, provideValueAccessor } from '@k5cjs/forms';
 
 @Component({
-  selector: 'app-custom-input',
-  templateUrl: './custom-input.component.html',
-  styleUrls: ['./custom-input.component.scss'],
-  providers: [provideValueAccessor(CustomInputComponent)],
+    selector: 'app-custom-input',
+    templateUrl: './custom-input.component.html',
+    styleUrls: ['./custom-input.component.scss'],
+    providers: [provideValueAccessor(CustomInputComponent)],
+    standalone: false
 })
 export class CustomInputComponent extends WrappedFormControl {
   @Input() name: string | undefined;

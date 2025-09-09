@@ -1,13 +1,13 @@
-<ng-container *ngIf="value | async as value; else placeholder">
+@if (value | async; as value) {
   <div>{{ value }}</div>
-</ng-container>
-
-<ng-template #placeholder>
+} @else {
   <div #ref>
     <ng-content placeholder></ng-content>
   </div>
+  @if (!ref.children.length) {
+    <span>Please choose an option</span>
+  }
+}
 
-  <span *ngIf="!ref.children.length">Please choose an option</span>
-</ng-template>
 
 <ng-content></ng-content>

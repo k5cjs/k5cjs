@@ -11,9 +11,10 @@ import { KcToggleOptions } from '../types';
 import { KcToggleItemDirective } from './toggle-item.directive';
 
 @Directive({
-  selector: '[kcToggleGroup], [toggleGroup]',
-  exportAs: 'toggleGroup',
-  providers: [provideValueAccessor(KcToggleGroupDirective)],
+    selector: '[kcToggleGroup], [toggleGroup]',
+    exportAs: 'toggleGroup',
+    providers: [provideValueAccessor(KcToggleGroupDirective)],
+    standalone: false
 })
 export class KcToggleGroupDirective<T> implements OnInit, ControlValueAccessor {
   @Input() options: KcToggleOptions<T>[] = [];

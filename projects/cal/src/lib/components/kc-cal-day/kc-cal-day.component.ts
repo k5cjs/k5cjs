@@ -15,10 +15,11 @@ import { KC_CAL_SELECTOR } from '../../tokens';
 import { findLeftMostDay, findRightMostDay, isDateBetween, isDateEqual, removeTime } from '../../utils';
 
 @Component({
-  selector: 'kc-cal-day',
-  templateUrl: './kc-cal-day.component.html',
-  styleUrls: ['./kc-cal-day.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-cal-day',
+    templateUrl: './kc-cal-day.component.html',
+    styleUrls: ['./kc-cal-day.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcCalDayComponent<T extends KcCalSelector = KcCalSelector> implements OnDestroy {
   @Input()

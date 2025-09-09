@@ -15,13 +15,14 @@ import { provideValueAccessor } from './provide-value-accessor';
 import { WrappedFormControl } from './wrapped-form-control';
 
 @Component({
-  selector: 'kc-input',
-  template: `
+    selector: 'kc-input',
+    template: `
     <input [(ngModel)]="value" />
     <span>{{ value }}</span>
   `,
-  providers: [provideValueAccessor(InputComponent)],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [provideValueAccessor(InputComponent)],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class InputComponent implements ControlValueAccessor {
   set value(val: unknown) {
@@ -47,23 +48,25 @@ class InputComponent implements ControlValueAccessor {
 }
 
 @Component({
-  selector: 'kc-child',
-  template: `
+    selector: 'kc-child',
+    template: `
     <kc-input></kc-input>
   `,
-  providers: [provideValueAccessor(ChildComponent)],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [provideValueAccessor(ChildComponent)],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class ChildComponent extends WrappedFormControl {}
 
 @Component({
-  selector: 'kc-parent',
-  template: `
+    selector: 'kc-parent',
+    template: `
     <form [formGroup]="form">
       <kc-child formControlName="input"></kc-child>
     </form>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class ParentComponent {
   form: UntypedFormGroup;
@@ -76,23 +79,25 @@ class ParentComponent {
 }
 
 @Component({
-  selector: 'kc-error-child',
-  template: `
+    selector: 'kc-error-child',
+    template: `
     <span></span>
   `,
-  providers: [provideValueAccessor(ErrorChildComponent)],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [provideValueAccessor(ErrorChildComponent)],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class ErrorChildComponent extends WrappedFormControl {}
 
 @Component({
-  selector: 'kc-error-parent',
-  template: `
+    selector: 'kc-error-parent',
+    template: `
     <form [formGroup]="form">
       <kc-error-child formControlName="input"></kc-error-child>
     </form>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class ErrorParentComponent {
   form: UntypedFormGroup;

@@ -9,7 +9,7 @@ import { KcInput } from '@k5cjs/input';
 
 import { KcScrollError } from './form-scroll-error.directive';
 @Component({
-  template: `
+    template: `
     <form [formGroup]="form" (ngSubmit)="submit()" scrollToError>
       <kc-form-field class="field">
         <input formControlName="control1" kc-input placeholder="Test" />
@@ -28,6 +28,7 @@ import { KcScrollError } from './form-scroll-error.directive';
       <button type="submit">Submit</button>
     </form>
   `,
+    standalone: false
 })
 class TestComponent {
   form = new FormGroup({

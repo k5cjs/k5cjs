@@ -257,17 +257,19 @@ describe('KcErrors', () => {
 });
 
 @Component({
-  template: `
-    <kc-form-field *ngIf="show" class="field">
-      <input [formControl]="control" kc-input />
-
-      <div error kcErrors [multiple]="multiple" [staggerTime]="staggerTime">
-        <span *kcError="'required'; label: 'required'; let value" id="error">{{ value }}</span>
-        <span *kcError="'email'" id="error">Please enter a valid email address</span>
-        <span *kcError="'minlength'; label: minLength; let value" id="error">{{ value }}</span>
-      </div>
-    </kc-form-field>
-  `,
+    template: `
+    @if (show) {
+      <kc-form-field class="field">
+        <input [formControl]="control" kc-input />
+        <div error kcErrors [multiple]="multiple" [staggerTime]="staggerTime">
+          <span *kcError="'required'; label: 'required'; let value" id="error">{{ value }}</span>
+          <span *kcError="'email'" id="error">Please enter a valid email address</span>
+          <span *kcError="'minlength'; label: minLength; let value" id="error">{{ value }}</span>
+        </div>
+      </kc-form-field>
+    }
+    `,
+    standalone: false
 })
 class DumpyComponent {
   show = true;

@@ -14,10 +14,11 @@ import { KC_SELECTION } from '../../tokens';
 import { KcOption } from '../../types';
 
 @Component({
-  selector: 'kc-option',
-  templateUrl: './kc-option.component.html',
-  styleUrls: ['./kc-option.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-option',
+    templateUrl: './kc-option.component.html',
+    styleUrls: ['./kc-option.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcOptionComponent<V, K, L> implements OnDestroy {
   @Input() option!: KcOption<V, K, L>;

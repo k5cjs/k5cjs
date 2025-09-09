@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angul
 import { KcOption, KcOptionsComponent } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-options',
-  templateUrl: './options.component.html',
-  styleUrls: ['./options.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-options',
+    templateUrl: './options.component.html',
+    styleUrls: ['./options.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class OptionsComponent extends KcOptionsComponent<string, string, string> {
   @Output() index: EventEmitter<number>;

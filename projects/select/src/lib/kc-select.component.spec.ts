@@ -121,8 +121,8 @@ describe('KcSelectComponent', () => {
 });
 
 @Component({
-  selector: 'kc-dummy',
-  template: `
+    selector: 'kc-dummy',
+    template: `
     <kc-select [formControl]="control" [options]="options" [multiple]="multiple">
       <kc-value *kcValue></kc-value>
 
@@ -131,7 +131,8 @@ describe('KcSelectComponent', () => {
       </kc-options>
     </kc-select>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class DummyComponent {
   multiple = true;

@@ -4,10 +4,11 @@ import { KcOptionDirective } from '../../directives';
 import { KcOption } from '../../types';
 
 @Component({
-  selector: 'kc-options',
-  templateUrl: './kc-options.component.html',
-  styleUrls: ['./kc-options.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-options',
+    templateUrl: './kc-options.component.html',
+    styleUrls: ['./kc-options.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcOptionsComponent<V, K, L> {
   @Input()

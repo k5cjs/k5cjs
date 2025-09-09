@@ -6,10 +6,11 @@ import { KC_SELECTION } from '../../tokens';
 import { KcOption } from '../../types';
 
 @Component({
-  selector: 'kc-value',
-  templateUrl: './kc-value.component.html',
-  styleUrls: ['./kc-value.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'kc-value',
+    templateUrl: './kc-value.component.html',
+    styleUrls: ['./kc-value.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class KcValueComponent<T extends boolean = false> {
   value!: Observable<string | undefined>;

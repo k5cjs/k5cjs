@@ -4,7 +4,10 @@ import { KcOption } from '../../types';
 
 type Context<V, K, L> = { $implicit: KcOption<V, K, L>[] };
 
-@Directive({ selector: '[kcOptions]' })
+@Directive({
+    selector: '[kcOptions]',
+    standalone: false
+})
 export class KcOptionsDirective<V, K, L> {
   @Input('kcOptionsType') public type!: KcOption<V, K, L>;
 

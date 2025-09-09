@@ -3,10 +3,11 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { KcOption, KcOptionValue } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-without-form-control',
-  templateUrl: './simple-without-form-control.component.html',
-  styleUrls: ['./simple-without-form-control.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-without-form-control',
+    templateUrl: './simple-without-form-control.component.html',
+    styleUrls: ['./simple-without-form-control.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleWithoutFormControlComponent {
   options: KcOption<string, string, string>[];

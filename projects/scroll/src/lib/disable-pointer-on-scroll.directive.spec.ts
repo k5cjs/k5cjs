@@ -45,15 +45,17 @@ describe('SelectionModel', () => {
 });
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'k5c-dummy',
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'k5c-dummy',
+    template: `
     <div #container class="container" k5cDisablePointerOnScroll>
-      <div #item *ngFor="let i of list" class="container__item"></div>
+      @for (i of list; track i) {
+        <div #item class="container__item"></div>
+      }
     </div>
-  `,
-  styles: [
-    `
+    `,
+    styles: [
+        `
       .container {
         display: flex;
         flex-direction: column;
@@ -69,8 +71,9 @@ describe('SelectionModel', () => {
         background: red;
       }
     `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class DummyComponent {
   @ViewChild('container', { static: true }) container!: ElementRef<HTMLElement>;
@@ -92,15 +95,17 @@ class DummyComponent {
 }
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'k5c-dummy',
-  template: `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    selector: 'k5c-dummy',
+    template: `
     <div #container class="container" [k5cDisablePointerOnScroll]="1500">
-      <div #item *ngFor="let i of list" class="container__item"></div>
+      @for (i of list; track i) {
+        <div #item class="container__item"></div>
+      }
     </div>
-  `,
-  styles: [
-    `
+    `,
+    styles: [
+        `
       .container {
         display: flex;
         flex-direction: column;
@@ -116,8 +121,9 @@ class DummyComponent {
         background: red;
       }
     `,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 class Dummy2Component {
   @ViewChild('container', { static: true }) container!: ElementRef<HTMLElement>;

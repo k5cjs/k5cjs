@@ -14,9 +14,11 @@
   <div class="control__input">
     <ng-content select="[kc-input],[control]"></ng-content>
 
-    <span *ngIf="empty" class="placeholder">
-      <ng-content select="[placeholder]"></ng-content>
-    </span>
+    @if (empty) {
+      <span class="placeholder">
+        <ng-content select="[placeholder]"></ng-content>
+      </span>
+    }
   </div>
 
   <div class="control__after">

@@ -4,10 +4,11 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption, filterNestedOptions } from '@k5cjs/select';
 
 @Component({
-  selector: 'app-simple-search',
-  templateUrl: './simple-search.component.html',
-  styleUrls: ['./simple-search.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-simple-search',
+    templateUrl: './simple-search.component.html',
+    styleUrls: ['./simple-search.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: false
 })
 export class SimpleSearchComponent {
   control: UntypedFormControl;

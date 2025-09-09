@@ -4,8 +4,8 @@ import { UntypedFormBuilder, UntypedFormControl } from '@angular/forms';
 import { KcOption } from 'dist/select/public-api';
 
 @Component({
-  selector: 'app-default-placeholder',
-  template: `
+    selector: 'app-default-placeholder',
+    template: `
     <pre>{{ control.value | json }}</pre>
 
     <kc-select [formControl]="control" [options]="options" multiple>
@@ -16,7 +16,8 @@ import { KcOption } from 'dist/select/public-api';
       </kc-options>
     </kc-select>
   `,
-  styleUrls: [],
+    styleUrls: [],
+    standalone: false
 })
 export class DefaultPlaceHolderComponent {
   control: UntypedFormControl;
