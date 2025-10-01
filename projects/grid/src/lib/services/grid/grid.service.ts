@@ -230,6 +230,26 @@ export class KcGridService {
 
     if (options?.emitEvent) this._itemsChanges.next([...this._items.values()]);
 
+    // expand the rows if the new element goes beyond
+    let maxBottom = 0;
+
+    this._items.forEach((item) => {
+      const bottom = item.context.row + item.context.rows;
+      if (bottom > maxBottom) {
+        maxBottom = bottom;
+      }
+    });
+
+    if (maxBottom > this.rows) {
+      const rowsGapsToAdd = item.rows + this.countOfRowsToAdd;
+
+      this.rows = maxBottom + this.countOfRowsToAdd;
+      this.rowsGaps = [...this.rowsGaps, ...this.rowsGaps.slice(0, rowsGapsToAdd)];
+
+      this.updateGrid();
+      this.update();
+    }
+    
     return id;
   }
 
@@ -353,6 +373,28 @@ export class KcGridService {
     if (item.rows === 0) return false;
     if (item.cols === 0) return false;
 
+    // vertical exit check for grid
+    if (item.row + item.rows === this.rows) {
+      const rowsToAdd = (item.row + item.rows) - this.rows + this.countOfRowsToAdd;
+  
+      this.rows = this.rows + rowsToAdd;
+      this.rowsGaps = [...this.rowsGaps, ...this.rowsGaps.slice(0, rowsToAdd)] as Gaps;
+  
+      this.updateGrid();
+      this.update();
+
+      const newScrollTop =
+        item.row * this.cellHeight + item.rows * this.cellHeight + this.rowsTotalGaps - this.scrollTop;
+
+      if (newScrollTop > 0) {
+        this.isItemScrolling = true;
+        requestAnimationFrame(() => {
+          this.footer.scrollIntoView({ behavior: 'smooth' });
+          this.isItemScrolling = false;
+        });
+      }
+    }
+  
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const last = this._lastResizeItem || this._items.get(id)!;
 
