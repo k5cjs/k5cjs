@@ -7,14 +7,18 @@ import { Action, ActionCreator, NotAllowedCheck } from '@ngrx/store';
 export type Params<T = unknown> = Record<PropertyKey, T>;
 export type HttpParams = Params<string | number | boolean>;
 
-export interface StateBase<T extends { id: PropertyKey }> extends EntityState<T> {
+export interface StateBase<T extends { id: PropertyKey }>
+  extends EntityState<T> {
   errors: Params<HttpErrorResponse | undefined>;
   loadings: Params<boolean | undefined>;
   queries: Params<({ ids: ReturnType<IdSelector<T>>[] } & Params) | undefined>;
   reloadSelectors: number;
 }
 
-export type ActionCreatorType<T extends object> = ActionCreator<string, (props: T & NotAllowedCheck<T>) => T & Action>;
+export type ActionCreatorType<T extends object> = ActionCreator<
+  string,
+  (props: T & NotAllowedCheck<T>) => T & Action
+>;
 
 interface ActionBase {
   /**
@@ -44,7 +48,8 @@ interface ActionBase {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ActionInit<T extends Params = Params, U = any, R = any> extends ActionBase {
+export interface ActionInit<T extends Params = Params, U = any, R = any>
+  extends ActionBase {
   query: string;
   params: T;
   url?: U;
@@ -56,7 +61,8 @@ export interface ActionInit<T extends Params = Params, U = any, R = any> extends
   beforeSuccess?: (response: R) => Observable<any>;
 }
 
-export interface ActionSuccess<T = Params> extends Pick<ActionBase, 'resetQueries' | 'reloadSelectors'> {
+export interface ActionSuccess<T = Params>
+  extends Pick<ActionBase, 'resetQueries' | 'reloadSelectors'> {
   query: string;
   params: T;
 }
