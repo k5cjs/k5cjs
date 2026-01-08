@@ -2,23 +2,51 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable, InjectionToken, Optional } from '@angular/core';
 import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
-import { Observable, catchError, delay, first, map, of, throwError, zip } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  delay,
+  first,
+  map,
+  of,
+  throwError,
+  zip,
+  switchMap,
+  tap,
+} from 'rxjs';
 
 import { AtLeastDeep } from '@k5cjs/types';
 import { EffectsModule } from '@ngrx/effects';
 import { IdSelector, createEntityAdapter } from '@ngrx/entity';
-import { Action, Store, StoreModule, createAction, createReducer, on, props } from '@ngrx/store';
+import {
+  Action,
+  Store,
+  StoreModule,
+  createAction,
+  createReducer,
+  on,
+  props,
+  ActionReducer,
+} from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
-import { ActionsBase } from './store.actions';
+import { ActionsBase, GLOBAL_ACTIONS } from './store.actions';
 import { EffectsBase } from './store.effects';
 import { HttpServiceBase } from './store.http.service';
 import { reducerBase, stateBase } from './store.reducer';
 import { SelectorsBase } from './store.selectors';
 import { StoreServiceBase } from './store.service';
-import { ActionInit, HttpParams, Options, Params, StateBase } from './store.type';
+import {
+  ActionInit,
+  HttpParams,
+  Options,
+  Params,
+  StateBase,
+} from './store.type';
 
-const SELECT_ID_TOKEN = new InjectionToken<IdSelector<FeatureStoreType>>('SELECT_ID');
+const SELECT_ID_TOKEN = new InjectionToken<IdSelector<FeatureStoreType>>(
+  'SELECT_ID'
+);
 
 const key = 'store';
 
@@ -53,32 +81,40 @@ function reducer(selectId: IdSelector<FeatureStoreType> | null) {
 
       ...reducerBase(adapter(selectId), actions),
 
-      on(createAction('set', props<{ payload: State }>()), (_, { payload }): StateBase<FeatureStoreType> => payload),
+      on(
+        createAction('set', props<{ payload: State }>()),
+        (_, { payload }): StateBase<FeatureStoreType> => payload
+      ),
 
       on(createAction('reset'), (state): StateBase<FeatureStoreType> => {
         reloadSelectors += 10;
 
         return { ...state, reloadSelectors };
-      }),
+      })
     )(state, action);
   };
 }
 
 class Selectors extends SelectorsBase<FeatureStoreType> {}
 
-const selectors = (selectId: IdSelector<FeatureStoreType> | null) => new Selectors(key, adapter(selectId));
+const selectors = (selectId: IdSelector<FeatureStoreType> | null) =>
+  new Selectors(key, adapter(selectId));
 
 @Injectable({ providedIn: 'root' })
 class HttpService extends HttpServiceBase<FeatureStoreType> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getByQuery(_options: ActionInit<HttpParams>): Observable<{ items: FeatureStoreType[] }> {
+  getByQuery(
+    _options: ActionInit<HttpParams>
+  ): Observable<{ items: FeatureStoreType[] }> {
     return of({ items: [], total: 0 });
   }
 
   test = 0;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getById(_options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
+  getById(
+    _options: ActionInit<{ item: Pick<FeatureStoreType, 'id'> }>
+  ): Observable<{ item: FeatureStoreType }> {
     if (this.test) {
       return of({ item: { id: '1', name: 'first' } });
     }
@@ -90,23 +126,29 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
 
   delete(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>,
+    _options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>
   ): Observable<{ item: FeatureStoreType }> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  create(_options: ActionInit<{ item: Omit<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
+  create(
+    _options: ActionInit<{ item: Omit<FeatureStoreType, 'id'> }>
+  ): Observable<{ item: FeatureStoreType }> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(_options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>): Observable<{ item: FeatureStoreType }> {
+  update(
+    _options: ActionInit<{ item: AtLeastDeep<FeatureStoreType, 'id'> }>
+  ): Observable<{ item: FeatureStoreType }> {
     throw new Error('Method not implemented.');
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  updateAll(_options: ActionInit<{ items: AtLeastDeep<FeatureStoreType, 'id'>[] }>): Observable<{
+  updateAll(
+    _options: ActionInit<{ items: AtLeastDeep<FeatureStoreType, 'id'>[] }>
+  ): Observable<{
     items: FeatureStoreType[];
   }> {
     throw new Error('Method not implemented.');
@@ -117,28 +159,32 @@ class HttpService extends HttpServiceBase<FeatureStoreType> {
 class Effects extends EffectsBase<FeatureStoreType> {
   constructor(
     http: HttpService,
-    @Optional()
-    @Inject(SELECT_ID_TOKEN)
-    selectId: IdSelector<FeatureStoreType> | null,
+    @Inject(SELECTOR_TOKEN)
+    selectors: Selectors
   ) {
-    super(actions, selectors(selectId), http);
+    super(actions, selectors, http);
   }
 }
 
 @Injectable({ providedIn: 'root' })
 class StoreService extends StoreServiceBase<FeatureStoreType> {
   constructor(
-    @Optional()
-    @Inject(SELECT_ID_TOKEN)
-    selectId: IdSelector<FeatureStoreType> | null,
+    @Inject(SELECTOR_TOKEN)
+    selectors: Selectors
   ) {
-    super(actions, selectors(selectId));
+    super(actions, selectors);
   }
 
   override getByQuery(
-    options: Options<Params, unknown, { items: unknown[]; name: string; age: number }>,
+    options: Options<
+      Params,
+      unknown,
+      { items: unknown[]; name: string; age: number }
+    >
   ): Observable<{ items: FeatureStoreType[]; total: number }>;
-  override getByQuery(options: Options<Params>): Observable<{ items: FeatureStoreType[] } & Params> {
+  override getByQuery(
+    options: Options<Params>
+  ): Observable<{ items: FeatureStoreType[] } & Params> {
     return super.getByQuery(options);
   }
 
@@ -158,7 +204,10 @@ describe('Store', () => {
       imports: [
         StoreModule.forRoot({ [key]: reducer(null) }),
         EffectsModule.forRoot([Effects]),
-        StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+        StoreDevtoolsModule.instrument({
+          maxAge: 100,
+          name: 'Orbility back office',
+        }),
       ],
       teardown: {
         destroyAfterEach: false,
@@ -167,25 +216,32 @@ describe('Store', () => {
 
     service = TestBed.inject(StoreService);
     http = TestBed.inject(HttpService);
-    store = TestBed.inject(Store) as Store<{ [key]: StateBase<FeatureStoreType> }>;
+    store = TestBed.inject(Store) as Store<{
+      [key]: StateBase<FeatureStoreType>;
+    }>;
 
     store.dispatch({ type: 'reset' });
   });
 
   it('getByQuery success', fakeAsync(() => {
-    spyOn(http, 'getByQuery').and.returnValue(of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }));
+    spyOn(http, 'getByQuery').and.returnValue(
+      of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } })
+    );
 
     let expected: { items: unknown[]; total: number };
     service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
 
     flush();
 
-    expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+    expect(expected!).toEqual({
+      items: [{ id: '1', name: 'first' }],
+      total: 1,
+    });
   }));
 
   it('prevent request if subscribe is not called', fakeAsync(() => {
     const spy = spyOn(http, 'getByQuery').and.returnValue(
-      of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }),
+      of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } })
     );
 
     service.getByQuery({ params: {} });
@@ -221,7 +277,10 @@ describe('Store', () => {
 
     flush();
 
-    expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+    expect(expected!).toEqual({
+      items: [{ id: '1', name: 'first' }],
+      total: 1,
+    });
   }));
 
   it('getByQuery error', fakeAsync(() => {
@@ -229,8 +288,8 @@ describe('Store', () => {
       of({ items: [{ id: '1', name: 'first' }], total: 1 }).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
@@ -242,17 +301,23 @@ describe('Store', () => {
     });
 
     let expectedErrorFromError: unknown;
-    service.error({ params: {} }).subscribe((value) => (expectedErrorFromError = value));
+    service
+      .error({ params: {} })
+      .subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('getById success', fakeAsync(() => {
-    spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first' } }));
+    spyOn(http, 'getById').and.returnValue(
+      of({ item: { id: '1', name: 'first' } })
+    );
 
     let expected: { item: FeatureStoreType };
     service
@@ -288,7 +353,9 @@ describe('Store', () => {
 
     let expected: { item: FeatureStoreType };
 
-    service.getById({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+    service
+      .getById({ params: { item: { id: '1' } } })
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -300,8 +367,8 @@ describe('Store', () => {
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
@@ -313,20 +380,28 @@ describe('Store', () => {
     });
 
     let expectedErrorFromError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+    service
+      .error({ params: { item: { id: '1' } } })
+      .subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
   it('create success', fakeAsync(() => {
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '1', name: 'created' } }));
+    spyOn(http, 'create').and.returnValue(
+      of({ item: { id: '1', name: 'created' } })
+    );
 
     let expected: { item: FeatureStoreType };
-    service.create({ params: { item: { name: 'test create' } }, first: true }).subscribe((value) => (expected = value));
+    service
+      .create({ params: { item: { name: 'test create' } }, first: true })
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -344,17 +419,25 @@ describe('Store', () => {
         errors: {},
         loadings: {},
         queries: {
-          [service.query({ params: { item: { name: 'first' } } })]: { ids: ['1'] },
+          [service.query({ params: { item: { name: 'first' } } })]: {
+            ids: ['1'],
+          },
         },
         reloadSelectors,
       },
     });
 
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'created' } }));
+    spyOn(http, 'create').and.returnValue(
+      of({ item: { id: '2', name: 'created' } })
+    );
 
     let expected: { item: FeatureStoreType };
     service
-      .create({ params: { item: { name: 'created' } }, resetQueries: false, first: true })
+      .create({
+        params: { item: { name: 'created' } },
+        resetQueries: false,
+        first: true,
+      })
       .subscribe((value) => (expected = value));
 
     flush();
@@ -380,8 +463,12 @@ describe('Store', () => {
         [service.query({ params: { item: { name: 'created' } } })]: false,
       },
       queries: {
-        [service.query({ params: { item: { name: 'first' } } })]: { ids: ['1'] },
-        [service.query({ params: { item: { name: 'created' } } })]: { ids: ['2'] },
+        [service.query({ params: { item: { name: 'first' } } })]: {
+          ids: ['1'],
+        },
+        [service.query({ params: { item: { name: 'created' } } })]: {
+          ids: ['2'],
+        },
       },
       reloadSelectors,
     });
@@ -392,8 +479,8 @@ describe('Store', () => {
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
@@ -407,12 +494,16 @@ describe('Store', () => {
     flush();
 
     let expectedErrorFromError: unknown;
-    service.error({ params: { item: { name: 'test update' } } }).subscribe((value) => (expectedErrorFromError = value));
+    service
+      .error({ params: { item: { name: 'test update' } } })
+      .subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
@@ -431,10 +522,14 @@ describe('Store', () => {
       },
     });
 
-    spyOn(http, 'update').and.returnValue(of({ item: { id: '1', name: 'after update' } }));
+    spyOn(http, 'update').and.returnValue(
+      of({ item: { id: '1', name: 'after update' } })
+    );
 
     let expected: { item: FeatureStoreType };
-    service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe((value) => (expected = value));
+    service
+      .update({ params: { item: { id: '1', name: 'test update' } } })
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -460,17 +555,19 @@ describe('Store', () => {
       of({ item: { id: '1', name: 'first' } }).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
     let expectedError: unknown;
 
-    service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe({
-      next: () => (expected = 'next'),
-      error: (error: unknown) => (expectedError = error),
-    });
+    service
+      .update({ params: { item: { id: '1', name: 'test update' } } })
+      .subscribe({
+        next: () => (expected = 'next'),
+        error: (error: unknown) => (expectedError = error),
+      });
 
     let expectedErrorFromError: unknown;
     service
@@ -480,7 +577,9 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
@@ -506,7 +605,7 @@ describe('Store', () => {
           { id: '1', name: 'first item test update all' },
           { id: '2', name: 'second item test update all' },
         ],
-      }),
+      })
     );
 
     let expected: { items: FeatureStoreType[] };
@@ -556,8 +655,8 @@ describe('Store', () => {
       }).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
@@ -592,7 +691,9 @@ describe('Store', () => {
     flush();
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
   }));
 
@@ -611,10 +712,14 @@ describe('Store', () => {
       },
     });
 
-    spyOn(http, 'delete').and.returnValue(of({ item: { id: '1', name: 'first' } }));
+    spyOn(http, 'delete').and.returnValue(
+      of({ item: { id: '1', name: 'first' } })
+    );
 
     let expected: boolean | undefined = true;
-    service.delete({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+    service
+      .delete({ params: { item: { id: '1' } } })
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -660,8 +765,8 @@ describe('Store', () => {
       of(undefined).pipe(
         map(() => {
           throw new HttpErrorResponse({ error: 'error message' });
-        }),
-      ),
+        })
+      )
     );
 
     let expected: unknown;
@@ -675,7 +780,9 @@ describe('Store', () => {
     flush();
 
     let expectedErrorFromError: unknown;
-    service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+    service
+      .error({ params: { item: { id: '1' } } })
+      .subscribe((value) => (expectedErrorFromError = value));
 
     flush();
 
@@ -686,7 +793,9 @@ describe('Store', () => {
       .subscribe((value) => (expectedState = value));
 
     expect(expected).toBeUndefined();
-    expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+    expect(expectedError).toEqual(
+      new HttpErrorResponse({ error: 'error message' })
+    );
     expect(expectedError).toEqual(expectedErrorFromError);
 
     expect(expectedState!).toEqual({
@@ -695,7 +804,8 @@ describe('Store', () => {
         '1': { id: '1', name: 'first' },
       },
       errors: {
-        [service.query({ params: { item: { id: '1' } } })]: new HttpErrorResponse({ error: 'error message' }),
+        [service.query({ params: { item: { id: '1' } } })]:
+          new HttpErrorResponse({ error: 'error message' }),
       },
       loadings: {
         [service.query({ params: { item: { id: '1' } } })]: false,
@@ -717,11 +827,13 @@ describe('Store', () => {
           { id: '2', name: 'second' },
         ],
         config: { total: 2 },
-      }),
+      })
     );
 
     let expected: { items: FeatureStoreType[]; total: number };
-    service.getByQuery({ params: { limit: 10 } }).subscribe((value) => (expected = value));
+    service
+      .getByQuery({ params: { limit: 10 } })
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -730,9 +842,13 @@ describe('Store', () => {
       total: 1,
     });
 
-    spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'second' } }));
+    spyOn(http, 'create').and.returnValue(
+      of({ item: { id: '2', name: 'second' } })
+    );
 
-    service.create({ params: { item: { name: 'test create' }, age: 10 } }).subscribe();
+    service
+      .create({ params: { item: { name: 'test create' }, age: 10 } })
+      .subscribe();
 
     flush();
 
@@ -749,17 +865,20 @@ describe('Store', () => {
         '2': { id: '2', name: 'second' },
       },
       errors: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: undefined,
+        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]:
+          undefined,
         [service.query({ params: { limit: 10 } })]: undefined,
       },
       loadings: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: false,
+        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]:
+          false,
         [service.query({ params: { limit: 10 } })]: false,
       },
       queries: {
-        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: {
-          ids: ['2'],
-        },
+        [service.query({ params: { item: { name: 'test create' }, age: 10 } })]:
+          {
+            ids: ['2'],
+          },
         [service.query({ params: { limit: 10 } })]: {
           ids: ['1', '2'],
           total: 2,
@@ -780,7 +899,7 @@ describe('Store', () => {
         config: {
           total: 3,
         },
-      }),
+      })
     );
 
     let expected: { items: unknown[]; total: number };
@@ -797,7 +916,9 @@ describe('Store', () => {
       total: 3,
     });
 
-    spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first', age: 18 } }));
+    spyOn(http, 'getById').and.returnValue(
+      of({ item: { id: '1', name: 'first', age: 18 } })
+    );
 
     type Full = FeatureStoreType & { age: number };
     let expectedFull: { item: Full };
@@ -809,7 +930,9 @@ describe('Store', () => {
 
     flush();
 
-    expect(expectedFull!).toEqual({ item: { id: '1', name: 'first', age: 18 } });
+    expect(expectedFull!).toEqual({
+      item: { id: '1', name: 'first', age: 18 },
+    });
   }));
 
   it('call before', fakeAsync(() => {
@@ -845,7 +968,7 @@ describe('Store', () => {
           name: 'Cristian',
           age: 18,
         },
-      }),
+      })
     );
 
     let expected: { items: unknown[]; total: number };
@@ -943,7 +1066,9 @@ describe('Store', () => {
     flush();
 
     let expectedQuery: { items: FeatureStoreType[] };
-    service.byQuery({ siteId: 10 }).subscribe((value) => (expectedQuery = value));
+    service
+      .byQuery({ siteId: 10 })
+      .subscribe((value) => (expectedQuery = value));
 
     expect(expected!).toEqual({
       items: [
@@ -976,7 +1101,9 @@ describe('Store', () => {
     flush();
 
     let expectedQueryExactQuery: { items: FeatureStoreType[] };
-    service.byQuery({ siteId: 10 }).subscribe((value) => (expectedQueryExactQuery = value));
+    service
+      .byQuery({ siteId: 10 })
+      .subscribe((value) => (expectedQueryExactQuery = value));
 
     expect(expectedExactQuery!).toEqual({
       items: [
@@ -1077,7 +1204,9 @@ describe('Store', () => {
 
   it('check queryOne in selector', fakeAsync(() => {
     let expected: undefined | { item: FeatureStoreType };
-    store.select(selectors(null).queryOne('undefined')).subscribe((value) => (expected = value));
+    store
+      .select(selectors(null).queryOne('undefined'))
+      .subscribe((value) => (expected = value));
 
     flush();
 
@@ -1088,7 +1217,7 @@ describe('Store', () => {
     spyOn(http, 'getById').and.returnValues(
       of({ item: { id: '1', name: 'first' } }),
       throwError(() => new HttpErrorResponse({ error: 'Error message' })),
-      of({ item: { id: '3', name: 'third' } }),
+      of({ item: { id: '3', name: 'third' } })
     );
 
     let expected1: unknown;
@@ -1099,8 +1228,12 @@ describe('Store', () => {
       service.getById({ params: { item: { id: '1' } } }),
       service
         .getById({ params: { item: { id: '2' } } })
-        .pipe(catchError(({ error }: { error: string }) => of(new HttpErrorResponse({ error })))),
-      service.getById({ params: { item: { id: '3' } } }),
+        .pipe(
+          catchError(({ error }: { error: string }) =>
+            of(new HttpErrorResponse({ error }))
+          )
+        ),
+      service.getById({ params: { item: { id: '3' } } })
     ).subscribe(([result1, result2, result3]) => {
       expected1 = result1;
       expected2 = result2;
@@ -1110,15 +1243,19 @@ describe('Store', () => {
     flush();
 
     expect(expected1).toEqual({ item: { id: '1', name: 'first' } });
-    expect(expected2).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected2).toEqual(
+      new HttpErrorResponse({ error: 'Error message' })
+    );
     expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
   }));
 
   it('check paralel dispaches', fakeAsync(() => {
     spyOn(http, 'getById').and.returnValues(
       of({ item: { id: '1', name: 'first' } }).pipe(delay(300)),
-      throwError(() => new HttpErrorResponse({ error: 'Error message' })).pipe(delay(200)),
-      of({ item: { id: '3', name: 'third' } }).pipe(delay(100)),
+      throwError(() => new HttpErrorResponse({ error: 'Error message' })).pipe(
+        delay(200)
+      ),
+      of({ item: { id: '3', name: 'third' } }).pipe(delay(100))
     );
 
     let expected1: unknown;
@@ -1129,8 +1266,12 @@ describe('Store', () => {
       service.getById({ params: { item: { id: '1' } } }),
       service
         .getById({ params: { item: { id: '2' } } })
-        .pipe(catchError(({ error }: { error: string }) => of(new HttpErrorResponse({ error })))),
-      service.getById({ params: { item: { id: '3' } } }),
+        .pipe(
+          catchError(({ error }: { error: string }) =>
+            of(new HttpErrorResponse({ error }))
+          )
+        ),
+      service.getById({ params: { item: { id: '3' } } })
     ).subscribe(([result1, result2, result3]) => {
       expected1 = result1;
       expected2 = result2;
@@ -1149,7 +1290,9 @@ describe('Store', () => {
     flush();
 
     expect(expected1).toEqual({ item: { id: '1', name: 'first' } });
-    expect(expected2).toEqual(new HttpErrorResponse({ error: 'Error message' }));
+    expect(expected2).toEqual(
+      new HttpErrorResponse({ error: 'Error message' })
+    );
     expect(expected3).toEqual({ item: { id: '3', name: 'third' } });
     expect(expectedState!).toEqual({
       ids: ['3', '1'],
@@ -1165,7 +1308,8 @@ describe('Store', () => {
       },
       errors: {
         [service.query({ params: { item: { id: '1' } } })]: undefined,
-        [service.query({ params: { item: { id: '2' } } })]: new HttpErrorResponse({ error: 'Error message' }),
+        [service.query({ params: { item: { id: '2' } } })]:
+          new HttpErrorResponse({ error: 'Error message' }),
         [service.query({ params: { item: { id: '3' } } })]: undefined,
       },
       loadings: {
@@ -1187,6 +1331,7 @@ describe('Store', () => {
 
   describe('Store with select id', () => {
     const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
+    const selector = selectors(selectId);
 
     beforeEach(() => {
       TestBed.resetTestingModule();
@@ -1195,7 +1340,10 @@ describe('Store', () => {
         imports: [
           StoreModule.forRoot({ [key]: reducer(selectId) }),
           EffectsModule.forRoot([Effects]),
-          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'Orbility back office' }),
+          StoreDevtoolsModule.instrument({
+            maxAge: 100,
+            name: 'Orbility back office',
+          }),
         ],
         teardown: {
           destroyAfterEach: false,
@@ -1210,20 +1358,29 @@ describe('Store', () => {
 
       service = TestBed.inject(StoreService);
       http = TestBed.inject(HttpService);
-      store = TestBed.inject(Store) as Store<{ [key]: StateBase<FeatureStoreType> }>;
+      store = TestBed.inject(Store) as Store<{
+        [key]: StateBase<FeatureStoreType>;
+      }>;
 
       store.dispatch({ type: 'reset' });
     });
 
     it('getByQuery success', fakeAsync(() => {
-      spyOn(http, 'getByQuery').and.returnValue(of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } }));
+      spyOn(http, 'getByQuery').and.returnValue(
+        of({ items: [{ id: '1', name: 'first' }], config: { total: 1 } })
+      );
 
       let expected: { items: unknown[]; total: number };
-      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+      service
+        .getByQuery({ params: {} })
+        .subscribe((value) => (expected = value));
 
       flush();
 
-      expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+      expect(expected!).toEqual({
+        items: [{ id: '1', name: 'first' }],
+        total: 1,
+      });
     }));
 
     it('getByQuery is loaded', fakeAsync(() => {
@@ -1248,11 +1405,16 @@ describe('Store', () => {
 
       let expected: { items: unknown[]; total: number };
 
-      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+      service
+        .getByQuery({ params: {} })
+        .subscribe((value) => (expected = value));
 
       flush();
 
-      expect(expected!).toEqual({ items: [{ id: '1', name: 'first' }], total: 1 });
+      expect(expected!).toEqual({
+        items: [{ id: '1', name: 'first' }],
+        total: 1,
+      });
     }));
 
     it('getByQuery error', fakeAsync(() => {
@@ -1260,8 +1422,8 @@ describe('Store', () => {
         of({ items: [{ id: '1', name: 'first' }], total: 1 }).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
@@ -1273,17 +1435,23 @@ describe('Store', () => {
       });
 
       let expectedErrorFromError: unknown;
-      service.error({ params: {} }).subscribe((value) => (expectedErrorFromError = value));
+      service
+        .error({ params: {} })
+        .subscribe((value) => (expectedErrorFromError = value));
 
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('getById success', fakeAsync(() => {
-      spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first' } }));
+      spyOn(http, 'getById').and.returnValue(
+        of({ item: { id: '1', name: 'first' } })
+      );
 
       let expected: { item: FeatureStoreType };
       service
@@ -1319,7 +1487,9 @@ describe('Store', () => {
 
       let expected: { item: FeatureStoreType };
 
-      service.getById({ params: { item: { id: '1' } } }).subscribe((value) => (expected = value));
+      service
+        .getById({ params: { item: { id: '1' } } })
+        .subscribe((value) => (expected = value));
 
       flush();
 
@@ -1331,8 +1501,8 @@ describe('Store', () => {
         of({ item: { id: '1', name: 'first' } }).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
@@ -1344,17 +1514,23 @@ describe('Store', () => {
       });
 
       let expectedErrorFromError: unknown;
-      service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+      service
+        .error({ params: { item: { id: '1' } } })
+        .subscribe((value) => (expectedErrorFromError = value));
 
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
     it('create success', fakeAsync(() => {
-      spyOn(http, 'create').and.returnValue(of({ item: { id: '1', name: 'created' } }));
+      spyOn(http, 'create').and.returnValue(
+        of({ item: { id: '1', name: 'created' } })
+      );
 
       let expected: { item: FeatureStoreType };
       service
@@ -1377,17 +1553,25 @@ describe('Store', () => {
           errors: {},
           loadings: {},
           queries: {
-            [service.query({ params: { item: { name: 'first' } } })]: { ids: [selectId({ id: '1', name: 'first' })] },
+            [service.query({ params: { item: { name: 'first' } } })]: {
+              ids: [selectId({ id: '1', name: 'first' })],
+            },
           },
           reloadSelectors,
         },
       });
 
-      spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'created' } }));
+      spyOn(http, 'create').and.returnValue(
+        of({ item: { id: '2', name: 'created' } })
+      );
 
       let expected: { item: FeatureStoreType };
       service
-        .create({ params: { item: { name: 'created' } }, resetQueries: false, first: true })
+        .create({
+          params: { item: { name: 'created' } },
+          resetQueries: false,
+          first: true,
+        })
         .subscribe((value) => (expected = value));
 
       flush();
@@ -1401,10 +1585,16 @@ describe('Store', () => {
       expect(expected!).toEqual({ item: { id: '2', name: 'created' } });
 
       expect(expectedState!).toEqual({
-        ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'created' })],
+        ids: [
+          selectId({ id: '1', name: 'first' }),
+          selectId({ id: '2', name: 'created' }),
+        ],
         entities: {
           [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-          [selectId({ id: '2', name: 'created' })]: { id: '2', name: 'created' },
+          [selectId({ id: '2', name: 'created' })]: {
+            id: '2',
+            name: 'created',
+          },
         },
         errors: {
           [service.query({ params: { item: { name: 'created' } } })]: undefined,
@@ -1413,8 +1603,12 @@ describe('Store', () => {
           [service.query({ params: { item: { name: 'created' } } })]: false,
         },
         queries: {
-          [service.query({ params: { item: { name: 'first' } } })]: { ids: [selectId({ id: '1', name: 'first' })] },
-          [service.query({ params: { item: { name: 'created' } } })]: { ids: [selectId({ id: '2', name: 'created' })] },
+          [service.query({ params: { item: { name: 'first' } } })]: {
+            ids: [selectId({ id: '1', name: 'first' })],
+          },
+          [service.query({ params: { item: { name: 'created' } } })]: {
+            ids: [selectId({ id: '2', name: 'created' })],
+          },
         },
         reloadSelectors,
       });
@@ -1425,8 +1619,8 @@ describe('Store', () => {
         of({ item: { id: '1', name: 'first' } }).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
@@ -1447,7 +1641,9 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
@@ -1457,7 +1653,11 @@ describe('Store', () => {
         payload: {
           ids: [selectId({ id: '1', name: 'first' })],
           entities: {
-            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 18 },
+            [selectId({ id: '1', name: 'first' })]: {
+              id: '1',
+              name: 'first',
+              age: 18,
+            },
           },
           errors: {},
           loadings: {},
@@ -1466,7 +1666,9 @@ describe('Store', () => {
         },
       });
 
-      spyOn(http, 'update').and.returnValue(of({ item: { id: '1', name: 'first', age: 30 } }));
+      spyOn(http, 'update').and.returnValue(
+        of({ item: { id: '1', name: 'first', age: 30 } })
+      );
 
       let expected: { item: FeatureStoreType };
 
@@ -1498,17 +1700,19 @@ describe('Store', () => {
         of({ item: { id: '1', name: 'first' } }).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
       let expectedError: unknown;
 
-      service.update({ params: { item: { id: '1', name: 'test update' } } }).subscribe({
-        next: () => (expected = 'next'),
-        error: (error: unknown) => (expectedError = error),
-      });
+      service
+        .update({ params: { item: { id: '1', name: 'test update' } } })
+        .subscribe({
+          next: () => (expected = 'next'),
+          error: (error: unknown) => (expectedError = error),
+        });
 
       let expectedErrorFromError: unknown;
       service
@@ -1518,7 +1722,9 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
@@ -1532,9 +1738,21 @@ describe('Store', () => {
             selectId({ id: '1', name: 'first' }),
           ],
           entities: {
-            [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second', age: 13 },
-            [selectId({ id: '1', name: 'third' })]: { id: '1', name: 'third', age: 13 },
-            [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first', age: 12 },
+            [selectId({ id: '2', name: 'second' })]: {
+              id: '2',
+              name: 'second',
+              age: 13,
+            },
+            [selectId({ id: '1', name: 'third' })]: {
+              id: '1',
+              name: 'third',
+              age: 13,
+            },
+            [selectId({ id: '1', name: 'first' })]: {
+              id: '1',
+              name: 'first',
+              age: 12,
+            },
           },
           errors: {},
           loadings: {},
@@ -1550,7 +1768,7 @@ describe('Store', () => {
             { id: '2', name: 'second', age: 24 },
             { id: '1', name: 'third', age: 70 },
           ],
-        }),
+        })
       );
 
       let expected: { items: FeatureStoreType[] };
@@ -1581,10 +1799,16 @@ describe('Store', () => {
       store.dispatch({
         type: 'set',
         payload: {
-          ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+          ids: [
+            selectId({ id: '1', name: 'first' }),
+            selectId({ id: '2', name: 'second' }),
+          ],
           entities: {
             [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-            [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second' },
+            [selectId({ id: '2', name: 'second' })]: {
+              id: '2',
+              name: 'second',
+            },
           },
           errors: {},
           loadings: {},
@@ -1602,8 +1826,8 @@ describe('Store', () => {
         }).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
@@ -1638,7 +1862,9 @@ describe('Store', () => {
       flush();
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
     }));
 
@@ -1657,10 +1883,14 @@ describe('Store', () => {
         },
       });
 
-      spyOn(http, 'delete').and.returnValue(of({ item: { id: '1', name: 'first' } }));
+      spyOn(http, 'delete').and.returnValue(
+        of({ item: { id: '1', name: 'first' } })
+      );
 
       let expected: boolean | undefined = true;
-      service.delete({ params: { item: { id: '1', name: 'first' } } }).subscribe((value) => (expected = value));
+      service
+        .delete({ params: { item: { id: '1', name: 'first' } } })
+        .subscribe((value) => (expected = value));
 
       flush();
 
@@ -1677,13 +1907,16 @@ describe('Store', () => {
         ids: [],
         entities: {},
         errors: {
-          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]:
+            undefined,
         },
         loadings: {
-          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]:
+            undefined,
         },
         queries: {
-          [service.query({ params: { item: { id: '1', name: 'first' } } })]: undefined,
+          [service.query({ params: { item: { id: '1', name: 'first' } } })]:
+            undefined,
         },
         reloadSelectors,
       });
@@ -1708,8 +1941,8 @@ describe('Store', () => {
         of(undefined).pipe(
           map(() => {
             throw new HttpErrorResponse({ error: 'error message' });
-          }),
-        ),
+          })
+        )
       );
 
       let expected: unknown;
@@ -1723,7 +1956,9 @@ describe('Store', () => {
       flush();
 
       let expectedErrorFromError: unknown;
-      service.error({ params: { item: { id: '1' } } }).subscribe((value) => (expectedErrorFromError = value));
+      service
+        .error({ params: { item: { id: '1' } } })
+        .subscribe((value) => (expectedErrorFromError = value));
 
       flush();
 
@@ -1734,7 +1969,9 @@ describe('Store', () => {
         .subscribe((value) => (expectedState = value));
 
       expect(expected).toBeUndefined();
-      expect(expectedError).toEqual(new HttpErrorResponse({ error: 'error message' }));
+      expect(expectedError).toEqual(
+        new HttpErrorResponse({ error: 'error message' })
+      );
       expect(expectedError).toEqual(expectedErrorFromError);
 
       expect(expectedState!).toEqual({
@@ -1743,7 +1980,8 @@ describe('Store', () => {
           [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
         },
         errors: {
-          [service.query({ params: { item: { id: '1' } } })]: new HttpErrorResponse({ error: 'error message' }),
+          [service.query({ params: { item: { id: '1' } } })]:
+            new HttpErrorResponse({ error: 'error message' }),
         },
         loadings: {
           [service.query({ params: { item: { id: '1' } } })]: false,
@@ -1765,11 +2003,13 @@ describe('Store', () => {
             { id: '2', name: 'second' },
           ],
           config: { total: 2 },
-        }),
+        })
       );
 
       let expected: { items: FeatureStoreType[]; total: number };
-      service.getByQuery({ params: { limit: 10 } }).subscribe((value) => (expected = value));
+      service
+        .getByQuery({ params: { limit: 10 } })
+        .subscribe((value) => (expected = value));
 
       flush();
 
@@ -1778,9 +2018,13 @@ describe('Store', () => {
         total: 1,
       });
 
-      spyOn(http, 'create').and.returnValue(of({ item: { id: '2', name: 'second' } }));
+      spyOn(http, 'create').and.returnValue(
+        of({ item: { id: '2', name: 'second' } })
+      );
 
-      service.create({ params: { item: { name: 'test create' }, age: 10 } }).subscribe();
+      service
+        .create({ params: { item: { name: 'test create' }, age: 10 } })
+        .subscribe();
 
       flush();
 
@@ -1791,25 +2035,37 @@ describe('Store', () => {
         .subscribe((value) => (expectedState = value));
 
       expect(expectedState!).toEqual({
-        ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+        ids: [
+          selectId({ id: '1', name: 'first' }),
+          selectId({ id: '2', name: 'second' }),
+        ],
         entities: {
           [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
           [selectId({ id: '2', name: 'second' })]: { id: '2', name: 'second' },
         },
         errors: {
-          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: undefined,
+          [service.query({
+            params: { item: { name: 'test create' }, age: 10 },
+          })]: undefined,
           [service.query({ params: { limit: 10 } })]: undefined,
         },
         loadings: {
-          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: false,
+          [service.query({
+            params: { item: { name: 'test create' }, age: 10 },
+          })]: false,
           [service.query({ params: { limit: 10 } })]: false,
         },
         queries: {
-          [service.query({ params: { item: { name: 'test create' }, age: 10 } })]: {
+          [service.query({
+            params: { item: { name: 'test create' }, age: 10 },
+          })]: {
             ids: [selectId({ id: '2', name: 'second' })],
           },
           [service.query({ params: { limit: 10 } })]: {
-            ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+            ids: [
+              selectId({ id: '1', name: 'first' }),
+              selectId({ id: '2', name: 'second' }),
+            ],
             total: 2,
           },
         },
@@ -1828,11 +2084,13 @@ describe('Store', () => {
           config: {
             total: 3,
           },
-        }),
+        })
       );
 
       let expected: { items: unknown[]; total: number };
-      service.getByQuery({ params: {} }).subscribe((value) => (expected = value));
+      service
+        .getByQuery({ params: {} })
+        .subscribe((value) => (expected = value));
 
       flush();
 
@@ -1845,7 +2103,9 @@ describe('Store', () => {
         total: 3,
       });
 
-      spyOn(http, 'getById').and.returnValue(of({ item: { id: '1', name: 'first', age: 18 } }));
+      spyOn(http, 'getById').and.returnValue(
+        of({ item: { id: '1', name: 'first', age: 18 } })
+      );
 
       type Full = FeatureStoreType & { age: number };
       let expectedFull: { item: Full };
@@ -1857,7 +2117,9 @@ describe('Store', () => {
 
       flush();
 
-      expect(expectedFull!).toEqual({ item: { id: '1', name: 'first', age: 18 } });
+      expect(expectedFull!).toEqual({
+        item: { id: '1', name: 'first', age: 18 },
+      });
     }));
 
     it('call before', fakeAsync(() => {
@@ -1893,7 +2155,7 @@ describe('Store', () => {
             name: 'Cristian',
             age: 18,
           },
-        }),
+        })
       );
 
       let expected: { items: unknown[]; total: number };
@@ -1977,7 +2239,9 @@ describe('Store', () => {
 
       let expected: FeatureStoreType | undefined;
 
-      service.byId({ id: '1', name: 'first' }).subscribe((value) => (expected = value));
+      service
+        .byId({ id: '1', name: 'first' })
+        .subscribe((value) => (expected = value));
 
       flush();
 
@@ -1988,16 +2252,25 @@ describe('Store', () => {
       store.dispatch({
         type: 'set',
         payload: {
-          ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '2', name: 'second' })],
+          ids: [
+            selectId({ id: '1', name: 'first' }),
+            selectId({ id: '2', name: 'second' }),
+          ],
           entities: {
             [selectId({ id: '1', name: 'first' })]: { id: '1', name: 'first' },
-            [selectId({ id: '1', name: 'second' })]: { id: '2', name: 'second' },
+            [selectId({ id: '1', name: 'second' })]: {
+              id: '2',
+              name: 'second',
+            },
           },
           errors: {},
           loadings: {},
           queries: {
             [service.query({ params: { limit: 100 } })]: {
-              ids: [selectId({ id: '1', name: 'first' }), selectId({ id: '1', name: 'second' })],
+              ids: [
+                selectId({ id: '1', name: 'first' }),
+                selectId({ id: '1', name: 'second' }),
+              ],
             },
           },
           reloadSelectors,
@@ -2042,6 +2315,85 @@ describe('Store', () => {
       flush();
 
       expect(expected!).toBeTrue();
+    }));
+  });
+
+  describe('Store that test memoized after reset store', () => {
+    const selectId = ({ id, name }: FeatureStoreType) => `${id}-${name}`;
+    const selector = selectors(selectId);
+
+    beforeEach(() => {
+      TestBed.resetTestingModule();
+
+      function resetMetaReducer(
+        reducer: ActionReducer<State>
+      ): ActionReducer<State> {
+        return (state: State | undefined, action: Action): State => {
+          if (action.type === GLOBAL_ACTIONS.reset.type)
+            return reducer(undefined, action);
+
+          return reducer(state, action);
+        };
+      }
+
+      TestBed.configureTestingModule({
+        imports: [
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          StoreModule.forRoot(
+            { [key]: reducer(selectId) },
+            { metaReducers: [resetMetaReducer as any] }
+          ),
+          EffectsModule.forRoot([Effects]),
+          StoreDevtoolsModule.instrument({ maxAge: 100, name: 'store dev' }),
+        ],
+        teardown: {
+          destroyAfterEach: false,
+        },
+        providers: [
+          {
+            provide: SELECT_ID_TOKEN,
+            useValue: selectId,
+          },
+        ],
+      });
+
+      service = TestBed.inject(StoreService);
+      http = TestBed.inject(HttpService);
+      store = TestBed.inject(Store) as Store<{
+        [key]: StateBase<FeatureStoreType>;
+      }>;
+    });
+
+    it('check reload selectors after reset', fakeAsync(() => {
+      const query = { id: 'can-match' };
+
+      service
+        .set({
+          params: { items: [{ id: '1', name: 'test update' }], query },
+          first: true,
+        })
+        .pipe(
+          switchMap(() => service.byQuery(query).pipe(first())),
+          tap((expected) =>
+            expect(expected).toEqual({
+              items: [{ id: '1', name: 'test update' }],
+            })
+          ),
+          tap(() => store.dispatch(GLOBAL_ACTIONS.reset())),
+          switchMap(() =>
+            service.set({
+              params: { items: [{ id: '2', name: 'test update' }], query },
+              first: true,
+            })
+          ),
+          switchMap(() => service.byQuery(query).pipe(first())),
+          tap((expected) =>
+            expect(expected).toEqual({
+              items: [{ id: '2', name: 'test update' }],
+            })
+          )
+        )
+        .subscribe();
     }));
   });
 });

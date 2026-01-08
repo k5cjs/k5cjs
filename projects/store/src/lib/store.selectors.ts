@@ -1,6 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { EntityAdapter, EntityState, IdSelector } from '@ngrx/entity';
+import {
+  Dictionary,
+  EntityAdapter,
+  EntityState,
+  IdSelector,
+} from '@ngrx/entity';
 import {
   MemoizedSelector,
   createFeatureSelector,
@@ -11,13 +16,16 @@ import {
 
 import { StateBase } from './store.type';
 
-export const isEqualCheck = <T extends { id: PropertyKey }>(a: StateBase<T>, b: StateBase<T>) => {
+export const isEqualCheck = <T extends { id: PropertyKey }>(
+  a: StateBase<T>,
+  b: StateBase<T>
+) => {
   return a.reloadSelectors === b.reloadSelectors;
 };
 
 // eslint-disable-next-line @ngrx/prefix-selectors-with-select
 export const createSelectorFirstMemoized = createSelectorFactory((memoize) =>
-  defaultMemoize(memoize, isEqualCheck),
+  defaultMemoize(memoize, isEqualCheck)
 ) as typeof createSelector;
 
 export class SelectorsBase<T extends { id: PropertyKey }> {
@@ -30,13 +38,25 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
   >;
 
   entity: (
-    item: Partial<T>,
-  ) => MemoizedSelector<object, T | undefined, (s1: Record<ReturnType<IdSelector<T>>, T | undefined>) => T | undefined>;
+    item: Partial<T>
+  ) => MemoizedSelector<
+    object,
+    T | undefined,
+    (s1: Record<ReturnType<IdSelector<T>>, T | undefined>) => T | undefined
+  >;
 
   queries: MemoizedSelector<
     object,
-    Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>,
-    (s1: StateBase<T>) => Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>
+    Record<
+      PropertyKey,
+      { ids: ReturnType<IdSelector<T>>[] & object } | undefined
+    >,
+    (
+      s1: StateBase<T>
+    ) => Record<
+      PropertyKey,
+      { ids: ReturnType<IdSelector<T>>[] & object } | undefined
+    >
   >;
 
   errors: MemoizedSelector<
@@ -52,15 +72,17 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
   >;
 
   error: (
-    query: string,
+    query: string
   ) => MemoizedSelector<
     object,
     HttpErrorResponse | undefined,
-    (s1: Record<PropertyKey, HttpErrorResponse | undefined>) => HttpErrorResponse | undefined
+    (
+      s1: Record<PropertyKey, HttpErrorResponse | undefined>
+    ) => HttpErrorResponse | undefined
   >;
 
   loading: (
-    query: string,
+    query: string
   ) => MemoizedSelector<
     object,
     boolean | undefined,
@@ -68,12 +90,15 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
   >;
 
   query: (
-    query: string,
+    query: string
   ) => MemoizedSelector<
     object,
     { ids: ReturnType<IdSelector<T>>[] & object } | undefined,
     (
-      s1: Record<PropertyKey, { ids: ReturnType<IdSelector<T>>[] & object } | undefined>,
+      s1: Record<
+        PropertyKey,
+        { ids: ReturnType<IdSelector<T>>[] & object } | undefined
+      >
     ) => { ids: ReturnType<IdSelector<T>>[] & object } | undefined
   >;
 
@@ -83,7 +108,7 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     (
       //
       s1: { ids: ReturnType<IdSelector<T>>[] & object },
-      s2: Record<ReturnType<IdSelector<T>>, T | undefined>,
+      s2: Record<ReturnType<IdSelector<T>>, T | undefined>
     ) => { items: T[] } | undefined
   >;
 
@@ -93,9 +118,14 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     (
       //
       s1: { ids: ReturnType<IdSelector<T>>[] & object },
-      s2: Record<ReturnType<IdSelector<T>>, T | undefined>,
+      s2: Record<ReturnType<IdSelector<T>>, T | undefined>
     ) => { item: T } | undefined
   >;
+
+  private _memoizedSelectors: Map<
+    string,
+    MemoizedSelector<object, Dictionary<T>, (s1: StateBase<T>) => Dictionary<T>>
+  > = new Map();
 
   constructor(key: string, adapter: EntityAdapter<T>) {
     const selectState = createFeatureSelector<StateBase<T>>(key);
@@ -105,32 +135,50 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
     this.all = createSelector(selectState, selectAll);
     this.entities = createSelector(
       selectState,
-      selectEntities as (state: EntityState<T>) => Record<ReturnType<IdSelector<T>>, T | undefined>,
+      selectEntities as (
+        state: EntityState<T>
+      ) => Record<ReturnType<IdSelector<T>>, T | undefined>
     );
     this.entity = (item: Partial<T>) =>
-      createSelector(this.entities, (entities) => entities?.[adapter.selectId(item as T)]);
+      createSelector(
+        this.entities,
+        (entities) => entities?.[adapter.selectId(item as T)]
+      );
     this.queries = createSelector(selectState, (state) => state.queries);
     this.errors = createSelector(selectState, (state) => state.errors);
     this.loadings = createSelector(selectState, (state) => state.loadings);
 
-    this.error = (queryId: string) => createSelector(this.errors, (queries) => queries[queryId]);
-    this.loading = (queryId: string) => createSelector(this.loadings, (queries) => queries[queryId]);
+    this.error = (queryId: string) =>
+      createSelector(this.errors, (queries) => queries[queryId]);
+    this.loading = (queryId: string) =>
+      createSelector(this.loadings, (queries) => queries[queryId]);
 
-    this.query = (queryId: string) => createSelector(this.queries, (queries) => queries[queryId]);
+    this.query = (queryId: string) =>
+      createSelector(this.queries, (queries) => queries[queryId]);
 
-    const entitiesFirstMemoized = createSelectorFirstMemoized(selectState, (state) => state.entities);
+    const selectorFirstMemoized = createSelectorFirstMemoized(
+      selectState,
+      (state) => state.entities
+    );
+    this._memoizedSelectors.set('selectorFirstMemoized', selectorFirstMemoized);
 
     this.queryAll = (queryId: string) =>
-      createSelector(this.query(queryId), entitiesFirstMemoized, (query, entities) => {
-        if (!query) return undefined;
+      createSelector(
+        this.query(queryId),
+        selectorFirstMemoized,
+        (query, entities) => {
+          if (!query) return undefined;
 
-        const { ids, ...rest } = query;
+          const { ids, ...rest } = query;
 
-        return {
-          ...rest,
-          items: ids.map((selectId) => entities[selectId]).filter((item): item is T => !!item),
-        };
-      });
+          return {
+            ...rest,
+            items: ids
+              .map((selectId) => entities[selectId])
+              .filter((item): item is T => !!item),
+          };
+        }
+      );
 
     this.queryOne = (queryId: string) =>
       createSelector(this.query(queryId), this.entities, (query, entities) => {
@@ -146,5 +194,9 @@ export class SelectorsBase<T extends { id: PropertyKey }> {
           item: entities[selectId]!,
         };
       });
+  }
+
+  release() {
+    this._memoizedSelectors.forEach((selector) => selector.release());
   }
 }
