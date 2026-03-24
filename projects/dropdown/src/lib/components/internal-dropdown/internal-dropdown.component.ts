@@ -29,9 +29,8 @@ export class KcInternalDropdownComponent implements OnDestroy {
   private _dialogOverlayRef: OverlayRef | undefined;
 
   cdkOverlayConfig = {
-    hasBackdrop: true,
+    hasBackdrop: false,
     disposeOnNavigation: true,
-    backdropClass: 'cdk-overlay-transparent-backdrop',
   };
 
   @Output() dialogClosed = new EventEmitter<void>();
@@ -66,7 +65,15 @@ export class KcInternalDropdownComponent implements OnDestroy {
 
     this._dialogOverlayRef = overlayRef;
 
-    overlayRef.backdropClick().subscribe(() => this._closeDialog());
+    overlayRef.outsidePointerEvents().subscribe(() => this._closeDialog());
+
+    this._repositionOnScroll(overlayRef);
+  }
+
+  private _repositionOnScroll(overlayRef: OverlayRef): void {
+    const onScroll = () => overlayRef.updatePosition();
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    overlayRef.detachments().subscribe(() => window.removeEventListener('scroll', onScroll, true));
   }
 
   private _closeDialog(): void {
