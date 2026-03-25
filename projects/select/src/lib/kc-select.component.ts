@@ -200,9 +200,8 @@ export class KcSelectComponent<V, K, L>
 
     this._tabIndex = parseInt(tabIndex) || 0;
     this.cdkOverlayConfig = {
-      hasBackdrop: true,
+      hasBackdrop: false,
       disposeOnNavigation: true,
-      backdropClass: 'cdk-overlay-transparent-backdrop',
     };
   }
 
@@ -458,7 +457,7 @@ export class KcSelectComponent<V, K, L>
     overlayRef.attach(dialogPortal);
 
     overlayRef
-      .backdropClick()
+      .outsidePointerEvents()
       .pipe(takeUntilDestroyed(this._destroy))
       .subscribe(() => {
         this.close();
@@ -491,7 +490,14 @@ export class KcSelectComponent<V, K, L>
       }
     });
 
+    this._repositionOnScroll(overlayRef);
     this._dialogOverlayRef = overlayRef;
+  }
+
+  private _repositionOnScroll(overlayRef: OverlayRef): void {
+    const onScroll = () => overlayRef.updatePosition();
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    overlayRef.detachments().subscribe(() => window.removeEventListener('scroll', onScroll, true));
   }
 
   private _getPositionStrategy(
