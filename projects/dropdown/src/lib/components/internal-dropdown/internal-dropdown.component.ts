@@ -65,7 +65,10 @@ export class KcInternalDropdownComponent implements OnDestroy {
 
     this._dialogOverlayRef = overlayRef;
 
-    overlayRef.outsidePointerEvents().subscribe(() => this._closeDialog());
+    overlayRef.outsidePointerEvents().subscribe((event: MouseEvent) => {
+      if ((event.target as HTMLElement)?.closest('.cdk-overlay-pane')) return;
+      this._closeDialog();
+    });
 
     this._repositionOnScroll(overlayRef);
   }
