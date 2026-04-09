@@ -66,7 +66,8 @@ export class KcInternalDropdownComponent implements OnDestroy {
     this._dialogOverlayRef = overlayRef;
 
     overlayRef.outsidePointerEvents().subscribe((event: MouseEvent) => {
-      if ((event.target as HTMLElement)?.closest('.cdk-overlay-pane')) return;
+      const pane = (event.target as HTMLElement)?.closest('.cdk-overlay-pane');
+      if (pane && overlayRef.overlayElement.contains(pane)) return;
       this._closeDialog();
     });
 
@@ -77,6 +78,24 @@ export class KcInternalDropdownComponent implements OnDestroy {
     const onScroll = () => overlayRef.updatePosition();
     window.addEventListener('scroll', onScroll, { capture: true, passive: true });
     overlayRef.detachments().subscribe(() => window.removeEventListener('scroll', onScroll, true));
+
+    const origin: HTMLElement = this.icon.nativeElement;
+    const scrollParent = this._getScrollParent(origin);
+    if (!scrollParent) return;
+
+    const observer = new IntersectionObserver(([entry]) => !entry.isIntersecting && this._closeDialog(), {
+      root: scrollParent,
+    });
+    observer.observe(origin);
+    overlayRef.detachments().subscribe(() => observer.disconnect());
+  }
+
+  private _getScrollParent(node: HTMLElement): HTMLElement | null {
+    for (let el = node.parentElement; el; el = el.parentElement) {
+      const { overflowX, overflowY } = getComputedStyle(el);
+      if (/(auto|scroll|hidden)/.test(overflowX + overflowY)) return el;
+    }
+    return null;
   }
 
   private _closeDialog(): void {
