@@ -460,7 +460,8 @@ export class KcSelectComponent<V, K, L>
       .outsidePointerEvents()
       .pipe(takeUntilDestroyed(this._destroy))
       .subscribe((event) => {
-        if ((event.target as HTMLElement)?.closest('.cdk-overlay-pane')) return;
+        const pane = (event.target as HTMLElement)?.closest('.cdk-overlay-pane');
+        if (pane && overlayRef.overlayElement.contains(pane)) return;
         this.close();
         this._stateChanges.next();
       });
@@ -499,6 +500,24 @@ export class KcSelectComponent<V, K, L>
     const onScroll = () => overlayRef.updatePosition();
     window.addEventListener('scroll', onScroll, { capture: true, passive: true });
     overlayRef.detachments().subscribe(() => window.removeEventListener('scroll', onScroll, true));
+
+    const origin: HTMLElement = (this.origin?.elementRef || this.elementRef).nativeElement;
+    const scrollParent = this._getScrollParent(origin);
+    if (!scrollParent) return;
+
+    const observer = new IntersectionObserver(([entry]) => !entry.isIntersecting && this.close(), {
+      root: scrollParent,
+    });
+    observer.observe(origin);
+    overlayRef.detachments().subscribe(() => observer.disconnect());
+  }
+
+  private _getScrollParent(node: HTMLElement): HTMLElement | null {
+    for (let el = node.parentElement; el; el = el.parentElement) {
+      const { overflowX, overflowY } = getComputedStyle(el);
+      if (/(auto|scroll|hidden)/.test(overflowX + overflowY)) return el;
+    }
+    return null;
   }
 
   private _getPositionStrategy(
