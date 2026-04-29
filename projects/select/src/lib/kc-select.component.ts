@@ -460,8 +460,7 @@ export class KcSelectComponent<V, K, L>
       .outsidePointerEvents()
       .pipe(takeUntilDestroyed(this._destroy))
       .subscribe((event) => {
-        const pane = (event.target as HTMLElement)?.closest('.cdk-overlay-pane');
-        if (pane && overlayRef.overlayElement.contains(pane)) return;
+        if ((event.target as HTMLElement)?.closest('.cdk-overlay-pane')) return;
         this.close();
         this._stateChanges.next();
       });
