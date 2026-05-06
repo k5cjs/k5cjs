@@ -1,6 +1,6 @@
 {
   "name": "@k5cjs/dropdown",
-  "version": "16.0.4",
+  "version": "16.0.5",
   "peerDependencies": {
     "@angular/core": "^16.0.0",
     "@angular/cdk": "^16.0.0"

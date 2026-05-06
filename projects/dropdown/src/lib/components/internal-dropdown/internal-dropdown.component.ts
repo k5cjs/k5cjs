@@ -74,7 +74,10 @@ export class KcInternalDropdownComponent implements OnDestroy {
   }
 
   private _repositionOnScroll(overlayRef: OverlayRef): void {
-    const onScroll = () => overlayRef.updatePosition();
+    const onScroll = (event: Event) => {
+      if (overlayRef.overlayElement?.contains(event.target as Node)) return;
+      overlayRef.updatePosition();
+    };
     window.addEventListener('scroll', onScroll, { capture: true, passive: true });
     overlayRef.detachments().subscribe(() => window.removeEventListener('scroll', onScroll, true));
 
