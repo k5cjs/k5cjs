@@ -456,6 +456,21 @@ export class KcSelectComponent<V, K, L>
     const dialogPortal = new TemplatePortal(this.templateRef, this._viewContainerRef);
     overlayRef.attach(dialogPortal);
 
+    const originalUpdatePosition = overlayRef.updatePosition.bind(overlayRef);
+    overlayRef.updatePosition = () => {
+      const scrollers: Array<[Element, number, number]> = [];
+      overlayRef.overlayElement.querySelectorAll('*').forEach((el: Element) => {
+        if (el.scrollTop || el.scrollLeft) {
+          scrollers.push([el, el.scrollTop, el.scrollLeft]);
+        }
+      });
+      originalUpdatePosition();
+      for (const [el, top, left] of scrollers) {
+        if (el.scrollTop !== top) el.scrollTop = top;
+        if (el.scrollLeft !== left) el.scrollLeft = left;
+      }
+    };
+
     overlayRef
       .outsidePointerEvents()
       .pipe(takeUntilDestroyed(this._destroy))
