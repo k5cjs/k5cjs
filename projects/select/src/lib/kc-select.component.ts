@@ -475,7 +475,14 @@ export class KcSelectComponent<V, K, L>
       .outsidePointerEvents()
       .pipe(takeUntilDestroyed(this._destroy))
       .subscribe((event) => {
-        if ((event.target as HTMLElement)?.closest('.cdk-overlay-pane')) return;
+        const pane = (event.target as HTMLElement)?.closest('.cdk-overlay-pane');
+        if (
+          pane &&
+          (pane === overlayRef.overlayElement ||
+            overlayRef.overlayElement.compareDocumentPosition(pane) & Node.DOCUMENT_POSITION_FOLLOWING)
+        ) {
+          return;
+        }
         this.close();
         this._stateChanges.next();
       });
