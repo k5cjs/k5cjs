@@ -56,6 +56,9 @@ export class KcInternalDropdownComponent implements OnDestroy {
         .position()
         .flexibleConnectedTo(this.icon)
         .withPositions(POSITIONS)
+        .withFlexibleDimensions(false)
+        .withGrowAfterOpen(true)
+        .withLockedPosition(true)
         .withPush(false),
       ...this.cdkOverlayConfig,
     });
