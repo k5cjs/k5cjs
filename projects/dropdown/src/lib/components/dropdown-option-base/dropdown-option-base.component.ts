@@ -12,6 +12,6 @@ export class KcDropdownOptionBaseComponent {
   constructor(private _test: KcInternalDropdownComponent) {}
   @HostListener('click')
   onClick(): void {
-    this._test.open();
+    this._test.toggle();
   }
 }
