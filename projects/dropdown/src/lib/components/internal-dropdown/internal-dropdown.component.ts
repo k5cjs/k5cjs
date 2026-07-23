@@ -49,6 +49,14 @@ export class KcInternalDropdownComponent implements OnDestroy {
     this._closeDialog();
   }
 
+  toggle(): void {
+    if (this._dialogOverlayRef) {
+      this._closeDialog();
+    } else {
+      this._openDialog();
+    }
+  }
+
   private _openDialog(): void {
     const overlayRef = this._overlay.create({
       scrollStrategy: this._overlay.scrollStrategies.reposition(),
