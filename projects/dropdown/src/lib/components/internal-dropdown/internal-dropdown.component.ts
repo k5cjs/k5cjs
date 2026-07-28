@@ -100,6 +100,9 @@ export class KcInternalDropdownComponent implements OnDestroy {
       ) {
         return;
       }
+      // trigger clicks are handled by `toggle()`; closing here too would race it and reopen.
+      if (this.icon.nativeElement.contains(event.target as Node)) return;
+
       this._closeDialog();
     });
 

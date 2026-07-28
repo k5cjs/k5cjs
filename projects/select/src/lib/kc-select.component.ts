@@ -483,6 +483,10 @@ export class KcSelectComponent<V, K, L>
         ) {
           return;
         }
+        // trigger clicks are handled by `click()`/the origin listener; closing here too would race it and reopen.
+        const trigger = (this.origin?.elementRef || this.elementRef).nativeElement;
+        if (trigger.contains(event.target as Node)) return;
+
         this.close();
         this._stateChanges.next();
       });
